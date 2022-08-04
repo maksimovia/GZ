@@ -12,7 +12,6 @@ def init_REFPROP(path_to_refplot):
         RP.SETPATHdll(path_to_refplot)
         return RP
 
-
 def REFPROP_h_s(h, s, gas,fraction, RP):
     prop = RP.REFPROPdll(gas, 'HS', 'P;T;D;CV;CP;KV;Prandtl;TCX;VIS', 21, 0, 0, h, s, fraction)
     res = dict()
@@ -30,7 +29,6 @@ def REFPROP_h_s(h, s, gas,fraction, RP):
     res['Prandtl'] = prop1.Output[6] 
     res['L'] = prop1.Output[7] 
     return res
-
 
 def REFPROP_p_t(p, t, gas,fraction, RP):
     prop = RP.REFPROPdll(gas, 'PT', 'H;S;D;CV;CP;KV;Prandtl;TCX;VIS', 21, 0, 0, p, t, fraction)
@@ -50,7 +48,6 @@ def REFPROP_p_t(p, t, gas,fraction, RP):
     res['L'] = prop1.Output[7] 
     return res
 
-
 def REFPROP_p_h(p, h, gas,fraction, RP):
     prop = RP.REFPROPdll(gas, 'PH', 'T;S;D;CV;CP;KV;Prandtl;TCX;VIS', 21, 0, 0, p, h, fraction)
     res = dict()
@@ -69,7 +66,6 @@ def REFPROP_p_h(p, h, gas,fraction, RP):
     res['Prandtl'] = prop1.Output[6] 
     res['L'] = prop1.Output[7] 
     return res
-
 
 def REFPROP_p_s(p, s, gas,fraction, RP):
     prop = RP.REFPROPdll(gas, 'PS', 'T;H;D;CV;CP;KV;Prandtl;TCX;VIS', 21, 0, 0, p, s, fraction)
@@ -105,7 +101,6 @@ def REFPROP_t_q(t, q, gas,fraction, RP):
     res['h'] = prop.Output[2]/1000
     return res
 
-
 class Materials_prop:
     def __init__(self, mat_name, fraction, hs_func, pt_func, ph_func, ps_func,pq_func, tq_func, *args, **kwargs):
         self.__mat_name = mat_name
@@ -137,9 +132,3 @@ class Materials_prop:
     
     def t_q(self, t, q):
         return self.__pq_func(t=t+273.15, q=q, gas=self.__mat_name,fraction=self.__fraction, **self.__params)
-    
-
-# RP = init_REFPROP(r'C:\Program Files (x86)\MINI-REFPROP')
-# print(REFPROP_p_h_s(502390, 2110.4, 'CO2', RP))
-# mt = Materials_prop('CO2', REFPROP_p_t, REFPROP_p_h, REFPROP_h_s, RP=RP)
-# print(mt.h_s(502390, 2110.4))
