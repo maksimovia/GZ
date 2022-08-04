@@ -199,7 +199,7 @@ class vaporND:
             H22 = self.water.p_q(self.P2,1)['h']  
             T22 = self.water.p_h(self.P2,H22)['T']
             Dvd = self.water_streams.at['PEVD-DROS','G']
-            Hvd =self.water.p_q(self.P2,1)['h']
+            Hvd =self.water.p_q(self.P2,0)['h']
             G2 = (Q-Dvd*(Hvd-self.H21))/(H22-self.H21)
             dTmin= min(T11-T22,T12-T21)
             dTmax= max(T11-T22,T12-T21)
@@ -223,4 +223,9 @@ class vaporND:
         H22 = self.water.p_q(self.P2,1)['h']
         T22 = self.water.p_h(self.P2,H22)['T']
         G2 = Q/(H22-self.H21)
-        return [T12,self.P1,H12,self.G1,T22,self.P2,H22,G2,Q]
+        Hvd = self.water.p_q(self.P2,0)['h']
+        Tvd = self.water.p_q(self.P2,0)['T']
+        Pvd = self.P2
+        Dvd = self.water_streams.at['PEVD-DROS','G']
+        
+        return [T12,self.P1,H12,self.G1,T22,self.P2,H22,G2,Q,Tvd,Pvd,Hvd,Dvd]
