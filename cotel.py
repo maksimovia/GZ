@@ -165,5 +165,11 @@ class vapor:
         return [T12,self.P1,H12,self.G1,T22,self.P2,H22,G2,Q]
 
 
-# print(1)
-print('Igor smotri che mogy')
+    
+    
+    
+    print('Igor smotri che mogy')
+    
+    
+    
+    print('Test')
