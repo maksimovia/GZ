@@ -65,7 +65,7 @@ class heatex:
             T22 = self.water.p_h(P22,H22)['T']
             dTmin= min(T11-T22,T12-T21)
             dTmax= max(T11-T22,T12-T21)
-            if dTmin<0 or dTmax<0 or dTmin==dTmax:   ##от зацикливания
+            if dTmin<0 or dTmax<0 or dTmin==dTmax:
                 LMTD = (dTmax+dTmin)/2
             else:
                 LMTD = (dTmax - dTmin) / (n.log(dTmax/dTmin))            
@@ -86,10 +86,8 @@ class heatex:
         T22 = self.water.p_h(P22,H22)['T']
         return [T12,P12,H12,self.G1,T22,P22,H22,self.G2,Q]
     
-    
 class vapor:
     def __init__(self, stream11, stream12,stream21,stream22,KPD,calctolerance,gas,gas0,water,calcmethod,gas_streams0,water_streams0,gas_streams,water_streams):
-  
         self.KPD=KPD
         self.gas_streams0=gas_streams0
         self.water_streams0=water_streams0
@@ -139,7 +137,7 @@ class vapor:
             G2 = Q/(H22-self.H21)
             dTmin= min(T11-T22,T12-T21)
             dTmax= max(T11-T22,T12-T21)
-            if dTmin<0 or dTmax<0 or dTmin==dTmax:   ##от зацикливания
+            if dTmin<0 or dTmax<0 or dTmin==dTmax:
                 LMTD = (dTmax+dTmin)/2
             else:
                 LMTD = (dTmax - dTmin) / (n.log(dTmax/dTmin))            
@@ -159,10 +157,7 @@ class vapor:
         H22 = self.water.p_q(self.P2,1)['h']
         T22 = self.water.p_h(self.P2,H22)['T']
         G2 = Q/(H22-self.H21)
-        return [T12,self.P1,H12,self.G1,T22,self.P2,H22,G2,Q]
-    
-    
-#              
+        return [T12,self.P1,H12,self.G1,T22,self.P2,H22,G2,Q]         
 class vaporND:
     def __init__(self, stream11, stream12,stream21,stream22,KPD,calctolerance,gas,gas0,water,calcmethod,gas_streams0,water_streams0,gas_streams,water_streams):
   
@@ -204,7 +199,6 @@ class vaporND:
         Pr01av = self.gas0.p_t(self.P01,T01av)['Prandtl']
         nu01av = self.gas0.p_t(self.P01,T01av)['nu']
         ro01av = self.gas0.p_t(self.P01,T01av)['rho']
-                
         def T12sved(T12):
             T11 = self.gas.p_h(self.P1,self.H11)['T']
             T21 = self.water.p_h(self.P2,self.H21)['T']
@@ -213,12 +207,11 @@ class vaporND:
             H22 = self.water.p_q(self.P2,1)['h']  
             T22 = self.water.p_h(self.P2,H22)['T']
             Dvd = self.water_streams.at['PEVD-DROS','G']
-#             Hvd =prop.water_HSW_P(self.P2)
             Hvd =self.water.p_q(self.P2,1)['h']
-            G2 = (Q-Dvd*(Hvd-self.H21))/(H22-self.H21)          ####!
+            G2 = (Q-Dvd*(Hvd-self.H21))/(H22-self.H21)
             dTmin= min(T11-T22,T12-T21)
             dTmax= max(T11-T22,T12-T21)
-            if dTmin<0 or dTmax<0 or dTmin==dTmax:   ##от зацикливания
+            if dTmin<0 or dTmax<0 or dTmin==dTmax:
                 LMTD = (dTmax+dTmin)/2
             else:
                 LMTD = (dTmax - dTmin) / (n.log(dTmax/dTmin))            

@@ -2,10 +2,22 @@ import mat_properties as prop
 import pandas as pd
 
 
+RP = prop.init_REFPROP(r'C:\Program Files (x86)\REFPROP')
+
+
+
+water=prop.Materials_prop('water',[1.0,0,0,0,0], prop.REFPROP_h_s,
+                                              prop.REFPROP_p_t,
+                                              prop.REFPROP_p_h,
+                                              prop.REFPROP_p_s,
+                                              prop.REFPROP_p_q,
+                                              prop.REFPROP_t_q,
+                                              RP=RP)
+
 
 
 class nasos:
-    def __init__(self,stream11,stream12,KPDnasos,water,water_streams):
+    def __init__(self,stream11,stream12,water,KPDnasos,water_streams):
         self.KPDnasos = KPDnasos
         self.P0  = water_streams.at[stream11,'P']
         self.P1  = water_streams.at[stream12,'P']
