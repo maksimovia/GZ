@@ -1,13 +1,8 @@
 import numpy as n
 from scipy.optimize import root
-import pandas as pd
-
-#RP = mat_properties.init_REFPROP(r'C:\Program Files (x86)\REFPROP')
 
 class heatex:
-    def __init__(self,stream11,stream12,stream21,stream22,KPD,calctolerance,
-                 gas0,gas1,water,calcmethod,gas_streams0,water_streams0,gas_streams,water_streams):
-        
+    def __init__(self,stream11,stream12,stream21,stream22,KPD,calctolerance,gas0,gas1,water,calcmethod,gas_streams0,water_streams0,gas_streams,water_streams):
         self.KPD=KPD
         self.gas_streams0=gas_streams0
         self.water_streams0=water_streams0
@@ -33,7 +28,6 @@ class heatex:
         self.G2   = water_streams.at[stream21,'G']
         self.P1   = gas_streams.at[stream11,'P']
         self.P21  = water_streams.at[stream21,'P']
-        
     def calc(self):
         Q0     = self.G01*(self.H011-self.H012)*self.KPD
         T011   = self.gas0.p_h(self.P01,self.H011)['T']
@@ -85,7 +79,6 @@ class heatex:
         H22 = self.H21 + (Q/self.G2)
         T22 = self.water.p_h(P22,H22)['T']
         return [T12,P12,H12,self.G1,T22,P22,H22,self.G2,Q]
-    
 class vapor:
     def __init__(self, stream11, stream12,stream21,stream22,KPD,calctolerance,gas,gas0,water,calcmethod,gas_streams0,water_streams0,gas_streams,water_streams):
         self.KPD=KPD
@@ -160,7 +153,6 @@ class vapor:
         return [T12,self.P1,H12,self.G1,T22,self.P2,H22,G2,Q]         
 class vaporND:
     def __init__(self, stream11, stream12,stream21,stream22,KPD,calctolerance,gas,gas0,water,calcmethod,gas_streams0,water_streams0,gas_streams,water_streams):
-  
         self.KPD=KPD
         self.gas_streams0=gas_streams0
         self.water_streams0=water_streams0
@@ -232,4 +224,3 @@ class vaporND:
         T22 = self.water.p_h(self.P2,H22)['T']
         G2 = Q/(H22-self.H21)
         return [T12,self.P1,H12,self.G1,T22,self.P2,H22,G2,Q]
-    

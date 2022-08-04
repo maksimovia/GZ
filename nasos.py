@@ -11,6 +11,5 @@ class nasos:
         self.h1teornasos = self.water.p_s(self.P1,self.s1teor)['h']
         self.h1realnasos = self.water.p_t(self.P0,self.T0)['h']+(self.h1teornasos-self.water.p_t(self.P0,self.T0)['h'])/self.KPDnasos
         self.T1nasosCO2=self.water.p_h(self.P1,self.h1realnasos)['T']
-        T1 = self.T1nasosCO2
         Rabota = self.G*(self.h1realnasos - self.water.p_t(self.P0,self.T0)['h'])
-        return [Rabota,T1,self.P0,self.P1,self.T0,self.G]
+        return [self.T1nasosCO2,self.P1,self.h1realnasos,self.G,Rabota]
