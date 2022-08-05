@@ -28,7 +28,7 @@ def REFPROP_h_s(h, s, gas,fraction, RP):
     res['nu'] = prop1.Output[5] / 100.
     res['Prandtl'] = prop1.Output[6] 
     res['L'] = prop1.Output[7]
-    res['Q'] = prop1.Output[8]
+    res['Q'] = prop1.Output[9]
     return res
 
 def REFPROP_p_t(p, t, gas,fraction, RP):
@@ -47,7 +47,7 @@ def REFPROP_p_t(p, t, gas,fraction, RP):
     res['nu'] = prop1.Output[5] / 100.
     res['Prandtl'] = prop1.Output[6] 
     res['L'] = prop1.Output[7]
-    res['Q'] = prop1.Output[8]
+    res['Q'] = prop1.Output[9]
     return res
 
 def REFPROP_p_h(p, h, gas,fraction, RP):
@@ -67,7 +67,7 @@ def REFPROP_p_h(p, h, gas,fraction, RP):
     res['nu'] = prop1.Output[5] / 100.
     res['Prandtl'] = prop1.Output[6] 
     res['L'] = prop1.Output[7] 
-    res['Q'] = prop1.Output[8]
+    res['Q'] = prop1.Output[9]
     return res
 
 def REFPROP_p_s(p, s, gas,fraction, RP):
@@ -86,7 +86,7 @@ def REFPROP_p_s(p, s, gas,fraction, RP):
     res['nu'] = prop1.Output[5] / 100.
     res['Prandtl'] = prop1.Output[6] 
     res['L'] = prop1.Output[7] 
-    res['Q'] = prop1.Output[8]
+    res['Q'] = prop1.Output[9]
     return res
 
 def REFPROP_p_q(p, q, gas,fraction, RP):
