@@ -13,7 +13,7 @@ def init_REFPROP(path_to_refplot):
         return RP
 
 def REFPROP_h_s(h, s, gas,fraction, RP):
-    prop = RP.REFPROPdll(gas, 'HS', 'P;T;D;CV;CP;KV;Prandtl;TCX;VIS', 21, 0, 0, h, s, fraction)
+    prop = RP.REFPROPdll(gas, 'HS', 'P;T;D;CV;CP;KV;Prandtl;TCX;VIS;Qmass', 21, 0, 0, h, s, fraction)
     res = dict()
     res['p'] = prop.Output[0]
     res['T'] = prop.Output[1]-273.15
@@ -24,14 +24,15 @@ def REFPROP_h_s(h, s, gas,fraction, RP):
     if fraction_local[3]>0.05:
         fraction_local[2]=fraction_local[2]+fraction_local[3]-0.05
         fraction_local[3]=0.05
-    prop1 = RP.REFPROPdll(gas, 'HS', 'P;T;D;CV;CP;KV;Prandtl;TCX;VIS', 21, 0, 0, h, s, fraction_local)
+    prop1 = RP.REFPROPdll(gas, 'HS', 'P;T;D;CV;CP;KV;Prandtl;TCX;VIS;Qmass', 21, 0, 0, h, s, fraction_local)
     res['nu'] = prop1.Output[5] / 100.
     res['Prandtl'] = prop1.Output[6] 
-    res['L'] = prop1.Output[7] 
+    res['L'] = prop1.Output[7]
+    res['Q'] = prop1.Output[8]
     return res
 
 def REFPROP_p_t(p, t, gas,fraction, RP):
-    prop = RP.REFPROPdll(gas, 'PT', 'H;S;D;CV;CP;KV;Prandtl;TCX;VIS', 21, 0, 0, p, t, fraction)
+    prop = RP.REFPROPdll(gas, 'PT', 'H;S;D;CV;CP;KV;Prandtl;TCX;VIS;Qmass', 21, 0, 0, p, t, fraction)
     res = dict()
     res['h'] = prop.Output[0]/1000
     res['s'] = prop.Output[1]/1000
@@ -42,14 +43,15 @@ def REFPROP_p_t(p, t, gas,fraction, RP):
     if fraction_local[3]>0.05:
         fraction_local[2]=fraction_local[2]+fraction_local[3]-0.05
         fraction_local[3]=0.05
-    prop1 = RP.REFPROPdll(gas, 'PT', 'H;S;D;CV;CP;KV;Prandtl;TCX;VIS', 21, 0, 0, p, t, fraction_local)
+    prop1 = RP.REFPROPdll(gas, 'PT', 'H;S;D;CV;CP;KV;Prandtl;TCX;VIS;Qmass', 21, 0, 0, p, t, fraction_local)
     res['nu'] = prop1.Output[5] / 100.
     res['Prandtl'] = prop1.Output[6] 
-    res['L'] = prop1.Output[7] 
+    res['L'] = prop1.Output[7]
+    res['Q'] = prop1.Output[8]
     return res
 
 def REFPROP_p_h(p, h, gas,fraction, RP):
-    prop = RP.REFPROPdll(gas, 'PH', 'T;S;D;CV;CP;KV;Prandtl;TCX;VIS', 21, 0, 0, p, h, fraction)
+    prop = RP.REFPROPdll(gas, 'PH', 'T;S;D;CV;CP;KV;Prandtl;TCX;VIS;QMass', 21, 0, 0, p, h, fraction)
     res = dict()
     res['T'] = prop.Output[0]-273.15
     res['s'] = prop.Output[1]/1000
@@ -61,14 +63,15 @@ def REFPROP_p_h(p, h, gas,fraction, RP):
         fraction_local[2]=fraction_local[2]+fraction_local[3]-0.05
         fraction_local[3]=0.05
     k = prop.Output[5]
-    prop1 = RP.REFPROPdll(gas, 'PH', 'T;S;D;CV;CP;KV;Prandtl;TCX;VIS', 21, 0, 0, p, h, fraction_local)
+    prop1 = RP.REFPROPdll(gas, 'PH', 'T;S;D;CV;CP;KV;Prandtl;TCX;VIS;Qmass', 21, 0, 0, p, h, fraction_local)
     res['nu'] = prop1.Output[5] / 100.
     res['Prandtl'] = prop1.Output[6] 
     res['L'] = prop1.Output[7] 
+    res['Q'] = prop1.Output[8]
     return res
 
 def REFPROP_p_s(p, s, gas,fraction, RP):
-    prop = RP.REFPROPdll(gas, 'PS', 'T;H;D;CV;CP;KV;Prandtl;TCX;VIS', 21, 0, 0, p, s, fraction)
+    prop = RP.REFPROPdll(gas, 'PS', 'T;H;D;CV;CP;KV;Prandtl;TCX;VIS;Qmass', 21, 0, 0, p, s, fraction)
     res = dict()
     res['T'] = prop.Output[0]-273.15
     res['h'] = prop.Output[1]/1000
@@ -79,10 +82,11 @@ def REFPROP_p_s(p, s, gas,fraction, RP):
     if fraction_local[3]>0.05:
         fraction_local[2]=fraction_local[2]+fraction_local[3]-0.05
         fraction_local[3]=0.05
-    prop1 = RP.REFPROPdll(gas, 'PS', 'T;H;D;CV;CP;KV;Prandtl;TCX;VIS', 21, 0, 0, p, s, fraction_local)
+    prop1 = RP.REFPROPdll(gas, 'PS', 'T;H;D;CV;CP;KV;Prandtl;TCX;VIS;Qmass', 21, 0, 0, p, s, fraction_local)
     res['nu'] = prop1.Output[5] / 100.
     res['Prandtl'] = prop1.Output[6] 
     res['L'] = prop1.Output[7] 
+    res['Q'] = prop1.Output[8]
     return res
 
 def REFPROP_p_q(p, q, gas,fraction, RP):
