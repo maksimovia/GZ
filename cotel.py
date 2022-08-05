@@ -222,7 +222,9 @@ class vaporND:
         Q = self.G1*(self.H11-H12)*self.KPD
         H22 = self.water.p_q(self.P2,1)['h']
         T22 = self.water.p_h(self.P2,H22)['T']
-        G2 = Q/(H22-self.H21)
+        Dvd = self.water_streams.at['PEVD-DROS','G']
+        Hvd =self.water.p_q(self.P2,0)['h']
+        G2 = (Q- Dvd*(Hvd-self.H21))/(H22-self.H21)
         Hvd = self.water.p_q(self.P2,0)['h']
         Tvd = self.water.p_q(self.P2,0)['T']
         Pvd = self.P2
