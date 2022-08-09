@@ -21,7 +21,7 @@ class heatex:
         self.G02  = water_streams0.at[stream21,'G']
         self.P01  = gas_streams0.at[stream11,'P']
         self.P021 = water_streams0.at[stream21,'P']
-        self.P022 = water_streams0.at[stream22,'P']
+        self.P022 = water_streams0.at[stream22,'P']        
         self.H11  = gas_streams.at[stream11,'H']
         self.H21  = water_streams.at[stream21,'H']
         self.G1   = gas_streams.at[stream11,'G']
