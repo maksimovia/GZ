@@ -50,8 +50,9 @@ class heatex:
         ddp    = (ro21/ro021)*((self.G02/self.G2)**2)
         P22    = self.P21 - ((self.P021-self.P022)/ddp)
         P12 = self.P1
-        def T12sved(T12):           
-            T11 = self.gas.p_h(self.P1,self.H11)['T']
+        T21 = self.gas.p_h(self.P21,self.H21)['T']
+        T11 = self.gas.p_h(self.P1,self.H11)['T']
+        def T12sved(T12):
             T21 = self.water.p_h(self.P21,self.H21)['T']
             H12 = self.gas.p_t(self.P1,T12)['h']
             Q = self.G1*(self.H11-H12)*self.KPD
@@ -72,7 +73,7 @@ class heatex:
             kk = (lambda01av/lambda1av)*((Pr01av/Pr1av)**0.33)*(((self.G01/self.G1)*(ro1av/ro01av)*(nu1av/nu01av))**0.685)
             Qq = Q0 / (kk*dt)
             return ((Q-Qq)/Q)
-        sol = root(T12sved, T012, method=self.calcmethod, tol=self.calctolerance)
+        sol = root(T12sved, T012-5, method=self.calcmethod, tol=self.calctolerance)
         T12=float(sol.x)
         H12 = self.gas.p_t(self.P1,T12)['h']
         Q = self.G1*(self.H11-H12)*self.KPD
@@ -119,7 +120,6 @@ class vapor:
         Pr01av = self.gas0.p_t(self.P01,T01av)['Prandtl']
         nu01av = self.gas0.p_t(self.P01,T01av)['nu']
         ro01av = self.gas0.p_t(self.P01,T01av)['rho']
-                
         def T12sved(T12):
             T11 = self.gas.p_h(self.P1,self.H11)['T']
             T21 = self.water.p_h(self.P2,self.H21)['T']
