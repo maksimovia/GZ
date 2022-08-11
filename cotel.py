@@ -54,9 +54,8 @@ class heatex:
         T21 = self.water.p_h(self.P21,self.H21)['T']
         T11 = self.gas.p_h(self.P1,self.H11)['T']
         def T12sved(T12):
-            if T12<=T21 or T12>=T11:
-#                 print(T12,'if vap')
-                return 100
+            if T12<T21 or T12>T11:
+                return 10**9
             else:
                 H12 = self.gas.p_t(self.P1,T12)['h']
                 Q = self.G1*(self.H11-H12)*self.KPD
@@ -76,11 +75,9 @@ class heatex:
                 ro1av = self.gas.p_t(self.P1,T1av)['rho']
                 kk = (lambda01av/lambda1av)*((Pr01av/Pr1av)**0.33)*(((self.G01/self.G1)*(ro1av/ro01av)*(nu1av/nu01av))**0.685)
                 Qq = Q0 / (kk*dt)
-#                 print(T12,'else vap')
-                return ((Q-Qq)/Q)*1000
-        sol = root(T12sved, 0.95*T11, method=self.calcmethod, tol=0.0000001, options={'maxfev':50, 'xtol':0.0000001})
-        T12=float(sol.x)        
-#         T12 = fsolve(T12sved, 0.95*T11, xtol=self.calctolerance)
+                return ((Q-Qq)/Q)*100
+        sol = root(T12sved, 0.99*T11, method=self.calcmethod, tol=self.calctolerance)
+        T12=float(sol.x)
         H12 = self.gas.p_t(self.P1,T12)['h']
         Q = self.G1*(self.H11-H12)*self.KPD
         H22 = self.H21 + (Q/self.G2)
@@ -132,9 +129,8 @@ class vapor:
         T21 = self.water.p_h(self.P2,self.H21)['T']
         def T12sved(T12):
             T12=float(T12)
-            if T12<=T21 or T12>=T11:
-#                 print(T12,T21,T11,'if vap')
-                return 10000
+            if T12<T21 or T12>T11:
+                return 10**9
             else:
                 H12 = self.gas.p_t(self.P1,T12)['h']
                 Q = self.G1*(self.H11-H12)*self.KPD
@@ -155,16 +151,9 @@ class vapor:
                 ro1av = self.gas.p_t(self.P1,T1av)['rho']
                 kk = (lambda01av/lambda1av)*((Pr01av/Pr1av)**0.33)*(((self.G01/self.G1)*(ro1av/ro01av)*(nu1av/nu01av))**0.685)
                 Qq = Q0 / (kk*dt)
-#                 print(T12,'else vap')
-                return ((Q-Qq)/Q)*1000
-        sol = root(T12sved, 0.95*T11, method=self.calcmethod, tol=0.0000001, options={'maxfev':50, 'xtol':0.00001})
+                return ((Q-Qq)/Q)*100
+        sol = root(T12sved, 0.99*T11, method=self.calcmethod, tol=self.calctolerance)
         T12=float(sol.x)
-#         Tprib = 0.99*T11
-#         while T12 < 0 :
-#             Tprib = Tprib-1
-#             sol = root(T12sved, Tprib, method=self.calcmethod, tol=self.calctolerance)
-#             T12=float(sol.x)
-#         T12 = fsolve(T12sved, 0.95*T11, xtol=self.calctolerance)
         H12 = self.gas.p_t(self.P1,T12)['h']
         Q = self.G1*(self.H11-H12)*self.KPD
         H22 = self.water.p_q(self.P2,1)['h']
@@ -214,9 +203,8 @@ class vaporND:
         T21 = self.water.p_h(self.P2,self.H21)['T']
         T11 = self.gas.p_h(self.P1,self.H11)['T']
         def T12sved(T12):
-            if T12<=T21 or T12>=T11:
-#                 print(T12,'if vapnd')
-                return 100
+            if T12<T21 or T12>T11:
+                return 10**9
             else:
                 H12 = self.gas.p_t(self.P1,T12)['h']
                 Q = self.G1*(self.H11-H12)*self.KPD
@@ -239,11 +227,9 @@ class vaporND:
                 ro1av = self.gas.p_t(self.P1,T1av)['rho']
                 kk = (lambda01av/lambda1av)*((Pr01av/Pr1av)**0.33)*(((self.G01/self.G1)*(ro1av/ro01av)*(nu1av/nu01av))**0.685)
                 Qq = Q0 / (kk*dt)
-#                 print(T12,'else vapnd')
-                return ((Q-Qq)/Q)*1000
-        sol = root(T12sved, 0.95*T11, method=self.calcmethod, tol=0.0000001, options={'maxfev':50, 'xtol':0.00001})
+                return ((Q-Qq)/Q)*100
+        sol = root(T12sved, 0.99*T11, method=self.calcmethod, tol=self.calctolerance)
         T12=float(sol.x)
-#         T12 = fsolve(T12sved, 0.95*T11, xtol=self.calctolerance)
         H12 = self.gas.p_t(self.P1,T12)['h']
         Q = self.G1*(self.H11-H12)*self.KPD
         H22 = self.water.p_q(self.P2,1)['h']
