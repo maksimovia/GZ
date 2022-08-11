@@ -78,7 +78,7 @@ class heatex:
                 Qq = Q0 / (kk*dt)
 #                 print(T12,'else vap')
                 return ((Q-Qq)/Q)*1000
-        sol = root(T12sved, 0.95*T11, method=self.calcmethod, tol=0.0000001, options={'maxfev':50, 'xtol':0.0000001})
+        sol = root(T12sved, 0.95*T11, method=self.calcmethod, tol=self.calctolerance, options={'maxfev':50, 'xtol':0.00001})
         T12=float(sol.x)        
 #         T12 = fsolve(T12sved, 0.95*T11, xtol=self.calctolerance)
         H12 = self.gas.p_t(self.P1,T12)['h']
@@ -157,7 +157,7 @@ class vapor:
                 Qq = Q0 / (kk*dt)
 #                 print(T12,'else vap')
                 return ((Q-Qq)/Q)*1000
-        sol = root(T12sved, 0.95*T11, method=self.calcmethod, tol=0.0000001, options={'maxfev':50, 'xtol':0.00001})
+        sol = root(T12sved, 0.95*T11, method=self.calcmethod, tol=self.calctolerance, options={'maxfev':50, 'xtol':0.00001})
         T12=float(sol.x)
 #         Tprib = 0.99*T11
 #         while T12 < 0 :
@@ -241,7 +241,7 @@ class vaporND:
                 Qq = Q0 / (kk*dt)
 #                 print(T12,'else vapnd')
                 return ((Q-Qq)/Q)*1000
-        sol = root(T12sved, 0.95*T11, method=self.calcmethod, tol=0.0000001, options={'maxfev':50, 'xtol':0.00001})
+        sol = root(T12sved, 0.95*T11, method=self.calcmethod, tol=self.calctolerance, options={'maxfev':50, 'xtol':0.00001})
         T12=float(sol.x)
 #         T12 = fsolve(T12sved, 0.95*T11, xtol=self.calctolerance)
         H12 = self.gas.p_t(self.P1,T12)['h']
