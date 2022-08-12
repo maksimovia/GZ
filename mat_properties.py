@@ -98,7 +98,7 @@ def REFPROP_p_q(p, q, gas,fraction, RP):
     return res
 
 def REFPROP_t_q(t, q, gas,fraction, RP):
-    prop = RP.REFPROPdll(gas, 'PQ', 'P;D;H', 21, 0, 0, t, q,fraction)
+    prop = RP.REFPROPdll(gas, 'TQ', 'P;D;H', 21, 0, 0, t, q,fraction)
     res = dict()
     res['P'] = prop.Output[0]/1e6
     res['rho'] = prop.Output[1]
@@ -135,4 +135,4 @@ class Materials_prop:
         return self.__pq_func(p=p*1e6, q=q, gas=self.__mat_name,fraction=self.__fraction, **self.__params)
     
     def t_q(self, t, q):
-        return self.__pq_func(t=t+273.15, q=q, gas=self.__mat_name,fraction=self.__fraction, **self.__params)
+        return self.__tq_func(t=t+273.15, q=q, gas=self.__mat_name,fraction=self.__fraction, **self.__params)
