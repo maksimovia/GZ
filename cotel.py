@@ -1,6 +1,5 @@
 import numpy as n
 from scipy.optimize import root
-from scipy.optimize import fsolve
 
 class heatex:
     def __init__(self,stream11,stream12,stream21,stream22,KPD,calctolerance,gas0,gas1,water,calcmethod,gas_streams0,water_streams0,gas_streams,water_streams):
