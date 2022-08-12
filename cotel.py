@@ -75,7 +75,12 @@ class heatex:
                 kk = (lambda01av/lambda1av)*((Pr01av/Pr1av)**0.33)*(((self.G01/self.G1)*(ro1av/ro01av)*(nu1av/nu01av))**0.685)
                 Qq = Q0 / (kk*dt)
                 return ((Q-Qq)/Q)*100
-        sol = root(T12sved, 0.99*T11, method=self.calcmethod, tol=self.calctolerance)
+        Tfirst=T11
+        try:
+            Tfirst=T12
+        except:
+            Tfirst=T11*0.9
+        sol = root(T12sved, max(Tfirst,T21+5), method=self.calcmethod, tol=self.calctolerance)
         T12=float(sol.x)
         H12 = self.gas.p_t(self.P1,T12)['h']
         Q = self.G1*(self.H11-H12)*self.KPD
@@ -151,7 +156,12 @@ class vapor:
                 kk = (lambda01av/lambda1av)*((Pr01av/Pr1av)**0.33)*(((self.G01/self.G1)*(ro1av/ro01av)*(nu1av/nu01av))**0.685)
                 Qq = Q0 / (kk*dt)
                 return ((Q-Qq)/Q)*100
-        sol = root(T12sved, 0.99*T11, method=self.calcmethod, tol=self.calctolerance)
+        Tfirst=T11
+        try:
+            Tfirst=T12
+        except :
+            Tfirst=T11*0.9
+        sol = root(T12sved, max(Tfirst,T21+5), method=self.calcmethod, tol=self.calctolerance)
         T12=float(sol.x)
         H12 = self.gas.p_t(self.P1,T12)['h']
         Q = self.G1*(self.H11-H12)*self.KPD
@@ -227,7 +237,12 @@ class vaporND:
                 kk = (lambda01av/lambda1av)*((Pr01av/Pr1av)**0.33)*(((self.G01/self.G1)*(ro1av/ro01av)*(nu1av/nu01av))**0.685)
                 Qq = Q0 / (kk*dt)
                 return ((Q-Qq)/Q)*100
-        sol = root(T12sved, 0.99*T11, method=self.calcmethod, tol=self.calctolerance)
+        Tfirst=T11
+        try:
+            Tfirst=T12
+        except:
+            Tfirst=T11*0.9
+        sol = root(T12sved, max(Tfirst,T21+5), method=self.calcmethod, tol=self.calctolerance)        
         T12=float(sol.x)
         H12 = self.gas.p_t(self.P1,T12)['h']
         Q = self.G1*(self.H11-H12)*self.KPD
