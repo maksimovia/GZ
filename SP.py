@@ -33,8 +33,10 @@ class od:
         Q=epsilon*min(Gdr,God)*self.Cp*Delta/1000
         tod_out=tw_in+Q*1000/God/self.Cp
         tdr_out=tdr_in-Q*1000/Gdr/self.Cp
-        print(God)
-        return [tdr_out,tod_out]
+        res = dict()
+        res['tdr_out']=tdr_out
+        res['tod_out']=tod_out
+        return res
     
 
 
@@ -71,9 +73,11 @@ class sp2:
         p_sp=Nas_sp['P']
         p_otb=p_sp/(1-self.dP)
         Qsp=Gsv*self.Cp*(tw_out-tw_in)/self.KPD/1000
-        Gotb=Qsp*1000/(h_otb_sp-hsp_nas)    
-        print(h_otb_sp)
-        return [p_otb,Gotb]
+        Gotb=Qsp*1000/(h_otb_sp-hsp_nas) 
+        res = dict()
+        res['p_otb']=p_otb
+        res['Gotb']=Gotb
+        return res
     
 
 
@@ -116,8 +120,10 @@ class sp1:
         tw_out=t_sp-(t_sp-tw_in)*m     
         Qsp=Gsv*self.Cp*(tw_out-tw_in)/self.KPD/1000
         Gotb=(Qsp*1000-G_nas_sp2*(h_nas_sp2-hsp_nas))/(h_otb_sp-hsp_nas)    
-        print(h_otb_sp)
-        return [tw_out,Gotb]
+        res = dict()
+        res['tw_out']=tw_out
+        res['Gotb']=Gotb
+        return res
 
 
 
