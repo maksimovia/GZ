@@ -1,17 +1,19 @@
 class nasos:
     def __init__(self,stream11,stream12,water,KPDnasos,water_streams):
         self.KPDnasos = KPDnasos
-        self.P0  = water_streams.at[stream11,'P']
-        self.P1  = water_streams.at[stream12,'P']
-        
-        self.H0 = water_streams.at[stream11,'H']
-        self.G  = water_streams.at[stream11,'G']
+        self.stream11=stream11
+        self.stream12=stream12
         self.water=water
-        self.T0 = self.water.p_h(self.P0,self.H0)['T']
+        self.water_streams=water_streams
     def calc(self):
-        self.s1teor = self.water.p_t(self.P0,self.T0)['s']
-        self.h1teornasos = self.water.p_s(self.P1,self.s1teor)['h']
-        self.h1realnasos = self.water.p_t(self.P0,self.T0)['h']+(self.h1teornasos-self.water.p_t(self.P0,self.T0)['h'])/self.KPDnasos
-        self.T1nasosCO2=self.water.p_h(self.P1,self.h1realnasos)['T']
-        Rabota = self.G*(self.h1realnasos - self.water.p_t(self.P0,self.T0)['h'])
-        return [self.T1nasosCO2,self.P1,self.h1realnasos,self.G,Rabota]
+        P0  = self.water_streams.at[self.stream11,'P']
+        P1  = self.water_streams.at[self.stream12,'P']
+        H0 = self.water_streams.at[self.stream11,'H']
+        T0 = self.water.p_h(P0,H0)['T']
+        G  = self.water_streams.at[self.stream11,'G']
+        s1teor = self.water.p_t(P0,T0)['s']
+        h1teornasos = self.water.p_s(P1,s1teor)['h']
+        h1realnasos = self.water.p_t(P0,T0)['h']+(h1teornasos-self.water.p_t(P0,T0)['h'])/self.KPDnasos
+        T1nasosCO2=self.water.p_h(P1,h1realnasos)['T']
+        Rabota = G*(h1realnasos - self.water.p_t(P0,T0)['h'])
+        return [T1nasosCO2,P1,h1realnasos,G,Rabota]
