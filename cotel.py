@@ -80,13 +80,15 @@ class heatex:
             Tfirst=T12
         except:
             Tfirst=T11*0.9
-        sol = root(T12sved, max(Tfirst,T21+5), method=self.calcmethod, tol=self.calctolerance)
+          #  max(Tfirst,T21+5)
+        sol = root(T12sved, T11*0.99, method=self.calcmethod, tol=self.calctolerance)
         T12=float(sol.x)
         H12 = self.gas.p_t(self.P1,T12)['h']
         Q = self.G1*(self.H11-H12)*self.KPD
         H22 = self.H21 + (Q/self.G2)
         T22 = self.water.p_h(P22,H22)['T']
         return [T12,P12,H12,self.G1,T22,P22,H22,self.G2,Q]
+    
 class vapor:
     def __init__(self, stream11, stream12,stream21,stream22,KPD,calctolerance,gas,gas0,water,calcmethod,gas_streams0,water_streams0,gas_streams,water_streams):
         self.KPD=KPD
