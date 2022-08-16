@@ -94,6 +94,10 @@ class heatex:
         H22 = H21 + (Q/G2)
         T22 = self.water.p_h(P22,H22)['T']
         return [T12,P12,H12,G1,T22,P22,H22,G2,Q]
+    def calculate_and_write(self):
+        calculation_result=self.calc()
+        
+        
 
 class heatexPEND:
     def __init__(self,stream11,stream12,stream21,stream22,KPD,calctolerance,gas0,gas1,water,calcmethod,gas_streams0,water_streams0,gas_streams,water_streams):
@@ -284,7 +288,7 @@ class evaporVD:
 
     
 class evaporND:
-    def __init__(self, stream11, stream12,stream21,stream22,KPD,calctolerance,gas,gas0,water,calcmethod,gas_streams0,water_streams0,gas_streams,water_streams):
+    def __init__(self, stream11, stream12,stream21,stream22,streamVD, KPD,calctolerance,gas,gas0,water,calcmethod,gas_streams0,water_streams0,gas_streams,water_streams):
         self.KPD=KPD
         self.gas_streams0=gas_streams0
         self.water_streams0=water_streams0
@@ -296,6 +300,7 @@ class evaporND:
         self.stream12=stream12
         self.stream21=stream21
         self.stream22=stream22
+        self.streamVD=streamVD
         self.gas=gas
         self.water=water
         self.gas0=gas0
@@ -331,6 +336,7 @@ class evaporND:
         P2   = self.water_streams.at[self.stream21,'P']
         T21 = self.water.p_h(P2,H21)['T']
         T11 = self.gas.p_h(P1,H11)['T']
+        Dvd = self.water_streams.at[self.streamVD,'G']
         def T12sved(T12):
             if T12<T21 or T12>T11:
                 return 10**9
@@ -339,7 +345,6 @@ class evaporND:
                 Q = G1*(H11-H12)*self.KPD
                 H22 = self.water.p_q(P2,1)['h']  
                 T22 = self.water.p_h(P2,H22)['T']
-                Dvd = self.water_streams.at['PEVD-DROS','G']
                 Hvd =self.water.p_q(P2,0)['h']
                 G2 = (Q-Dvd*(Hvd-H21))/(H22-H21)
                 dTmin= min(T11-T22, T12-T22)
@@ -368,7 +373,6 @@ class evaporND:
         Q = G1*(H11-H12)*self.KPD
         H22 = self.water.p_q(P2,1)['h']
         T22 = self.water.p_h(P2,H22)['T']
-        Dvd = self.water_streams.at['PEVD-DROS','G']
         Hvd =self.water.p_q(P2,0)['h']
         G2 = (Q- Dvd*(Hvd-H21))/(H22-H21)
         Tvd = self.water.p_q(P2,0)['T']
