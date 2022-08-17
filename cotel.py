@@ -477,12 +477,13 @@ class cotel_all:
                                                  EVD['Pw'], EVD['Hw'], EVD['Gw']]
 
                 # Баланс ПЕВ+ИВД+ЭВД
-                Qgas1 = self.KPD*self.gas_streams.at['GTU-PEVD', 'G'] * \
+                Qgas1VD = self.KPD*self.gas_streams.at['GTU-PEVD', 'G'] * \
             (self.gas_streams.at['GTU-PEVD', 'H']-self.gas_streams.at['IVD-EVD', 'H'])
-                Qwat1 = self.water_streams.at['PEVD-DROSVD', 'G']*(\
+                Qwat1VD = self.water_streams.at['PEVD-DROSVD', 'G']*(\
             self.water_streams.at['PEVD-DROSVD', 'H']-self.water_streams.at['EVD-IVD', 'H'])
-                print('dQ/Q ПЕВД+ИВД+ЭВД', ((Qgas1-Qwat1)/Qgas1*100))
-                if abs((Qgas1-Qwat1)/Qgas1*100) < self.calctolerance:
+                ErrorVD=(Qgas1VD-Qwat1VD)/Qgas1VD*100
+                print('dQ/Q ПЕВД+ИВД+ЭВД', ErrorVD)
+                if abs(ErrorVD) < self.calctolerance:
                     break
             print("ВД: --- %s сек. ---" % round((time.time() - start_time), 1))
             # Для сходимости
@@ -538,15 +539,16 @@ class cotel_all:
                 print("GPK:--- %s сек. ---" % round((time.time() - start_timeGPK), 1))
 
                 # Баланс ППНД+ИНД+ГПК
-                Qgas1 = self.KPD*self.gas_streams.at['EVD-PPND', 'G'] * \
+                Qgas1ND = self.KPD*self.gas_streams.at['EVD-PPND', 'G'] * \
             (self.gas_streams.at['EVD-PPND', 'H']-self.gas_streams.at['GPK-out', 'H'])
-                Qwat1 = self.water_streams.at['GPK-IND', 'G']*(self.water_streams.at['GPK-IND', 'H']-self.water_streams.at['X-GPK', 'H']) +\
+                Qwat1ND = self.water_streams.at['GPK-IND', 'G']*(self.water_streams.at['GPK-IND', 'H']-self.water_streams.at['X-GPK', 'H']) +\
             self.water_streams.at['IND-PPND', 'G']*(self.water_streams.at['IND-PPND', 'H']-self.water_streams.at['GPK-IND', 'H']) +\
             self.water_streams.at['PPND-DROSND', 'G']*(self.water_streams.at['PPND-DROSND', 'H']-self.water_streams.at['IND-PPND', 'H']) +\
             self.water_streams.at['BND-PEN', 'G'] * \
             (self.water_streams.at['BND-PEN', 'H']-self.water_streams.at['GPK-IND', 'H'])
-                print('dQ/Q ППНД+ИНД+ГПК', (Qgas1-Qwat1)/Qgas1*100)
-                if abs((Qgas1-Qwat1)/Qgas1*100) < self.calctolerance:
+                ErrorND=(Qgas1ND-Qwat1ND)/Qgas1ND*100
+                print('dQ/Q ППНД+ИНД+ГПК',ErrorND )
+                if abs(ErrorND) < self.calctolerance:
                     break
             print("НД+ --- %s сек. ---" % round((time.time() - start_time), 1))
 
@@ -555,6 +557,11 @@ class cotel_all:
         (self.gas_streams.at['GTU-PEVD', 'H']-self.gas_streams.at['GPK-out', 'H'])
             Qwatall = self.water_streams.at['PPND-DROSND', 'G']*(self.water_streams.at['PPND-DROSND', 'H']-self.water_streams.at['X-GPK', 'H'])+self.water_streams.at['PEVD-DROSVD', 'G']*(
         self.water_streams.at['PEVD-DROSVD', 'H']-self.water_streams.at['X-GPK', 'H'])-self.water_streams.at['BND-PEN', 'G']*(self.water_streams.at['PEN-EVD', 'H']-self.water_streams.at['BND-PEN', 'H'])
-            print('dQ/Qsumm', (Qgasall-Qwatall)/Qgasall*100)
-            if abs((Qgasall-Qwatall)/Qgasall) < self.calctolerance:
+            ErrorALL=(Qgasall-Qwatall)/Qgasall*100
+            print('dQ/Qsumm',ErrorALL )
+            if abs((Qgasall-Qwatall)/Qgasall*100) < self.calctolerance:
+                print('dQ/Qsumm',ErrorALL)
+                print('dQ/Qvd',ErrorVD)
+                print('dQ/Qnd',ErrorND)
                 break
+            
