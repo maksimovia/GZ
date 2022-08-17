@@ -33,6 +33,8 @@ class od:
         Q=epsilon*min(Gdr,God)*self.Cp*Delta/1000
         tod_out=tw_in+Q*1000/God/self.Cp
         tdr_out=tdr_in-Q*1000/Gdr/self.Cp
+        self.water_streams.at[self.stream12,'G']= Gdr
+        self.water_streams.at[self.stream22,'G']= God     
         res = dict()
         res['tdr_out']=tdr_out
         res['tod_out']=tod_out
@@ -74,6 +76,16 @@ class sp2:
         p_otb=p_sp/(1-self.dP)
         Qsp=Gsv*self.Cp*(tw_out-tw_in)/self.KPD/1000
         Gotb=Qsp*1000/(h_otb_sp-hsp_nas) 
+        
+        self.water_streams.at[self.stream12,'G']= Gotb
+        self.water_streams.at[self.stream22,'G']= Gsv   
+        
+        self.water_streams.at[self.stream12,'H']= hsp_nas
+        self.water_streams.at[self.stream22,'H']= self.Cp*tw_out   
+        
+        self.water_streams.at[self.stream12,'P']= hsp_nas
+        self.water_streams.at[self.stream22,'P']= self.water_streams.at[self.stream21,'P']   
+        
         res = dict()
         res['p_otb']=p_otb
         res['Gotb']=Gotb
@@ -119,7 +131,14 @@ class sp1:
         hsp_nas=Nas_sp['h']
         tw_out=t_sp-(t_sp-tw_in)*m     
         Qsp=Gsv*self.Cp*(tw_out-tw_in)/self.KPD/1000
-        Gotb=(Qsp*1000-G_nas_sp2*(h_nas_sp2-hsp_nas))/(h_otb_sp-hsp_nas)    
+        Gotb=(Qsp*1000-G_nas_sp2*(h_nas_sp2-hsp_nas))/(h_otb_sp-hsp_nas)  
+        
+        self.water_streams.at[self.stream12,'G']= (G_nas_sp2+Gotb)
+        self.water_streams.at[self.stream22,'G']= Gsv   
+        
+        self.water_streams.loc[self.stream22, 'T'] = SP1_res['tw_out']
+
+        
         res = dict()
         res['tw_out']=tw_out
         res['Gotb']=Gotb
