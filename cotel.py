@@ -1,5 +1,7 @@
 import numpy as n
 from scipy.optimize import root
+import time
+
 
 class heatex:
     def __init__(self,stream11,stream12,stream21,stream22,KPD,calctolerance,gas0,gas1,water,calcmethod,gas_streams0,water_streams0,gas_streams,water_streams):
@@ -45,6 +47,7 @@ class heatex:
         self.ro021  = self.water.p_q(self.P021,1)['rho']        
 
     def calc(self):
+        start_timeProp = time.time()
         H11  = self.gas_streams.at[self.stream11,'H']
         H21  = self.water_streams.at[self.stream21,'H']
         G1   = self.gas_streams.at[self.stream11,'G']
@@ -57,6 +60,11 @@ class heatex:
         P12 = P1
         T21 = self.water.p_h(P21,H21)['T']
         T11 = self.gas.p_h(P1,H11)['T']
+        
+        print("Prop:--- %s сек. ---" % round((time.time() - start_timeProp),1))
+
+        start_timeIter = time.time()
+
         def T12sved(T12):
             if T12<T21 or T12>T11:
                 return 10**9
@@ -89,14 +97,17 @@ class heatex:
           #  max(Tfirst,T21+5)
         sol = root(T12sved,max(Tfirst,T21+5), method=self.calcmethod, tol=self.calctolerance)
         T12=float(sol.x)
+        print("Iter:--- %s сек. ---" % round((time.time() - start_timeIter),1))
+        start_timeElse = time.time()
+
+
         H12 = self.gas.p_t(P1,T12)['h']
         Q = G1*(H11-H12)*self.KPD
         H22 = H21 + (Q/G2)
         T22 = self.water.p_h(P22,H22)['T']
-        return [T12,P12,H12,G1,T22,P22,H22,G2,Q]
-    def calculate_and_write(self):
-        calculation_result=self.calc()
-        
+        print("Else:--- %s сек. ---" % round((time.time() - start_timeElse),1))
+
+        return {'Tg':T12,'Pg':P12,'Hg':H12,'Gg':G1,'Qg':Q, 'Tw':T22,'Pw':P22,'Hw':H22,'Gw':G2}
         
 
 class heatexPEND:
