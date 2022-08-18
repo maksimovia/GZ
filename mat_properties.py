@@ -101,20 +101,23 @@ def REFPROP_p_s(p, s, gas,fraction, RP):
 
 def REFPROP_p_q(p, q, gas,fraction, RP):
     RP.PREOSdll(0)
-    prop = RP.REFPROPdll(gas, 'PQ', 'T;D;H', 21, 0, 0, p, q,fraction)
+    prop = RP.REFPROPdll(gas, 'PQ', 'T;D;H;S', 21, 0, 0, p, q,fraction)
     res = dict()
     res['T'] = prop.Output[0]-273.15
     res['rho'] = prop.Output[1]
     res['h'] = prop.Output[2]/1000
+    res['s'] = prop.Output[3]/1000
     return res
 
 def REFPROP_t_q(t, q, gas,fraction, RP):
     RP.PREOSdll(0)
-    prop = RP.REFPROPdll(gas, 'TQ', 'P;D;H', 21, 0, 0, t, q,fraction)
+    prop = RP.REFPROPdll(gas, 'TQ', 'P;D;H;S', 21, 0, 0, t, q,fraction)
     res = dict()
     res['P'] = prop.Output[0]/1e6
     res['rho'] = prop.Output[1]
     res['h'] = prop.Output[2]/1000
+    res['s'] = prop.Output[3]/1000
+
     return res
 
 class Materials_prop:

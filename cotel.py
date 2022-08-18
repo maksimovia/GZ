@@ -411,7 +411,7 @@ class cotel_all:
         self.EVD_obj = heatex('IVD-EVD', 'EVD-PPND', 'PEN-EVD', 'EVD-IVD',
                          KPD, calctolerance, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams)
 
-        self.PEN_obj = nasos.nasos('BND-PEN', 'PEN-EVD', water, KPDnasos, water_streams)
+        self.PEN_obj = nasos.nasos('BND-PEN', 'PEN-EVD', water, KPDnasos, water_streams,water_streams0)
 
         self.PPND_obj = heatexPEND('EVD-PPND', 'PPND-IND', 'IND-PPND', 'PPND-DROSND',
                               KPD, calctolerance, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams)
@@ -515,6 +515,7 @@ class cotel_all:
                 PEN = self.PEN_obj.calc()
                 self.water_streams.loc['PEN-EVD',
                           'T':'G'] = [PEN[0], PEN[1], PEN[2], PEN[3]]
+                print(PEN)
 
                 # Баланс ППНД+ИНД
                 Qgas = self.KPD*self.gas_streams.at['EVD-PPND', 'G'] * \
