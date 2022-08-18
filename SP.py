@@ -31,7 +31,7 @@ class od:
         tw_in = self.water_streams.at[self.stream21,'T']
         Delta=tdr_in-tw_in
         epsilon=min(0.999, 1/(0.35*min(Gdr,God)/max(Gdr,God)+0.65+1/self.F*n.sqrt(min(Gdr,God)/max(Gdr,God))))
-        Q=epsilon*min(Gdr,God)*self.Cp*Delta/1000
+        Q=min(epsilon,1)*min(Gdr,God)*self.Cp*Delta/1000
         tod_out=tw_in+Q*1000*self.KPD/God/self.Cp
         # tod_out=tw_in+Q*1000*self.KPD/God/self.Cp
         tdr_out=tdr_in-Q*1000/Gdr/self.Cp
@@ -52,6 +52,7 @@ class od:
         res['tdr_out']=tdr_out
         res['tod_out']=tod_out
         res['Qw']=Qw
+        res['epsilon']=epsilon
       
 
         return res
@@ -159,6 +160,7 @@ class sp1:
         self.water_streams.at[self.stream22,'G']= Gsv   
         
         self.water_streams.loc[self.stream22, 'T'] = tw_out
+        self.water_streams.loc[self.stream12, 'T'] = t_sp
         
         self.water_streams.at[self.stream12,'H']= hsp_nas
         self.water_streams.at[self.stream22,'H']= self.Cp*tw_out   
@@ -275,9 +277,27 @@ class teplofik_systema:
             t_pw = self.water_streams.at["SP2-WOUT", "T"]
             Qw_all = Cp * (t_pw - t_ow) * Gsv_in / 1000
             Error_all = (Qw_summ - Qw_all) / Qw_all * 100
+            Qw_sp1_sp2=Cp * (t_pw - t_sp1in) * Gsv_in / 1000
+            Qw_summ_sp1_sp2 = (
+                (
+                    self.water_streams.at["OTB2-SP2", "G"]
+                    * (
+                        self.water_streams.at["OTB2-SP2", "H"]
+                        - self.water_streams.at["SP1-OD", "H"]
+                    )
+                    + self.water_streams.at["OTB1-SP1", "G"]
+                    * (
+                        self.water_streams.at["OTB1-SP1", "H"]
+                        - self.water_streams.at["SP1-OD", "H"]
+                    )
+                )
+                * self.KPD_SP/1000
+            )
 
             print('Qw_summ',Qw_summ)
             print('Qw_all',Qw_all)
+            print('Qw_sp1_sp2',Qw_sp1_sp2)
+            print('Qw_summ_sp1_sp2',Qw_summ_sp1_sp2)
             if abs(Error_all) < calctolerance:
                 print(Qw_summ)
                 print(Qw_all)
@@ -287,7 +307,7 @@ class teplofik_systema:
 
             
 
-        return SP1_res, SP2_res, OD_res
+        return {'SP1':SP1_res, 'SP2':SP2_res, 'OD':OD_res}
 
 
 
