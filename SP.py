@@ -282,7 +282,10 @@ class teplofik_systema:
                 print(Qw_summ)
                 print(Qw_all)
                 break
-            if 
+            if i==maxiterations-1:
+                print('Достигнуто максимальное количетсво итераций')
+
+            
 
         return SP1_res, SP2_res, OD_res
 
