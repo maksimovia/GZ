@@ -7,7 +7,8 @@ class nasos():
         self.water_streams=water_streams
         self.water_streams0=water_streams0
         self.G0=water_streams0.at[self.stream11,'G']
-    
+        self.P01  = water_streams0.at[self.stream11,'P']
+        self.P02  = water_streams0.at[self.stream12,'P']
         
     def KPD(self,G):
         g_otn=G/self.G0
@@ -18,6 +19,23 @@ class nasos():
             KPD = (603.31*g_otn**4 - 1902.8*g_otn**3 + 2241.5*g_otn**2 - 1168*g_otn + 227.13) * self.KPDnasos
         return KPD
     
+    
+    def KPDm (self):
+        P1  = self.water_streams.at[self.stream11,'P']
+        P2  = self.water_streams.at[self.stream12,'P']
+        G=self.water_streams.at[self.stream11,'G']
+        H_otn = (P2-P1)/(self.P02-self.P01)
+        Q_otn = G/self.G0
+        H0 = -0.1957 * Q_otn - 0.1254 * Q_otn + 1.3138
+        n = (H_otn/H0 -0.0233)/0.9402
+        KN = 0.9402 * n + 0.0233
+        if KN > 1:
+            KPDgm = 0.9736 * KN**(-0.3358)
+        else:
+            KPDgm = 0.9736 * KN**(0.3358)
+        return KPDgm
+    
+    
     def calc(self):
         
         P1  = self.water_streams.at[self.stream11,'P']
@@ -25,11 +43,9 @@ class nasos():
         h1 = self.water_streams.at[self.stream11,'H']
         T1 = self.water.p_q(P1,0)['T']
         G1  = self.water_streams.at[self.stream11,'G']
-        # print (G1,'G1')
         s1 = self.water.p_q(P1,0)['s']
         h2teor = self.water.p_s(P2,s1)['h']
         h2real = h1+(h2teor-h1)/self.KPD(G1)
-        # print (h2real,'h2')
         T2=self.water.p_h(P2,h2real)['T']
         Rabota = G1*(h2real - h1)
-        return [T2, P2, h2real, G1, Rabota, self.KPD(G1)]
+        return [T2, P2, h2real, G1, Rabota, self.KPD(G1),self.KPDm()]

@@ -419,7 +419,7 @@ class cotel_all:
         self.IND_obj = evaporND('PPND-IND', 'IND-GPK', 'GPK-IND', 'IND-PPND',  'PEVD-DROSVD',
                            KPD, calctolerance, gas1, gas0, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams)
 
-        self.GPK_obj = heatex('IND-GPK', 'GPK-out', 'X-GPK', 'GPK-IND',
+        self.GPK_obj = heatex('IND-GPK', 'GPK-out', 'REC-GPK', 'GPK-REC',
                          KPD, calctolerance, gas1, gas0, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams)
         self.KPD=KPD
         self.calctolerance=calctolerance
@@ -428,6 +428,7 @@ class cotel_all:
         self.gas_streams0=gas_streams0
         self.water_streams0=water_streams0
         self.gas1=gas1
+        self.water=water
 
        
 
@@ -515,7 +516,7 @@ class cotel_all:
                 PEN = self.PEN_obj.calc()
                 self.water_streams.loc['PEN-EVD',
                           'T':'G'] = [PEN[0], PEN[1], PEN[2], PEN[3]]
-                print(PEN)
+                # print(PEN)
 
                 # Баланс ППНД+ИНД
                 Qgas = self.KPD*self.gas_streams.at['EVD-PPND', 'G'] * \
@@ -524,43 +525,75 @@ class cotel_all:
             self.water_streams.at['PPND-DROSND', 'G']*(self.water_streams.at['PPND-DROSND', 'H'] -\
                                                   self.water_streams.at['IND-PPND', 'H'])+\
         self.water_streams.at['BND-PEN', 'G']*(self.water_streams.at['BND-PEN', 'H']-self.water_streams.at['GPK-IND', 'H'])
-                
-                # Расчёт расхода в ГПК
-                self.water_streams.loc['X-GPK', 'G'] = self.water_streams.at['PPND-DROSND',
-                                                           'G']+self.water_streams.at['PEVD-DROSVD', 'G']
-                self.water_streams.loc['GPK-IND', 'G'] = self.water_streams.at['X-GPK', 'G']
-                
+               
+            
+                # Расчет ГПК
                 start_timeGPK = time.time()
-                # Расчёт ГПК
-                GPK = self.GPK_obj.calc()
-                self.gas_streams.loc['GPK-out', 'T':'G'] = [GPK['Tg'],
+                for i in range(it):
+                 
+                    
+                    # Расчёт ГПК
+                    GPK = self.GPK_obj.calc()
+                    self.gas_streams.loc['GPK-out', 'T':'G'] = [GPK['Tg'],
                                                GPK['Pg'], GPK['Hg'], GPK['Gg']]
-                self.water_streams.loc['GPK-IND', 'T':'G'] = [GPK['Tw'],
+                    self.water_streams.loc['GPK-REC', 'T':'G'] = [GPK['Tw'],
                                                  GPK['Pw'], GPK['Hw'], GPK['Gw']]
-                print("GPK:--- %s сек. ---" % round((time.time() - start_timeGPK), 1))
+                    Qw_gpk1= self.water_streams.at['GPK-IND', 'G']*(self.water_streams.at['GPK-IND', 'H']-self.water_streams.at['SMESHOD-REC', 'H'])
+                    Qw_gpk2= self.water_streams.at['GPK-REC', 'G']*(self.water_streams.at['GPK-REC', 'H']-self.water_streams.at['REC-GPK', 'H'])
+                    Error_gpk=(Qw_gpk1-Qw_gpk2)/Qw_gpk1*100
+                    
+                    # Расчёт расхода в ГПК (рециркуляция)
+                    tgpk_in=self.water_streams0.loc['REC-GPK', 'T']
+                    p_gpk=self.water_streams.loc['REC-GPK', 'P']
+                    h_gpk_in_rec=self.water_streams.at['SMESHOD-REC', 'H']
+                    h_gpk_in_60=self.water.p_t(p_gpk,tgpk_in)['h']
+                    self.water_streams.at['REC-GPK', 'H']=h_gpk_in_60
+                    h_gpk_out=self.water_streams.at['GPK-REC', 'H']
+                    G_all=self.water_streams.at['PPND-DROSND','G']+self.water_streams.at['PEVD-DROSVD', 'G']
+                    G_rec=G_all*(h_gpk_in_60-h_gpk_in_rec)/(h_gpk_out-h_gpk_in_60)
+                    G_gpk=G_all+G_rec
+                    self.water_streams.at['REC-GPK', 'G'] = G_gpk
+                    self.water_streams.loc['GPK-IND', 'T':'H']= self.water_streams.loc['GPK-REC', 'T':'H']
+                    self.water_streams.at['GPK-IND', 'G'] = G_all
+                    
+                    if abs(Error_gpk) < self.calctolerance:
+                        break
 
+                print("GPK:--- %s сек. ---" % round((time.time() - start_timeGPK), 1))
+                    
                 # Баланс ППНД+ИНД+ГПК
                 Qgas1ND = self.KPD*self.gas_streams.at['EVD-PPND', 'G'] * \
             (self.gas_streams.at['EVD-PPND', 'H']-self.gas_streams.at['GPK-out', 'H'])
-                Qwat1ND = self.water_streams.at['GPK-IND', 'G']*(self.water_streams.at['GPK-IND', 'H']-self.water_streams.at['X-GPK', 'H']) +\
+                Qwat1ND = self.water_streams.at['GPK-IND', 'G']*(self.water_streams.at['GPK-IND', 'H']-self.water_streams.at['SMESHOD-REC', 'H']) +\
             self.water_streams.at['IND-PPND', 'G']*(self.water_streams.at['IND-PPND', 'H']-self.water_streams.at['GPK-IND', 'H']) +\
             self.water_streams.at['PPND-DROSND', 'G']*(self.water_streams.at['PPND-DROSND', 'H']-self.water_streams.at['IND-PPND', 'H']) +\
             self.water_streams.at['BND-PEN', 'G'] * \
             (self.water_streams.at['BND-PEN', 'H']-self.water_streams.at['GPK-IND', 'H'])
+                Qwat2ND = self.water_streams.at['GPK-REC', 'G']*(self.water_streams.at['GPK-REC', 'H']-self.water_streams.at['REC-GPK', 'H']) +\
+            self.water_streams.at['IND-PPND', 'G']*(self.water_streams.at['IND-PPND', 'H']-self.water_streams.at['GPK-IND', 'H']) +\
+            self.water_streams.at['PPND-DROSND', 'G']*(self.water_streams.at['PPND-DROSND', 'H']-self.water_streams.at['IND-PPND', 'H']) +\
+            self.water_streams.at['BND-PEN', 'G'] * \
+            (self.water_streams.at['BND-PEN', 'H']-self.water_streams.at['GPK-IND', 'H'])
+                print(Qwat2ND)
+                print(Qwat1ND)
                 ErrorND=(Qgas1ND-Qwat1ND)/Qgas1ND*100
+                ErrorND2=(Qgas1ND-Qwat2ND)/Qgas1ND*100
+
                 print('dQ/Q ППНД+ИНД+ГПК',ErrorND )
-                if abs(ErrorND) < self.calctolerance:
+                if abs(ErrorND) < self.calctolerance and abs(ErrorND2) < self.calctolerance:
                     break
             print("НД+ --- %s сек. ---" % round((time.time() - start_time), 1))
 
             # Баланс общий
             Qgasall = self.KPD*self.gas_streams.at['GTU-PEVD', 'G'] * \
         (self.gas_streams.at['GTU-PEVD', 'H']-self.gas_streams.at['GPK-out', 'H'])
-            Qwatall = self.water_streams.at['PPND-DROSND', 'G']*(self.water_streams.at['PPND-DROSND', 'H']-self.water_streams.at['X-GPK', 'H'])+self.water_streams.at['PEVD-DROSVD', 'G']*(
-        self.water_streams.at['PEVD-DROSVD', 'H']-self.water_streams.at['X-GPK', 'H'])-self.water_streams.at['BND-PEN', 'G']*(self.water_streams.at['PEN-EVD', 'H']-self.water_streams.at['BND-PEN', 'H'])
+            Qwatall = self.water_streams.at['PPND-DROSND', 'G']*(self.water_streams.at['PPND-DROSND', 'H']-self.water_streams.at['SMESHOD-REC', 'H'])+self.water_streams.at['PEVD-DROSVD', 'G']*(
+        self.water_streams.at['PEVD-DROSVD', 'H']-self.water_streams.at['SMESHOD-REC', 'H'])-self.water_streams.at['BND-PEN', 'G']*(self.water_streams.at['PEN-EVD', 'H']-self.water_streams.at['BND-PEN', 'H'])
             ErrorALL=(Qgasall-Qwatall)/Qgasall*100
-            print('dQ/Qsumm',ErrorALL )
+            print('dQ/Qsumm',ErrorALL)
             if abs((Qgasall-Qwatall)/Qgasall*100) < self.calctolerance:
+                print("Fin:--- %s сек. ---" %
+                      round((time.time() - start_time), 1))
                 print('dQ/Qsumm',ErrorALL)
                 print('dQ/Qvd',ErrorVD)
                 print('dQ/Qnd',ErrorND)
