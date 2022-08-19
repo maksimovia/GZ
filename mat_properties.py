@@ -61,18 +61,19 @@ def REFPROP_p_h(p, h, gas,fraction, RP):
         RP.PREOSdll(0)
     else:
         RP.PREOSdll(2)
-    prop = RP.REFPROPdll(gas, 'PH', 'T;S;D;CV;CP;KV;Prandtl;TCX;VIS;QMass', 21, 0, 0, p, h, fraction)
+    prop = RP.REFPROPdll(gas, 'PH', 'T;S;D;CV;CP;KV;Q;Prandtl;TCX;VIS;QMass', 21, 0, 0, p, h, fraction)
     res = dict()
     res['T'] = prop.Output[0]-273.15
     res['s'] = prop.Output[1]/1000
     res['rho'] = prop.Output[2]
     res['cv'] = prop.Output[3]
     res['cp'] = prop.Output[4]
+    k = prop.Output[5]
+    res['q']  = prop.Output[6]
     fraction_local=list(fraction)
     if fraction_local[3]>0.05:
         fraction_local[2]=fraction_local[2]+fraction_local[3]-0.05
         fraction_local[3]=0.05
-    k = prop.Output[5]
     prop1 = RP.REFPROPdll(gas, 'PH', 'T;S;D;CV;CP;KV;Prandtl;TCX;VIS;Qmass', 21, 0, 0, p, h, fraction_local)
     res['nu'] = prop1.Output[5] / 100.
     res['Prandtl'] = prop1.Output[6] 
