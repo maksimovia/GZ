@@ -2,12 +2,10 @@ import mat_properties as prop
 import numpy as n
 
 class od:
-    def __init__(self,stream11,stream12,stream21,stream22,KPD,calctolerance,water,calcmethod,water_streams0,water_streams):
+    def __init__(self,stream11,stream12,stream21,stream22,KPD,water,water_streams0,water_streams):
         self.KPD=KPD
         self.water_streams0=water_streams0
         self.water_streams=water_streams
-        self.calcmethod=calcmethod
-        self.calctolerance=calctolerance
         self.stream11=stream11
         self.stream21=stream21
         self.stream12=stream12
@@ -65,12 +63,10 @@ class od:
 
 
 class sp2:
-    def __init__(self,stream11,stream12,stream21,stream22,KPD,calctolerance,water,calcmethod,water_streams0,water_streams):
+    def __init__(self,stream11,stream12,stream21,stream22,KPD,water,water_streams0,water_streams):
         self.KPD=KPD
         self.water_streams0=water_streams0
         self.water_streams=water_streams
-        self.calcmethod=calcmethod
-        self.calctolerance=calctolerance
         self.stream11=stream11
         self.stream21=stream21
         self.stream12=stream12
@@ -134,12 +130,10 @@ class sp2:
 #делаю класс СП1 (верхний отбор по пару, второй по воде)
 
 class sp1:
-    def __init__(self,stream11,stream12,stream21,stream22,stream111, KPD,calctolerance,water,calcmethod,water_streams0,water_streams):
+    def __init__(self,stream11,stream12,stream21,stream22,stream111, KPD,water,water_streams0,water_streams):
         self.KPD=KPD
         self.water_streams0=water_streams0
         self.water_streams=water_streams
-        self.calcmethod=calcmethod
-        self.calctolerance=calctolerance
         self.stream11=stream11
         self.stream21=stream21
         self.stream12=stream12
@@ -204,7 +198,7 @@ class sp1:
 
 class teplofik_systema:
     def __init__(
-        self, KPD_SP, calctolerance, water, calcmethod, water_streams0, water_streams
+        self, KPD_SP, water, water_streams0, water_streams
     ):
 
         self.OD = od(
@@ -213,9 +207,7 @@ class teplofik_systema:
             "SWIN-OD",
             "OD-SP1",
             KPD_SP,
-            calctolerance,
             water,
-            calcmethod,
             water_streams0,
             water_streams,
         )
@@ -226,9 +218,7 @@ class teplofik_systema:
             "SP1-SP2",
             "SP2-SP1",
             KPD_SP,
-            calctolerance,
             water,
-            calcmethod,
             water_streams0,
             water_streams,
         )
@@ -238,10 +228,8 @@ class teplofik_systema:
             "SP1-SP2",
             "SP2-WOUT",
             KPD_SP,
-            calctolerance,
             water,
-            calcmethod,
-            water_streams0,
+           water_streams0,
             water_streams,
         )
 
