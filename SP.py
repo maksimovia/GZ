@@ -29,17 +29,21 @@ class od:
         Gdr = self.water_streams.at[self.stream11,'G']
         God = self.water_streams.at[self.stream21,'G']
         tdr_in = self.water_streams.at[self.stream11,'T']
+        Hdr_in = self.water_streams.at[self.stream11,'H']
         tw_in = self.water_streams.at[self.stream21,'T']
+        pdr_in = self.water_streams.at[self.stream11,'P']
+        pdr_out=pdr_in
         Delta=tdr_in-tw_in
         epsilon=min(0.999, 1/(0.35*min(Gdr,God)/max(Gdr,God)+0.65+1/self.F*n.sqrt(min(Gdr,God)/max(Gdr,God))))
         Q=min(epsilon,1)*min(Gdr,God)*self.Cp*Delta/1000
         tod_out=tw_in+Q*1000*self.KPD/God/self.Cp
-        # tod_out=tw_in+Q*1000*self.KPD/God/self.Cp
-        tdr_out=tdr_in-Q*1000/Gdr/self.Cp
+        Hdr_out=Hdr_in-Q*1000/Gdr
+        tdr_out=self.water.p_h(pdr_out,Hdr_out)['T']
+
         self.water_streams.at[self.stream12,'G']= Gdr
         self.water_streams.at[self.stream22,'G']= God    
  
-        self.water_streams.at[self.stream12,'H']= self.Cp*tdr_out
+        self.water_streams.at[self.stream12,'H']= Hdr_out
         self.water_streams.at[self.stream22,'H']= self.Cp*tod_out   
         
         self.water_streams.at[self.stream12,'T']= tdr_out
@@ -82,24 +86,27 @@ class sp2:
 
     
     def KF_otn(self, Gsv):
-        KF_ot=1.2285*(Gsv/self.Gsv_0)**4-4.8973*(Gsv/self.Gsv_0)**3+6.3132*(Gsv/self.Gsv_0)**2-2.6031*(Gsv/self.Gsv_0)**1+0.96
+        Gsv_0=self.Gsv_0
+        G_otn=Gsv/self.Gsv_0
+        KF_ot=1.2285*(G_otn)**4-4.8973*(G_otn)**3+6.3132*(G_otn)**2-2.6031*(G_otn)**1+0.96
+        # KF_ot=1
         return KF_ot
-    
         
     def calc(self):
         Gsv=self.water_streams.at[self.stream21,'G'] #расход нагреваемого потока
         tw_out= self.water_streams.at[self.stream22,'T'] #температура воды на выходе
         tw_in = self.water_streams.at[self.stream21,'T'] #температура холодного поткоа на входе
-        h_otb_sp= self.water_streams0.at[self.stream11,'H'] #температура воды на выходе
-        m=n.exp(-self.KF/Gsv/self.Cp)
+        h_otb_sp= self.water_streams.at[self.stream11,'H'] 
+        m=n.exp(-self.KF*self.KF_otn(Gsv)/Gsv/self.Cp)
         tsp=(tw_out-tw_in*m)/(1-m)
         Nas_sp=self.water.t_q(tsp,0)
         hsp_nas=Nas_sp['h']
         p_sp=Nas_sp['P']
         p_otb=p_sp/(1-self.dP)
-        Qsp=Gsv*self.Cp*(tw_out-tw_in)/self.KPD/1000
-        Gotb=Qsp*1000/(h_otb_sp-hsp_nas)
-        Qw=Gsv*self.Cp*(tw_out-tw_in)/1000
+        Qsp=Gsv*self.Cp*(tw_out-tw_in)/1000
+        Gotb=Qsp*1000/(h_otb_sp-hsp_nas)/self.KPD
+
+        Qw=Qsp
         
         self.water_streams.at[self.stream12,'G']= Gotb
         self.water_streams.at[self.stream11,'G']= Gotb
@@ -107,6 +114,8 @@ class sp2:
         
         self.water_streams.at[self.stream12,'H']= hsp_nas
         self.water_streams.at[self.stream22,'H']= self.Cp*tw_out   
+        
+        self.water_streams.at[self.stream12,'T']= tsp  
         
         self.water_streams.at[self.stream12,'P']= p_sp 
         self.water_streams.at[self.stream11,'P']= p_otb
@@ -136,6 +145,7 @@ class sp1:
         self.stream12=stream12
         self.stream22=stream22
         self.stream111=stream111
+        self.Gsv_0 =water_streams0.at[self.stream21,'G'] #расход нагреваемого потока
         self.water=water
         self.Cp=4.187
         self.dP=5/100
@@ -145,6 +155,15 @@ class sp1:
         Gsv_0 =water_streams0.at[self.stream21,'G'] #расход нагреваемого потока
         self.KF=Gsv_0*self.Cp*n.log((tsp1_0-tsp1_in_0)/(tsp1_0-tw1_0))
 
+    
+    def KF_otn(self, Gsv):
+        Gsv_0=self.Gsv_0
+        G_otn=Gsv/self.Gsv_0
+        KF_ot=1.2285*(G_otn)**4-4.8973*(G_otn)**3+6.3132*(G_otn)**2-2.6031*(G_otn)**1+0.96
+        # KF_ot=1
+        return KF_ot
+    
+    
     def calc(self):
         Gsv= self.water_streams.at[self.stream21,'G'] #расход нагреваемого потока
         tw_in = self.water_streams.at[self.stream21,'T'] #температура холодного поткоа на входе
@@ -152,15 +171,14 @@ class sp1:
         p_otb_sp= self.water_streams.at[self.stream11,'P'] #температура воды на выходе
         h_nas_sp2= self.water_streams.at[self.stream111,'H'] #температура воды на выходе
         G_nas_sp2= self.water_streams.at[self.stream111,'G'] #температура воды на выходе
-        m=n.exp(-self.KF/Gsv/self.Cp)
+        m=n.exp(-self.KF*self.KF_otn(Gsv)/Gsv/self.Cp)
         p_sp=p_otb_sp*(1-self.dP)
         Nas_sp=self.water.p_q(p_sp,0)
         t_sp=Nas_sp['T']
         hsp_nas=Nas_sp['h']
         tw_out=t_sp-(t_sp-tw_in)*m     
-        Qsp=Gsv*self.Cp*(tw_out-tw_in)/self.KPD/1000
         Qw=Gsv*self.Cp*(tw_out-tw_in)/1000
-        Gotb=(Qsp*1000-G_nas_sp2*(h_nas_sp2-hsp_nas))/(h_otb_sp-hsp_nas)  
+        Gotb=(Qw*1000-G_nas_sp2*(h_nas_sp2-hsp_nas)*self.KPD)/(h_otb_sp-hsp_nas) / self.KPD
         
         self.water_streams.at[self.stream12,'G']= (G_nas_sp2+Gotb)
         self.water_streams.at[self.stream11,'G']= Gotb
@@ -249,6 +267,7 @@ class teplofik_systema:
 
             # Расчет ОД
             OD_res = self.OD.calc()
+            Qw_od=OD_res['Qw']
 
             # Смешение
             t_wod = self.water_streams.at["OD-SP1", "T"]
@@ -261,8 +280,10 @@ class teplofik_systema:
 
             # Расчет СП
             SP1_res = self.SP1.calc()
+            Qw_sp1=SP1_res['Qw']
 
             SP2_res = self.SP2.calc()
+            Qw_sp2=SP2_res['Qw']
 
             # Баланс по сетевой воде
             Qw_summ = (
@@ -284,35 +305,34 @@ class teplofik_systema:
             t_pw = self.water_streams.at["SP2-WOUT", "T"]
             Qw_all = Cp * (t_pw - t_ow) * Gsv_in / 1000
             Error_all = (Qw_summ - Qw_all) / Qw_all * 100
-            Qw_sp1_sp2=Cp * (t_pw - t_sp1in) * Gsv_in / 1000
-            Qw_summ_sp1_sp2 = (
-                (
-                    self.water_streams.at["OTB2-SP2", "G"]
-                    * (
-                        self.water_streams.at["OTB2-SP2", "H"]
-                        - self.water_streams.at["SP1-OD", "H"]
-                    )
-                    + self.water_streams.at["OTB1-SP1", "G"]
-                    * (
-                        self.water_streams.at["OTB1-SP1", "H"]
-                        - self.water_streams.at["SP1-OD", "H"]
-                    )
-                )
-                * self.KPD_SP/1000
-            )
+#             Qw_sp1_sp2=Cp * (t_pw - t_sp1in) * Gsv_in / 1000
+#             t_sp2in=self.water_streams.at["SP1-SP2", "T"]
+#             Qw_sp2=Cp * (t_pw - t_sp2in) * Gsv_in / 1000
+            Qw_summ_sp1 = ((self.water_streams.at["OTB1-SP1", "G"]* (self.water_streams.at["OTB1-SP1", "H"]- self.water_streams.at["SP1-OD", "H"]))+self.water_streams.at["SP2-SP1", "G"]* (self.water_streams.at["SP2-SP1", "H"]- self.water_streams.at["SP1-OD", "H"]))* self.KPD_SP/1000
+    
+            Qw_summ_sp2 = (self.water_streams.at["OTB2-SP2", "G"]* (self.water_streams.at["OTB2-SP2", "H"]- self.water_streams.at["SP2-SP1", "H"])) * self.KPD_SP/1000
+            Qw_summ_od = (self.water_streams.at["SP1-OD", "G"]* (self.water_streams.at["SP1-OD", "H"]- self.water_streams.at["OD-GPK", "H"])) * self.KPD_SP/1000
+#             print(self.water_streams.at["OTB2-SP2", "H"])
+#             Qw_sp2q=Qw_sp2
+                
+                
+#             Qw_summq=Qw_od+Qw_sp1+Qw_sp2
 
-            print('Qw_summ',Qw_summ)
-            print('Qw_all',Qw_all)
-            print('Qw_sp1_sp2',Qw_sp1_sp2)
-            print('Qw_summ_sp1_sp2',Qw_summ_sp1_sp2)
+            # print('Qw_summ',Qw_summ)
+            # print('Qw_all',Qw_all)
+            # print('Error_all',Error_all)
+#             print('ALL_delt',Qw_summ-Qw_all)
+#             print('SP2_delt',Qw_summ_sp2-Qw_sp2)
+#             print('SP1_delt',Qw_summ_sp1-Qw_sp1)
+#             print('OD_delt',Qw_summ_od-Qw_od)
+
             if abs(Error_all) < calctolerance:
                 print(Qw_summ)
-                print(Qw_all)
+                print('Error_all',Error_all)
+                
                 break
             if i==maxiterations-1:
                 print('Достигнуто максимальное количетсво итераций')
-
-            
 
         return {'SP1':SP1_res, 'SP2':SP2_res, 'OD':OD_res}
 
