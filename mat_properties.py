@@ -20,8 +20,8 @@ def REFPROP_h_s(h, s, gas,fraction, RP):
     res['p'] = prop.Output[0]
     res['T'] = prop.Output[1]-273.15
     res['rho'] = prop.Output[2]
-    res['cp'] = prop.Output[3]
-    res['cv'] = prop.Output[4]
+    res['cv'] = prop.Output[3]
+    res['cp'] = prop.Output[4]
     fraction_local=list(fraction)
     if fraction_local[3]>0.05:
         fraction_local[2]=fraction_local[2]+fraction_local[3]-0.05
@@ -43,8 +43,8 @@ def REFPROP_p_t(p, t, gas,fraction, RP):
     res['h'] = prop.Output[0]/1000
     res['s'] = prop.Output[1]/1000
     res['rho'] = prop.Output[2]
-    res['cp'] = prop.Output[3]
-    res['cv'] = prop.Output[4]
+    res['cv'] = prop.Output[3]
+    res['cp'] = prop.Output[4]
     fraction_local=list(fraction)
     if fraction_local[3]>0.05:
         fraction_local[2]=fraction_local[2]+fraction_local[3]-0.05
@@ -66,8 +66,8 @@ def REFPROP_p_h(p, h, gas,fraction, RP):
     res['T'] = prop.Output[0]-273.15
     res['s'] = prop.Output[1]/1000
     res['rho'] = prop.Output[2]
-    res['cp'] = prop.Output[3]
-    res['cv'] = prop.Output[4]
+    res['cv'] = prop.Output[3]
+    res['cp'] = prop.Output[4]
     fraction_local=list(fraction)
     if fraction_local[3]>0.05:
         fraction_local[2]=fraction_local[2]+fraction_local[3]-0.05
@@ -87,8 +87,8 @@ def REFPROP_p_s(p, s, gas,fraction, RP):
     res['T'] = prop.Output[0]-273.15
     res['h'] = prop.Output[1]/1000
     res['rho'] = prop.Output[2]
-    res['cp'] = prop.Output[3]
-    res['cv'] = prop.Output[4]
+    res['cv'] = prop.Output[3]
+    res['cp'] = prop.Output[4]
     fraction_local=list(fraction)
     if fraction_local[3]>0.05:
         fraction_local[2]=fraction_local[2]+fraction_local[3]-0.05
