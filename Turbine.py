@@ -97,7 +97,6 @@ class turbine:
         self.effiency0_ots2 = (self.Hsmesh0 - self.Hotb20) / (self.Hsmesh0 - Hotb2t0)
 
         Hotb1t0 = water.p_s(self.Potb10, self.Sotb20)["h"]
-        print(self.Sotb20)
         self.effiency0_ots3 = (self.Hotb20 - self.Hotb10) / (self.Hotb20 - Hotb1t0)
 
         Hin_kondt0 = water.p_s(self.Pin_kond0, self.Sin_cnd0)["h"]
@@ -281,7 +280,7 @@ class turbine:
                 self.Pin_cnd,
                 self.Pin_kond,
             ]
-            P_out1 = P_out.copy()
+            P_out1=P_out.copy()
             Eff_out = [
                 self.effiency0_ots1,
                 self.effiency0_ots2,
@@ -299,11 +298,24 @@ class turbine:
                 self.Pin_cnd,
                 self.Pin_kond,
             ]
-            P_out2 = P_out.copy()
+            P_out2=P_out.copy()
             Errors = list(map(lambda x, y: (x - y) / x * 100, P_out1, P_out2))
             Max_error = max(Errors)
-            print("Максимальная погрешность определения давления в отборах", Max_error)
             if abs(Max_error) < calctolerance:
+                print("Максимальная погрешность определения давления в отборах", Max_error)
                 break
+        self.water_streams.loc[self.stream1:self.stream8, "P"]=P_out2
+        self.water_streams.loc[self.stream1:self.stream8, "H"]=H_out
+        Temperatures=list(map( lambda p,h: self.water.p_h(p, h)["T"],P_out2,H_out))
+        Entropies=list(map( lambda p,h: self.water.p_h(p, h)["s"],P_out2,H_out))
+        # Humidities=list(map( lambda p,h: round((1-self.water.p_h(p, h)["Q"])*100,3),P_out2,H_out))
+        Humidities=list(map( lambda p,h: self.water.p_h(p, h)["Q"],P_out2,H_out))
+        Humidities=list(map( lambda x: 100 if x<0 else x*100,Humidities))
+        self.water_streams.loc[self.stream1:self.stream8, "T"]=Temperatures
+        self.water_streams.loc[self.stream1:self.stream8, "S"]=Entropies
+        self.water_streams.loc[self.stream1:self.stream8, "X"]=Humidities
 
-        return Max_error, P_out, Eff_out
+        
+        
+
+        return {'Max_error':Max_error, 'P_out':P_out2, 'Eff_out':Eff_out}
