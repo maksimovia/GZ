@@ -1,5 +1,6 @@
 from ctREFPROP.ctREFPROP import REFPROPFunctionLibrary
 import os
+os.environ["RPPREFIX"] = r"C:/Program Files (x86)/REFPROP"
 
 def init_REFPROP(path_to_refplot):
     try:
