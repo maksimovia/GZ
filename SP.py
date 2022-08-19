@@ -315,12 +315,12 @@ class teplofik_systema:
 #             print('OD_delt',Qw_summ_od-Qw_od)
 
             if abs(Error_all) < calctolerance:
-                print(Qw_summ)
-                print('Error_all',Error_all)
+                print('Мощность теплофикационной установки',Qw_summ)
+                print('Погрешность определения тепловой мощности теплофикационной установки',Error_all)
                 
                 break
             if i==maxiterations-1:
-                print('Достигнуто максимальное количетсво итераций')
+                print('Достигнуто максимальное количество итераций')
 
         return {'SP1':SP1_res, 'SP2':SP2_res, 'OD':OD_res}
 

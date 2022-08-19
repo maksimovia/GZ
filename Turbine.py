@@ -304,6 +304,8 @@ class turbine:
             if abs(Max_error) < calctolerance:
                 print("Максимальная погрешность определения давления в отборах", Max_error)
                 break
+            if i==maxiterations-1:
+                print('Достигнуто максимальное количество итераций')
         self.water_streams.loc[self.stream1:self.stream8, "P"]=P_out2
         self.water_streams.loc[self.stream1:self.stream8, "H"]=H_out
         Temperatures=list(map( lambda p,h: self.water.p_h(p, h)["T"],P_out2,H_out))
