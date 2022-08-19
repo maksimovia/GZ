@@ -24,6 +24,7 @@ class od:
         tdr2_0=tdr_in_0-Qod_0*1000/G_dr_0/self.Cp
         deltat=((tdr_in_0-tod_out_0)-(tdr2_0-tw1_0))/n.log((tdr_in_0-tod_out_0)/(tdr2_0-tw1_0))
         self.F=n.sqrt((tdr_in_0-tdr2_0)*(tod_out_0-tw1_0))/deltat
+
     def calc(self):
         Gdr = self.water_streams.at[self.stream11,'G']
         God = self.water_streams.at[self.stream21,'G']
@@ -79,6 +80,12 @@ class sp2:
         self.Gsv_0 =water_streams0.at[self.stream21,'G'] #расход нагреваемого потока
         self.KF=self.Gsv_0*self.Cp*n.log((tsp2_0-tsp2_in_0)/(tsp2_0-tw2_0))
 
+    
+    def KF_otn(self, Gsv):
+        KF_ot=1.2285*(Gsv/self.Gsv_0)**4-4.8973*(Gsv/self.Gsv_0)**3+6.3132*(Gsv/self.Gsv_0)**2-2.6031*(Gsv/self.Gsv_0)**1+0.96
+        return KF_ot
+    
+        
     def calc(self):
         Gsv=self.water_streams.at[self.stream21,'G'] #расход нагреваемого потока
         tw_out= self.water_streams.at[self.stream22,'T'] #температура воды на выходе
