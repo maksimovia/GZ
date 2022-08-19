@@ -574,8 +574,8 @@ class cotel_all:
             self.water_streams.at['PPND-DROSND', 'G']*(self.water_streams.at['PPND-DROSND', 'H']-self.water_streams.at['IND-PPND', 'H']) +\
             self.water_streams.at['BND-PEN', 'G'] * \
             (self.water_streams.at['BND-PEN', 'H']-self.water_streams.at['GPK-IND', 'H'])
-                print(Qwat2ND)
-                print(Qwat1ND)
+                # print(Qwat2ND)
+                # print(Qwat1ND)
                 ErrorND=(Qgas1ND-Qwat1ND)/Qgas1ND*100
                 ErrorND2=(Qgas1ND-Qwat2ND)/Qgas1ND*100
 
