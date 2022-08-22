@@ -111,6 +111,15 @@ def REFPROP_p_q(p, q, gas,fraction, RP):
     res['s'] = prop.Output[3]/1000
     return res
 
+def REFPROP_p_rho(p, rho, gas,fraction, RP):
+    RP.PREOSdll(0)
+    prop = RP.REFPROPdll(gas, 'PD', 'T;H;S', 21, 0, 0, p, rho,fraction)
+    res = dict()
+    res['T'] = prop.Output[0]-273.15
+    res['h'] = prop.Output[1]/1000
+    res['s'] = prop.Output[2]/1000
+    return res
+
 def REFPROP_t_q(t, q, gas,fraction, RP):
     RP.PREOSdll(0)
     prop = RP.REFPROPdll(gas, 'TQ', 'P;D;H;S', 21, 0, 0, t, q,fraction)
@@ -123,7 +132,7 @@ def REFPROP_t_q(t, q, gas,fraction, RP):
     return res
 
 class Materials_prop:
-    def __init__(self, mat_name, fraction, hs_func, pt_func, ph_func, ps_func,pq_func, tq_func, *args, **kwargs):
+    def __init__(self, mat_name, fraction, hs_func, pt_func, ph_func, ps_func,pq_func, tq_func, prho_func, *args, **kwargs):
         self.__mat_name = mat_name
         self.__fraction = fraction
         self.__hs_func = hs_func
@@ -132,6 +141,7 @@ class Materials_prop:
         self.__ps_func = ps_func
         self.__pq_func = pq_func
         self.__tq_func = tq_func
+        self.__prho_func = prho_func
         self.__params = dict()
         for key, val in kwargs.items():
             self.__params[key] = val
@@ -153,3 +163,6 @@ class Materials_prop:
     
     def t_q(self, t, q):
         return self.__tq_func(t=t+273.15, q=q, gas=self.__mat_name,fraction=self.__fraction, **self.__params)
+    
+    def p_rho(self, p, rho):
+        return self.__prho_func(p=p*1e6, rho=rho, gas=self.__mat_name,fraction=self.__fraction, **self.__params)

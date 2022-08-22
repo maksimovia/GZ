@@ -117,10 +117,24 @@ class turbine:
 
     def stodola_flugel(self, D0, D1, pn0, pv0, Vv0, pn1, pv1, Vv1):
         pv1 = n.sqrt(
-            pn1**2 + ((D1 / D0) ** 2) * (pv0**2 - pn0**2) * pv1 * Vv1 / pv0 / Vv0
+            pn1**2 + ((D1 / D0) ** 2) * (pv0**2 - pn0**2) * (pv1 * Vv1 / (pv0 * Vv0))
         )
         return pv1
-
+    
+#     def stodola_flugel(self, D0, D1, pn0, pv0, Vv0, pn1, pv1, Vv1):
+#         Tv1=self.water.p_rho(pv1, 1/Vv1)['T']
+#         Tv0=self.water.p_rho(pv0, 1/Vv0)['T']
+        
+#         pv1 = n.sqrt(
+#             pn1**2 + ((D1 / D0) ** 2) * (pv0**2 - pn0**2) * ((Tv1+273.15)/(Tv0+273.15))
+#         )
+#         print('dT',((Tv1+273.15)/(Tv0+273.15)))
+#         print('dpV',(pv1 * Vv1 / (pv0 * Vv0)))
+#         print('dG',(D1 / D0) ** 2)
+#         print('dP',(pv0**2 - pn0**2))
+#         print('Pnd',pn1**2)
+#         return pv1
+    
     def retrive_values(self):
         # Параметры в точках из таблицы
         self.Pvd = self.water_streams.at[self.stream1, "P"]
@@ -193,6 +207,7 @@ class turbine:
     def calculate_turbine_stodol_flugel(self):
 
         # отсек 4
+        # print('G_ots4',self.Gin_cnd)
         self.Vin_cnd = 1 / self.water.p_h(self.Pin_cnd, self.Hin_cnd)["rho"]
         self.Pin_cnd = self.stodola_flugel(
             self.Gin_cnd0,
@@ -204,14 +219,16 @@ class turbine:
             self.Pin_cnd,
             self.Vin_cnd,
         )
+
         # диафрагма
         self.Potb1 = self.Pin_cnd + self.diafragma
 
         # отсек 3
+        # print('G_ots3',self.Gotb1)
         self.Votb2 = 1 / self.water.p_h(self.Potb2, self.Hotb2)["rho"]
         self.Potb2 = self.stodola_flugel(
-            self.Gotb20,
-            self.Gotb20,
+            self.Gotb10,
+            self.Gotb1,
             self.Potb10,
             self.Potb20,
             self.Votb20,
@@ -219,8 +236,11 @@ class turbine:
             self.Potb2,
             self.Votb2,
         )
+        
 
+        # D0, D1, pn0, pv0, Vv0, pn1, pv1, Vv1
         # отсек 2
+        # print('G_ots2',self.Gsmesh)
         self.Vsmesh = 1 / self.water.p_h(self.Psmesh, self.Hsmesh)["rho"]
         self.Psmesh = self.stodola_flugel(
             self.Gsmesh0,
@@ -235,7 +255,8 @@ class turbine:
 
         # Уточняем давления в смешении, на выходе из турбины и НД
         self.Vnd = 1 / self.water.p_h(self.Pnd, self.Hnd)["rho"]
-        self.Pnd = self.Psmesh + self.delta_Pnd_smesh0 * (self.Gnd*self.Vnd/self.Gnd0/self.Vnd0)**2
+        self.Pnd = self.Psmesh + self.delta_Pnd_smesh0 * (self.Gnd/self.Gnd0)**2
+        # self.Pnd = self.Psmesh + self.delta_Pnd_smesh0 * (self.Gnd*self.Vnd/self.Gnd0*self.Vnd0)**2
         self.Pvd_out = self.Psmesh
 
         # отсек 1
@@ -302,8 +323,8 @@ class turbine:
             P_out2=P_out.copy()
             Errors = list(map(lambda x, y: (x - y) / x * 100, P_out1, P_out2))
             Max_error = max(Errors)
-            if abs(Max_error) < calctolerance:
-                print("Максимальная погрешность определения давления в отборах", Max_error)
+            if abs(Max_error) < calctolerance and i>1:
+                # print("Максимальная погрешность определения давления в отборах", Max_error)
                 break
             if i==maxiterations-1:
                 print('Достигнуто максимальное количество итераций')
@@ -317,8 +338,22 @@ class turbine:
         self.water_streams.loc[self.stream1:self.stream8, "T"]=Temperatures
         self.water_streams.loc[self.stream1:self.stream8, "S"]=Entropies
         self.water_streams.loc[self.stream1:self.stream8, "X"]=Humidities
-
+    
+    def calculate_power(self):
+        self.retrive_values()
         
+        # отсек 1
+        N1=self.Gvd*(self.Hvd-self.Hvd_out)/1000
         
-
-        return {'Max_error':Max_error, 'P_out':P_out2, 'Eff_out':Eff_out}
+        # отсек 2
+        N2=self.Gsmesh*(self.Hsmesh-self.Hotb2)/1000
+        
+        # отсек 3
+        N4=self.Gotb1*(self.Hotb2-self.Hotb1)/1000
+        
+        # отсек 4
+        N3=self.Gin_cnd*(self.Hin_cnd-self.Hin_kond)/1000
+        
+        Ni_all=N1+N2+N3+N4
+        
+        return {'Ni':Ni_all,'Ni1':N1,'Ni2':N2,'Ni3':N3,'Ni4':N4}

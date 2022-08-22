@@ -320,8 +320,8 @@ class teplofik_systema:
 #             print('OD_delt',Qw_summ_od-Qw_od)
 
             if abs(Error_all) < calctolerance:
-                print('Мощность теплофикационной установки',Qw_summ)
-                print('Погрешность определения тепловой мощности теплофикационной установки',Error_all)
+                # print('Мощность теплофикационной установки',Qw_summ)
+                # print('Погрешность определения тепловой мощности теплофикационной установки',Error_all)
                 
                 break
             if i==maxiterations-1:
