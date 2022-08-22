@@ -62,7 +62,7 @@ class heatex:
         T11 = self.gas.p_h(P1, H11)['T']
 
         print("Prop:--- %s сек. ---" %
-              round((time.time() - start_timeProp), 1))
+              round((time.time() - start_timeProp), 2))
 
         start_timeIter = time.time()
 
@@ -101,7 +101,7 @@ class heatex:
                    method=self.calcmethod, tol=self.calctolerance)
         T12 = float(sol.x)
         print("Iter:--- %s сек. ---" %
-              round((time.time() - start_timeIter), 1))
+              round((time.time() - start_timeIter), 2))
         start_timeElse = time.time()
 
         H12 = self.gas.p_t(P1, T12)['h']
@@ -109,7 +109,7 @@ class heatex:
         H22 = H21 + (Q/G2)
         T22 = self.water.p_h(P22, H22)['T']
         print("Else:--- %s сек. ---" %
-              round((time.time() - start_timeElse), 1))
+              round((time.time() - start_timeElse), 2))
 
         return {'Tg': T12, 'Pg': P12, 'Hg': H12, 'Gg': G1, 'Qg': Q, 'Tw': T22, 'Pw': P22, 'Hw': H22, 'Gw': G2}
 
@@ -451,7 +451,7 @@ class cotel_all:
                                                      PEVD['Pw'], PEVD['Hw'], PEVD['Gw']]
                 
                 print("PEVD:--- %s сек. ---" %
-                      round((time.time() - start_timePEVD), 1))
+                      round((time.time() - start_timePEVD), 2))
 
                 start_timeIVD = time.time()
 
@@ -460,7 +460,7 @@ class cotel_all:
                 self.gas_streams.loc['IVD-EVD', 'T':'G'] = [IVD[0], IVD[1], IVD[2], IVD[3]]
                 self.water_streams.loc['IVD-PEVD','T':'G'] = [IVD[4], IVD[5], IVD[6], IVD[7]]
 
-                print("IVD:--- %s сек. ---" % round((time.time() - start_timeIVD), 1))
+                print("IVD:--- %s сек. ---" % round((time.time() - start_timeIVD), 2))
 
                 # Переопределение расхода в ВД
                 self.water_streams.loc['PEVD-DROSVD':'PEN-EVD', 'G'] = IVD[7]
@@ -470,7 +470,7 @@ class cotel_all:
                 
                 # Расчёт ЭВД
                 EVD = self.EVD_obj.calc()
-                print("EVD:--- %s сек. ---" % round((time.time() - start_timePEVD), 1))
+                print("EVD:--- %s сек. ---" % round((time.time() - start_timeEVD), 2))
                 
                 self.gas_streams.loc['EVD-PPND', 'T':'G'] = [EVD['Tg'],
                                                 EVD['Pg'], EVD['Hg'], EVD['Gg']]
@@ -486,7 +486,7 @@ class cotel_all:
                 print('dQ/Q ПЕВД+ИВД+ЭВД', ErrorVD)
                 if abs(ErrorVD) < self.calctolerance:
                     break
-            print("ВД: --- %s сек. ---" % round((time.time() - start_time), 1))
+            print("ВД: --- %s сек. ---" % round((time.time() - start_time), 2))
             # Для сходимости
             if i == 0:
                 self.gas_streams.loc['PPND-IND', 'T'] = self.gas_streams.loc['EVD-PPND', 'T'] - 3
@@ -559,7 +559,7 @@ class cotel_all:
                     if abs(Error_gpk) < self.calctolerance:
                         break
 
-                print("GPK:--- %s сек. ---" % round((time.time() - start_timeGPK), 1))
+                print("GPK:--- %s сек. ---" % round((time.time() - start_timeGPK), 2))
                     
                 # Баланс ППНД+ИНД+ГПК
                 Qgas1ND = self.KPD*self.gas_streams.at['EVD-PPND', 'G'] * \
@@ -582,7 +582,7 @@ class cotel_all:
                 print('dQ/Q ППНД+ИНД+ГПК',ErrorND )
                 if abs(ErrorND) < self.calctolerance and abs(ErrorND2) < self.calctolerance:
                     break
-            print("НД+ --- %s сек. ---" % round((time.time() - start_time), 1))
+            print("НД+ --- %s сек. ---" % round((time.time() - start_time), 2))
 
             # Баланс общий
             Qgasall = self.KPD*self.gas_streams.at['GTU-PEVD', 'G'] * \
@@ -593,7 +593,7 @@ class cotel_all:
             print('dQ/Qsumm',ErrorALL)
             if abs((Qgasall-Qwatall)/Qgasall*100) < self.calctolerance:
                 print("Fin:--- %s сек. ---" %
-                      round((time.time() - start_time), 1))
+                      round((time.time() - start_time), 2))
                 print('dQ/Qsumm',ErrorALL)
                 print('dQ/Qvd',ErrorVD)
                 print('dQ/Qnd',ErrorND)
