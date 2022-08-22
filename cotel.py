@@ -489,7 +489,7 @@ class cotel_all:
             print("ВД: --- %s сек. ---" % round((time.time() - start_time), 1))
             # Для сходимости
             if i == 0:
-                self.gas_streams.loc['PPND-IND', 'T'] = self.gas_streams.loc['EVD-PPND', 'T'] - 1
+                self.gas_streams.loc['PPND-IND', 'T'] = self.gas_streams.loc['EVD-PPND', 'T'] - 3
                 self.gas_streams.loc['PPND-IND', 'H'] = self.gas1.p_t(self.gas_streams.loc['PPND-IND', 'P'], self.gas_streams.loc['PPND-IND', 'T'])['h']
                 
             # Связка низкого давления

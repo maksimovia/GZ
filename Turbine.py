@@ -234,7 +234,8 @@ class turbine:
         )
 
         # Уточняем давления в смешении, на выходе из турбины и НД
-        self.Pnd = self.Psmesh + self.delta_Pnd_smesh0 * 1
+        self.Vnd = 1 / self.water.p_h(self.Pnd, self.Hnd)["rho"]
+        self.Pnd = self.Psmesh + self.delta_Pnd_smesh0 * (self.Gnd*self.Vnd/self.Gnd0/self.Vnd0)**2
         self.Pvd_out = self.Psmesh
 
         # отсек 1

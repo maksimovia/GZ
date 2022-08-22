@@ -170,9 +170,14 @@ class sp1:
         Nas_sp=self.water.p_q(p_sp,0)
         t_sp=Nas_sp['T']
         hsp_nas=Nas_sp['h']
-        tw_out=t_sp-(t_sp-tw_in)*m     
-        Qw=Gsv*self.Cp*(tw_out-tw_in)/1000
-        Gotb=(Qw*1000-G_nas_sp2*(h_nas_sp2-hsp_nas)*self.KPD)/(h_otb_sp-hsp_nas) / self.KPD
+        if t_sp<tw_in:
+            Qw=0
+            tw_out=tw_in+G_nas_sp2*(h_nas_sp2-hsp_nas)*self.KPD/Gsv/self.Cp
+            Gotb=0
+        else:
+            tw_out=t_sp-(t_sp-tw_in)*m     
+            Qw=Gsv*self.Cp*(tw_out-tw_in)/1000
+            Gotb=(Qw*1000-G_nas_sp2*(h_nas_sp2-hsp_nas)*self.KPD)/(h_otb_sp-hsp_nas) / self.KPD
         
         self.water_streams.at[self.stream12,'G']= (G_nas_sp2+Gotb)
         self.water_streams.at[self.stream11,'G']= Gotb
