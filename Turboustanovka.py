@@ -203,29 +203,31 @@ class turboustanovka:
         if teplofikacia == 1:
             Result = self.calculate_t_rejim(
                 calcmethod, calctolerance, maxiterations)
+            Qsp1 = Result['Tepl_systema_res']['SP1']['Qw']
+            Qsp2 = Result['Tepl_systema_res']['SP2']['Qw']
+            Qod = Result['Tepl_systema_res']['OD']['Qw']
+            self.heaters.at["SP2", "Qw"] = Qsp2
+            self.heaters.at["SP1", "Qw"] = Qsp1
+            self.heaters.at["OD", "Qw"] = Qod
+            self.heaters.at["SP2", "KPD"] = self.KPD_SP
+            self.heaters.at["SP1", "KPD"] = self.KPD_SP
+            self.heaters.at["OD", "KPD"] = self.KPD_SP
 
         if teplofikacia == 0:
             diafragma = 0
             Turb_res = self.Turb.calculate(
                 diafragma, maxiterations, calctolerance)
-            Result = {"Turb_res": Turb.calculate_power()}
+            Result = {"Turb_res": self.Turb.calculate_power()}
 
         # запись данных в таблицу блоков
-        Qsp1 = Result['Tepl_systema_res']['SP1']['Qw']
-        Qsp2 = Result['Tepl_systema_res']['SP2']['Qw']
-        Qod = Result['Tepl_systema_res']['OD']['Qw']
+        
         Ni = Result['Turb_res']['Ni']
         Ni1 = Result['Turb_res']['Ni1']
         Ni2 = Result['Turb_res']['Ni2']
         Ni3 = Result['Turb_res']['Ni3']
         Ni4 = Result['Turb_res']['Ni4']
 
-        self.heaters.at["SP2", "Qw"] = Qsp2
-        self.heaters.at["SP1", "Qw"] = Qsp1
-        self.heaters.at["OD", "Qw"] = Qod
-        self.heaters.at["SP2", "KPD"] = self.KPD_SP
-        self.heaters.at["SP1", "KPD"] = self.KPD_SP
-        self.heaters.at["OD", "KPD"] = self.KPD_SP
+       
         self.electric.at["Turbine", "Ni"] = Ni
         self.electric.loc["Tots1":"Tots4", "Ni"] = [Ni1, Ni2, Ni3, Ni4]
 
@@ -241,7 +243,6 @@ class turboustanovka:
         KN_res = self.KN.calc()
         Result['KN'] = KN_res
         self.water_streams.loc["KN-GPK",'T':'G'] = [KN_res['T2'], KN_res['P2'], KN_res['h2real'], KN_res['G1']]
-        print(KN_res['G1'])
         self.electric.loc['KN', 'Ni':'KPD'] = [KN_res['Ni'], KN_res['Ngm'], KN_res['KPDm'], KN_res['KPD']]
         # Расчет смешения перед ГПК
         h_kn = self.water_streams.at["KN-GPK", "H"]
@@ -249,7 +250,9 @@ class turboustanovka:
 
         h_od = self.water_streams.at["OD-GPK", "H"]
         G_od = self.water_streams.at["OD-GPK", "G"]
-
+        if teplofikacia == 0:
+            G_od=0
+            h_od=0
         G_smeshod = G_kn+G_od
         h_smeshod = (h_od*G_od+h_kn*G_kn)/G_smeshod
         p_smeshod = self.water_streams.at["SMESHOD-REC", "P"]
@@ -257,5 +260,6 @@ class turboustanovka:
         self.water_streams.at["SMESHOD-REC", "T"] = t_smeshod
         self.water_streams.at["SMESHOD-REC", "H"] = h_smeshod
         self.water_streams.at["SMESHOD-REC", "G"] = G_smeshod
+        # print('G_smeshod',G_smeshod,'h_smeshod',h_smeshod,'t_smeshod',t_smeshod,)        
 
         return Result
