@@ -4,14 +4,13 @@ import time
 import nasos
 
 class heatex:
-    def __init__(self, stream11, stream12, stream21, stream22, KPD, calctolerance, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters):
+    def __init__(self, stream11, stream12, stream21, stream22, KPD, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters):
         self.KPD = KPD
         self.gas_streams0 = gas_streams0
         self.water_streams0 = water_streams0
         self.gas_streams = gas_streams
         self.water_streams = water_streams
         self.calcmethod = calcmethod
-        self.calctolerance = calctolerance
         self.stream11 = stream11
         self.stream12 = stream12
         self.stream21 = stream21
@@ -47,7 +46,7 @@ class heatex:
         self.ro02av = self.water.p_t(P02av, T02av)['rho']
         self.ro021 = self.water.p_q(self.P021, 1)['rho']
 
-    def calc(self):
+    def calc(self,calctolerance):
         H11 = self.gas_streams.at[self.stream11, 'H']
         H21 = self.water_streams.at[self.stream21, 'H']
         G1 = self.gas_streams.at[self.stream11, 'G']
@@ -98,7 +97,7 @@ class heatex:
         except:
             Tfirst = T11*0.9
         sol = root(T12sved, max(Tfirst, T21+5),
-                   method=self.calcmethod, tol=self.calctolerance)
+                   method=self.calcmethod, tol=calctolerance)
         T12 = float(sol.x)
         H12 = self.gas.p_t(P1, T12)['h']
         Q = G1*(H11-H12)*self.KPD
@@ -109,14 +108,13 @@ class heatex:
 
 
 class heatexPEND:
-    def __init__(self, stream11, stream12, stream21, stream22, KPD, calctolerance, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters):
+    def __init__(self, stream11, stream12, stream21, stream22, KPD,  gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters):
         self.KPD = KPD
         self.gas_streams0 = gas_streams0
         self.water_streams0 = water_streams0
         self.gas_streams = gas_streams
         self.water_streams = water_streams
         self.calcmethod = calcmethod
-        self.calctolerance = calctolerance
         self.stream11 = stream11
         self.stream12 = stream12
         self.stream21 = stream21
@@ -151,7 +149,7 @@ class heatexPEND:
         self.ro01av = self.gas0.p_t(self.P01, T01av)['rho']
         self.ro02av = self.water.p_t(P02av, T02av)['rho']
         self.ro021 = self.water.p_q(self.P021, 1)['rho']
-    def calc(self):
+    def calc(self,calctolerance):
         H11 = self.gas_streams.at[self.stream11, 'H']
         H21 = self.water_streams.at[self.stream21, 'H']
         G1 = self.gas_streams.at[self.stream11, 'G']
@@ -201,7 +199,7 @@ class heatexPEND:
             Tfirst = T12
         except:
             Tfirst = T11*0.9
-        sol = root(T12sved, T11*0.99, method=self.calcmethod,tol=self.calctolerance)
+        sol = root(T12sved, T11*0.99, method=self.calcmethod,tol=calctolerance)
         T12 = float(sol.x)
         H12 = self.gas.p_t(P1, T12)['h']
         Q = G1*(H11-H12)*self.KPD
@@ -212,14 +210,13 @@ class heatexPEND:
 
 
 class evaporVD:
-    def __init__(self, stream11, stream12, stream21, stream22, KPD, calctolerance, gas, gas0, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters):
+    def __init__(self, stream11, stream12, stream21, stream22, KPD, gas, gas0, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters):
         self.KPD = KPD
         self.gas_streams0 = gas_streams0
         self.water_streams0 = water_streams0
         self.gas_streams = gas_streams
         self.water_streams = water_streams
         self.calcmethod = calcmethod
-        self.calctolerance = calctolerance
         self.stream11 = stream11
         self.stream12 = stream12
         self.stream21 = stream21
@@ -250,7 +247,7 @@ class evaporVD:
         self.Pr01av = self.gas0.p_t(self.P01, T01av)['Prandtl']
         self.nu01av = self.gas0.p_t(self.P01, T01av)['nu']
         self.ro01av = self.gas0.p_t(self.P01, T01av)['rho']
-    def calc(self):
+    def calc(self,calctolerance):
         H11 = self.gas_streams.at[self.stream11, 'H']
         H21 = self.water_streams.at[self.stream21, 'H']
         G1 = self.gas_streams.at[self.stream11, 'G']
@@ -291,7 +288,7 @@ class evaporVD:
             Tfirst = T12
         except:
             Tfirst = T11*0.9
-        sol = root(T12sved, max(Tfirst, T21+5),method=self.calcmethod, tol=self.calctolerance)
+        sol = root(T12sved, max(Tfirst, T21+5),method=self.calcmethod, tol=calctolerance)
         T12 = float(sol.x)
         H12 = self.gas.p_t(P1, T12)['h']
         Q = G1*(H11-H12)*self.KPD
@@ -303,14 +300,13 @@ class evaporVD:
 
 
 class evaporND:
-    def __init__(self, stream11, stream12, stream21, stream22, streamVD, KPD, calctolerance, gas, gas0, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters):
+    def __init__(self, stream11, stream12, stream21, stream22, streamVD, KPD, gas, gas0, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters):
         self.KPD = KPD
         self.gas_streams0 = gas_streams0
         self.water_streams0 = water_streams0
         self.gas_streams = gas_streams
         self.water_streams = water_streams
         self.calcmethod = calcmethod
-        self.calctolerance = calctolerance
         self.stream11 = stream11
         self.stream12 = stream12
         self.stream21 = stream21
@@ -342,7 +338,7 @@ class evaporND:
         self.Pr01av = self.gas0.p_t(self.P01, T01av)['Prandtl']
         self.nu01av = self.gas0.p_t(self.P01, T01av)['nu']
         self.ro01av = self.gas0.p_t(self.P01, T01av)['rho']
-    def calc(self):
+    def calc(self,calctolerance):
         H11 = self.gas_streams.at[self.stream11, 'H']
         H21 = self.water_streams.at[self.stream21, 'H']
         G1 = self.gas_streams.at[self.stream11, 'G']
@@ -382,7 +378,7 @@ class evaporND:
             Tfirst = T12
         except:
             Tfirst = T11*0.9
-        sol = root(T12sved, max(Tfirst, T21+5),method=self.calcmethod, tol=self.calctolerance)
+        sol = root(T12sved, max(Tfirst, T21+5),method=self.calcmethod, tol=calctolerance)
         T12 = float(sol.x)
         H12 = self.gas.p_t(P1, T12)['h']
         Q = G1*(H11-H12)*self.KPD
@@ -397,28 +393,27 @@ class evaporND:
 
 
 class cotel_all:
-    def __init__(self, KPD,KPDnasos, calctolerance, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams, heaters, electric):
+    def __init__(self, KPD,KPDnasos,  gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams, heaters, electric):
         self.PEVD_obj = heatex('GTU-PEVD', 'PEVD-IVD', 'IVD-PEVD', 'PEVD-DROSVD',
-                          KPD, calctolerance, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters)
+                          KPD,  gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters)
 
         self.IVD_obj = evaporVD('PEVD-IVD', 'IVD-EVD', 'EVD-IVD', 'IVD-PEVD',
-                           KPD, calctolerance, gas1, gas0, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters)
+                           KPD,  gas1, gas0, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters)
 
         self.EVD_obj = heatex('IVD-EVD', 'EVD-PPND', 'PEN-EVD', 'EVD-IVD',
-                         KPD, calctolerance, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters)
+                         KPD,  gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters)
 
         self.PEN_obj = nasos.nasos('BND-PEN', 'PEN-EVD', water, KPDnasos, water_streams,water_streams0)
 
         self.PPND_obj = heatexPEND('EVD-PPND', 'PPND-IND', 'IND-PPND', 'PPND-DROSND',
-                              KPD, calctolerance, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters)
+                              KPD,  gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters)
 
         self.IND_obj = evaporND('PPND-IND', 'IND-GPK', 'GPK-IND', 'IND-PPND',  'PEVD-DROSVD',
-                           KPD, calctolerance, gas1, gas0, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters)
+                           KPD, gas1, gas0, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters)
 
         self.GPK_obj = heatex('IND-GPK', 'GPK-out', 'REC-GPK', 'GPK-REC',
-                         KPD, calctolerance, gas1, gas0, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters)
+                         KPD,  gas1, gas0, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters)
         self.KPD=KPD
-        self.calctolerance=calctolerance
         self.water_streams=water_streams
         self.gas_streams=gas_streams
         self.gas_streams0=gas_streams0
@@ -427,7 +422,7 @@ class cotel_all:
         self.water=water
         self.heaters=heaters
         self.electric=electric
-    def calc(self,maxiterations=50):
+    def calc(self,calctolerance,maxiterations=50):
         it = maxiterations
         start_time = time.time()
         
@@ -437,14 +432,14 @@ class cotel_all:
             for j in range(it):
                 
                 # Расчёт ПЕВД
-                PEVD = self.PEVD_obj.calc()
+                PEVD = self.PEVD_obj.calc(calctolerance)
                 self.gas_streams.loc['PEVD-IVD', 'T':'G'] = [PEVD['Tg'], PEVD['Pg'], PEVD['Hg'], PEVD['Gg']]
                 self.water_streams.loc['PEVD-DROSVD', 'T':'G'] = [PEVD['Tw'], PEVD['Pw2'], PEVD['Hw'], PEVD['Gw']]
                 self.heaters.loc['PEVD', 'Qw':'KPD'] = [PEVD['Qw'], PEVD['Qg'], PEVD['KPD']]
                 self.water_streams.loc["IVD-PEVD":"PEN-EVD", "P"] = PEVD['Pw1']
                 
                 # Расчёт ИВД
-                IVD = self.IVD_obj.calc()
+                IVD = self.IVD_obj.calc(calctolerance)
                 self.gas_streams.loc['IVD-EVD', 'T':'G'] = [IVD['Tg'], IVD['Pg'], IVD['Hg'], IVD['Gg']]
                 self.water_streams.loc['IVD-PEVD','T':'G'] = [IVD['Tw'], IVD['Pw'], IVD['Hw'], IVD['Gw']]
                 self.heaters.loc['IVD', 'Qw':'KPD'] = [IVD['Qw'],IVD['Qg'],IVD['KPD']]
@@ -454,7 +449,7 @@ class cotel_all:
                 self.water_streams.loc['BND-PEN', 'G'] = IVD['Gw']
                 
                 # Расчёт ЭВД
-                EVD = self.EVD_obj.calc()
+                EVD = self.EVD_obj.calc(calctolerance)
                 
                 self.gas_streams.loc['EVD-PPND', 'T':'G'] = [EVD['Tg'],EVD['Pg'], EVD['Hg'], EVD['Gg']]
                 self.water_streams.loc['EVD-IVD', 'T':'G'] = [EVD['Tw'],EVD['Pw2'], EVD['Hw'], EVD['Gw']]
@@ -467,7 +462,7 @@ class cotel_all:
             self.water_streams.at['PEVD-DROSVD', 'H']-self.water_streams.at['EVD-IVD', 'H'])
                 ErrorVD=(Qgas1VD-Qwat1VD)/Qgas1VD*100
                 print('dQ/Q ПЕВД+ИВД+ЭВД', ErrorVD)
-                if abs(ErrorVD) < self.calctolerance:
+                if abs(ErrorVD) < calctolerance:
                     break
             # Для сходимости
             if i == 0:
@@ -477,7 +472,7 @@ class cotel_all:
             # Связка низкого давления
             for j in range(it):
                 # Расчёт ППНД
-                PPND = self.PPND_obj.calc()
+                PPND = self.PPND_obj.calc(calctolerance)
                 self.gas_streams.loc['PPND-IND', 'T':'G'] = [PPND['Tg'],
                                                 PPND['Pg'], PPND['Hg'], PPND['Gg']]
                 self.water_streams.loc['PPND-DROSND', 'T':'G'] = [PPND['Tw'], PPND['Pw2'], PPND['Hw'], PPND['Gw']]
@@ -486,7 +481,7 @@ class cotel_all:
                 self.water_streams.loc["BND-PEN", "P"] = PPND['Pw1']
                 
                 # Расчёт ИНД
-                IND = self.IND_obj.calc()
+                IND = self.IND_obj.calc(calctolerance)
                 self.gas_streams.loc['IND-GPK', 'T':'G'] = [IND['Tg'], IND['Pg'], IND['Hg'], IND['Gg']]
                 self.water_streams.loc['IND-PPND',
                           'T':'G'] = [IND['Tw'], IND['Pw'], IND['Hw'], IND['Gw']]
@@ -516,7 +511,7 @@ class cotel_all:
                 for i in range(it):
                  
                     # Расчёт ГПК
-                    GPK = self.GPK_obj.calc()
+                    GPK = self.GPK_obj.calc(calctolerance)
                     self.gas_streams.loc['GPK-out', 'T':'G'] = [GPK['Tg'],GPK['Pg'], GPK['Hg'], GPK['Gg']]
                     self.water_streams.loc['GPK-REC', 'T':'G'] = [GPK['Tw'],GPK['Pw2'], GPK['Hw'], GPK['Gw']]
                     Qw_gpk1= self.water_streams.at['GPK-IND', 'G']*(self.water_streams.at['GPK-IND', 'H']-self.water_streams.at['SMESHOD-REC', 'H'])
@@ -537,7 +532,7 @@ class cotel_all:
                     self.water_streams.loc['GPK-IND', 'T':'H']= self.water_streams.loc['GPK-REC', 'T':'H']
                     self.water_streams.at['GPK-IND', 'G'] = G_all
                     self.heaters.loc['GPK', 'Qw':'KPD'] = [GPK['Qw'],GPK['Qg'],GPK['KPD']]
-                    if abs(Error_gpk) < self.calctolerance:
+                    if abs(Error_gpk) < calctolerance:
                         break
 
                     
@@ -558,7 +553,7 @@ class cotel_all:
                 ErrorND2=(Qgas1ND-Qwat2ND)/Qgas1ND*100
                 
                 print('dQ/Q ППНД+ИНД+ГПК',ErrorND )
-                if abs(ErrorND) < self.calctolerance and abs(ErrorND2) < self.calctolerance:
+                if abs(ErrorND) < calctolerance and abs(ErrorND2) < calctolerance:
                     break
 
             # Баланс общий
@@ -568,7 +563,7 @@ class cotel_all:
         self.water_streams.at['PEVD-DROSVD', 'H']-self.water_streams.at['SMESHOD-REC', 'H'])-self.water_streams.at['BND-PEN', 'G']*(self.water_streams.at['PEN-EVD', 'H']-self.water_streams.at['BND-PEN', 'H'])
             ErrorALL=(Qgasall-Qwatall)/Qgasall*100
             print('dQ/Qsumm',ErrorALL)
-            if abs((Qgasall-Qwatall)/Qgasall*100) < self.calctolerance:
+            if abs((Qgasall-Qwatall)/Qgasall*100) < calctolerance:
                 print("Fin:--- %s сек. ---" %
                       round((time.time() - start_time), 2))
                 print('dQ/Qsumm',ErrorALL)
