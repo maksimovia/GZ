@@ -408,7 +408,7 @@ class evaporND:
 
 
 class cotel_all:
-    def __init__(self, KPD,KPDnasos, calctolerance, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams, heaters, electric, Pvd,Pnd):
+    def __init__(self, KPD,KPDnasos, calctolerance, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams, heaters, electric):
         self.PEVD_obj = heatex('GTU-PEVD', 'PEVD-IVD', 'IVD-PEVD', 'PEVD-DROSVD',
                           KPD, calctolerance, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters)
 
@@ -438,13 +438,9 @@ class cotel_all:
         self.water=water
         self.heaters=heaters
         self.electric=electric
-        self.Pvd = Pvd
-        self.Pnd = Pnd
     def calc(self,maxiterations=50):
         it = maxiterations
         start_time = time.time()
-        self.water_streams.loc["PEVD-DROSVD", "P"] = self.Pvd
-        self.water_streams.loc["PPND-DROSND", "P"] = self.Pnd
         for i in range(it):
             # Связвка высокого давления
             for j in range(it):
