@@ -419,7 +419,7 @@ class cotel_all:
         self.EVD_obj = heatex('IVD-EVD', 'EVD-PPND', 'PEN-EVD', 'EVD-IVD',
                          KPD, calctolerance, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters)
 
-        self.PEN_obj = nasos.nasos('BND-PEN', 'PEN-EVD', water, KPDnasos, water_streams,water_streams0,heaters,electric)
+        self.PEN_obj = nasos.nasos('BND-PEN', 'PEN-EVD', water, KPDnasos, water_streams,water_streams0)
 
         self.PPND_obj = heatexPEND('EVD-PPND', 'PPND-IND', 'IND-PPND', 'PPND-DROSND',
                               KPD, calctolerance, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters)

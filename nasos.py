@@ -1,10 +1,8 @@
 class nasos():
-    def __init__(self,stream11,stream12,water, KPDnasos,  water_streams, water_streams0,heaters,electric):
+    def __init__(self,stream11,stream12,water, KPDnasos,  water_streams, water_streams0):
         self.KPDnasos = KPDnasos
         self.stream11=stream11
         self.stream12=stream12
-        self.heaters=heaters
-        self.electric=electric
         self.water=water
         self.water_streams=water_streams
         self.water_streams0=water_streams0
