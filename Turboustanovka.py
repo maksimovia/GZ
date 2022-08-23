@@ -215,6 +215,7 @@ class turboustanovka:
 
         if teplofikacia == 0:
             diafragma = 0
+            self.water_streams.loc["DOOTB1":"INKOND","G"] = self.water_streams.at["DROSVD-TURBVD", 'G']+self.water_streams.at["DROSND-TURBND", 'G']
             Turb_res = self.Turb.calculate(
                 diafragma, maxiterations, calctolerance)
             Result = {"Turb_res": self.Turb.calculate_power()}

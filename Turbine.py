@@ -179,6 +179,7 @@ class turbine:
         KPD_ots1 = self.effiency0_ots1
         ots1_out = self.expansion(self.Pvd, self.Hvd, self.Pvd_out, KPD_ots1)
         self.Hvd_out = ots1_out["h"]
+        self.Gvd_out=self.Gvd
 
         # расчет смешения
         self.Gsmesh = self.Gnd + self.Gvd
@@ -188,6 +189,7 @@ class turbine:
         KPD_ots2 = self.effiency0_ots2
         ots2_out = self.expansion(self.Psmesh, self.Hsmesh, self.Potb2, KPD_ots2)
         self.Hotb2 = ots2_out["h"]
+        self.Gotb2=self.Gsmesh
 
         # отсек 3
         KPD_ots3 = self.effiency0_ots3
@@ -290,8 +292,7 @@ class turbine:
                 self.Hotb2,
                 self.Hotb1,
                 self.Hin_cnd,
-                self.Hin_kond,
-            ]
+                self.Hin_kond]
             P_out = [
                 self.Pvd,
                 self.Pvd_out,
@@ -300,15 +301,13 @@ class turbine:
                 self.Potb2,
                 self.Potb1,
                 self.Pin_cnd,
-                self.Pin_kond,
-            ]
+                self.Pin_kond]
             P_out1=P_out.copy()
             Eff_out = [
                 self.effiency0_ots1,
                 self.effiency0_ots2,
                 self.effiency0_ots3,
-                self.effiency0_ots4,
-            ]
+                self.effiency0_ots4]
             self.calculate_turbine_stodol_flugel()
             P_out = [
                 self.Pvd,
@@ -318,8 +317,7 @@ class turbine:
                 self.Potb2,
                 self.Potb1,
                 self.Pin_cnd,
-                self.Pin_kond,
-            ]
+                self.Pin_kond]
             P_out2=P_out.copy()
             Errors = list(map(lambda x, y: (x - y) / x * 100, P_out1, P_out2))
             Max_error = max(Errors)
@@ -328,6 +326,15 @@ class turbine:
                 break
             if i==maxiterations-1:
                 print('Достигнуто максимальное количество итераций')
+        G_out=[self.Gvd,
+                self.Gvd_out,
+                self.Gnd,
+                self.Gsmesh,
+                self.Gotb2,
+                self.Gotb1,
+                self.Gin_cnd,
+                self.Gin_kond,]
+        self.water_streams.loc[self.stream1:self.stream8, "G"]=G_out
         self.water_streams.loc[self.stream1:self.stream8, "P"]=P_out2
         self.water_streams.loc[self.stream1:self.stream8, "H"]=H_out
         Temperatures=list(map( lambda p,h: self.water.p_h(p, h)["T"],P_out2,H_out))
