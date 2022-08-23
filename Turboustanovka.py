@@ -230,18 +230,19 @@ class turboustanovka:
         self.electric.loc["Tots1":"Tots4", "Ni"] = [Ni1, Ni2, Ni3, Ni4]
 
         # Расчет насоса конденсатного (расход должен меняться из расчета - добавочная вода в конденсатор)
-        self.water_streams.at["KOND-KN","G"] = self.water_streams.at["INKOND", 'G']
         pk = self.water_streams.loc["INKOND", 'P']
         KONDout = self.water.p_q(pk, 0)
         T_KNin = KONDout['T']
         H_KNin = KONDout['h']
         self.water_streams.loc["KOND-KN", "T":'H'] = [T_KNin, pk, H_KNin]
-
+        self.water_streams.at["KOND-KN","G"] = self.water_streams.at["INKOND", 'G']
         self.water_streams.at["KN-GPK",
                               "P"] = self.water_streams.at["SMESHOD-REC", "P"]
         KN_res = self.KN.calc()
         Result['KN'] = KN_res
-
+        self.water_streams.loc["KN-GPK",'T':'G'] = [KN_res['T2'], KN_res['P2'], KN_res['h2real'], KN_res['G1']]
+        print(KN_res['G1'])
+        self.electric.loc['KN', 'Ni':'KPD'] = [KN_res['Ni'], KN_res['Ngm'], KN_res['KPDm'], KN_res['KPD']]
         # Расчет смешения перед ГПК
         h_kn = self.water_streams.at["KN-GPK", "H"]
         G_kn = self.water_streams.at["KN-GPK", "G"]
