@@ -12,6 +12,8 @@ class nasos():
         
     def KPD(self,G):
         g_otn=G/self.G0
+        if g_otn<0.65:
+            g_otn=0.65
         KPD_otn =(603.31*g_otn**4 - 1902.8*g_otn**3 + 2241.5*g_otn**2 - 1168*g_otn + 227.13)
         if KPD_otn > 1:
             KPD = self.KPDnasos
