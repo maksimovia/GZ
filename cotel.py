@@ -54,17 +54,24 @@ class heatex:
         G1 = self.gas_streams.at[self.stream11, 'G']
         G2 = self.water_streams.at[self.stream21, 'G']
         P1 = self.gas_streams.at[self.stream11, 'P']
-        P21 = self.water_streams.at[self.stream21, 'P']
+        P22 = self.water_streams.at[self.stream22, 'P']
+        def dPsved(P21):
+            if P21 < P22 or P21>2*P22:
+                return 10**9
+            else:
+                ro21 = self.water.p_q(P21, 1)['rho']
+                ddp = (ro21/self.ro021)*((self.G02/G2)**2)
+                P22new = P21 - ((self.P021-self.P022)/ddp)
+                return P22-P22new
+        sol = root(dPsved, 1.1*P22, tol=10**-8)
+        P21 = float(sol.x)
         ro21 = self.water.p_q(P21, 1)['rho']
-        ddp = (ro21/self.ro021)*((self.G02/G2)**2)
-        P22 = P21 - ((self.P021-self.P022)/ddp)
         P12 = P1
         T21 = self.water.p_h(P21, H21)['T']
         T11 = self.gas.p_h(P1, H11)['T']
-
+        
         print("Prop:--- %s сек. ---" %
               round((time.time() - start_timeProp), 2))
-
         start_timeIter = time.time()
 
         def T12sved(T12):
@@ -87,7 +94,6 @@ class heatex:
                 Pr1av = self.gas.p_t(P1, T1av)['Prandtl']
                 nu1av = self.gas.p_t(P1, T1av)['nu']
                 ro1av = self.gas.p_t(P1, T1av)['rho']
-
                 kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
                     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
                 Qq = self.Q0 / (kk*dt)
@@ -97,14 +103,12 @@ class heatex:
             Tfirst = T12
         except:
             Tfirst = T11*0.9
-          #  max(Tfirst,T21+5)
         sol = root(T12sved, max(Tfirst, T21+5),
                    method=self.calcmethod, tol=self.calctolerance)
         T12 = float(sol.x)
         print("Iter:--- %s сек. ---" %
               round((time.time() - start_timeIter), 2))
         start_timeElse = time.time()
-
         H12 = self.gas.p_t(P1, T12)['h']
         Q = G1*(H11-H12)*self.KPD
         Qg = G1*(H11-H12)
@@ -112,8 +116,7 @@ class heatex:
         T22 = self.water.p_h(P22, H22)['T']
         print("Else:--- %s сек. ---" %
               round((time.time() - start_timeElse), 2))
-
-        return {'Tg': T12, 'Pg': P12, 'Hg': H12, 'Gg': G1, 'Qg': Qg, 'Tw': T22, 'Pw': P22, 'Hw': H22, 'Gw': G2, 'Qw':Q, 'KPD':self.KPD}
+        return {'Tg': T12, 'Pg': P12, 'Hg': H12, 'Gg': G1, 'Qg': Qg, 'Tw': T22, 'Pw1': P21,'Pw2': P22, 'Hw': H22, 'Gw': G2, 'Qw':Q, 'KPD':self.KPD}
 
 
 class heatexPEND:
@@ -159,21 +162,27 @@ class heatexPEND:
         self.ro01av = self.gas0.p_t(self.P01, T01av)['rho']
         self.ro02av = self.water.p_t(P02av, T02av)['rho']
         self.ro021 = self.water.p_q(self.P021, 1)['rho']
-
     def calc(self):
         H11 = self.gas_streams.at[self.stream11, 'H']
         H21 = self.water_streams.at[self.stream21, 'H']
         G1 = self.gas_streams.at[self.stream11, 'G']
         G2 = self.water_streams.at[self.stream21, 'G']
         P1 = self.gas_streams.at[self.stream11, 'P']
-        P21 = self.water_streams.at[self.stream21, 'P']
+        P22 = self.water_streams.at[self.stream22, 'P']
+        def dPsved(P21):
+            if P21 < P22 or P21>2*P22:
+                return 10**9
+            else:
+                ro21 = self.water.p_q(P21, 1)['rho']
+                ddp = (ro21/self.ro021)*((self.G02/G2)**2)
+                P22new = P21 - ((self.P021-self.P022)/ddp)
+                return P22-P22new
+        sol = root(dPsved, 1.1*P22, tol=10**-8)
+        P21 = float(sol.x)
         ro21 = self.water.p_q(P21, 1)['rho']
-        ddp = (ro21/self.ro021)*((self.G02/G2)**2)
-        P22 = P21 - ((self.P021-self.P022)/ddp)
         P12 = P1
         T21 = self.water.p_h(P21, H21)['T']
         T11 = self.gas.p_h(P1, H11)['T']
-
         def T12sved(T12):
             if T12 < T21 or T12 > T11:
                 return 10**9
@@ -194,7 +203,6 @@ class heatexPEND:
                 Pr1av = self.gas.p_t(P1, T1av)['Prandtl']
                 nu1av = self.gas.p_t(P1, T1av)['nu']
                 ro1av = self.gas.p_t(P1, T1av)['rho']
-
                 kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
                     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
                 Qq = self.Q0 / (kk*dt)
@@ -204,16 +212,14 @@ class heatexPEND:
             Tfirst = T12
         except:
             Tfirst = T11*0.9
-          #  max(Tfirst,T21+5)
-        sol = root(T12sved, T11*0.99, method=self.calcmethod,
-                   tol=self.calctolerance)
+        sol = root(T12sved, T11*0.99, method=self.calcmethod,tol=self.calctolerance)
         T12 = float(sol.x)
         H12 = self.gas.p_t(P1, T12)['h']
         Q = G1*(H11-H12)*self.KPD
         Qg = G1*(H11-H12)
         H22 = H21 + (Q/G2)
         T22 = self.water.p_h(P22, H22)['T']
-        return {'Tg': T12, 'Pg': P12, 'Hg': H12, 'Gg': G1, 'Qg': Qg, 'Tw': T22, 'Pw': P22, 'Hw': H22, 'Gw': G2, 'Qw':Q, 'KPD':self.KPD}
+        return {'Tg': T12, 'Pg': P12, 'Hg': H12, 'Gg': G1, 'Qg': Qg, 'Tw': T22, 'Pw1': P21,'Pw2': P22, 'Hw': H22, 'Gw': G2, 'Qw':Q, 'KPD':self.KPD}
 
 
 class evaporVD:
@@ -255,7 +261,6 @@ class evaporVD:
         self.Pr01av = self.gas0.p_t(self.P01, T01av)['Prandtl']
         self.nu01av = self.gas0.p_t(self.P01, T01av)['nu']
         self.ro01av = self.gas0.p_t(self.P01, T01av)['rho']
-
     def calc(self):
         H11 = self.gas_streams.at[self.stream11, 'H']
         H21 = self.water_streams.at[self.stream21, 'H']
@@ -266,7 +271,6 @@ class evaporVD:
         T11 = self.gas.p_h(P1, H11)['T']
         T11 = self.gas.p_h(P1, H11)['T']
         T21 = self.water.p_q(P2, 0)['T']
-
         def T12sved(T12):
             T12 = float(T12)
             if T12 < T21 or T12 > T11:
@@ -298,8 +302,7 @@ class evaporVD:
             Tfirst = T12
         except:
             Tfirst = T11*0.9
-        sol = root(T12sved, max(Tfirst, T21+5),
-                   method=self.calcmethod, tol=self.calctolerance)
+        sol = root(T12sved, max(Tfirst, T21+5),method=self.calcmethod, tol=self.calctolerance)
         T12 = float(sol.x)
         H12 = self.gas.p_t(P1, T12)['h']
         Q = G1*(H11-H12)*self.KPD
@@ -350,9 +353,7 @@ class evaporND:
         self.Pr01av = self.gas0.p_t(self.P01, T01av)['Prandtl']
         self.nu01av = self.gas0.p_t(self.P01, T01av)['nu']
         self.ro01av = self.gas0.p_t(self.P01, T01av)['rho']
-
     def calc(self):
-
         H11 = self.gas_streams.at[self.stream11, 'H']
         H21 = self.water_streams.at[self.stream21, 'H']
         G1 = self.gas_streams.at[self.stream11, 'G']
@@ -361,7 +362,6 @@ class evaporND:
         T21 = self.water.p_q(P2, 0)['T']
         T11 = self.gas.p_h(P1, H11)['T']
         Dvd = self.water_streams.at[self.streamVD, 'G']
-
         def T12sved(T12):
             if T12 < T21 or T12 > T11:
                 return 10**9
@@ -393,8 +393,7 @@ class evaporND:
             Tfirst = T12
         except:
             Tfirst = T11*0.9
-        sol = root(T12sved, max(Tfirst, T21+5),
-                   method=self.calcmethod, tol=self.calctolerance)
+        sol = root(T12sved, max(Tfirst, T21+5),method=self.calcmethod, tol=self.calctolerance)
         T12 = float(sol.x)
         H12 = self.gas.p_t(P1, T12)['h']
         Q = G1*(H11-H12)*self.KPD
@@ -409,7 +408,7 @@ class evaporND:
 
 
 class cotel_all:
-    def __init__(self, KPD,KPDnasos, calctolerance, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams, heaters, electric):
+    def __init__(self, KPD,KPDnasos, calctolerance, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams, heaters, electric, Pvd,Pnd):
         self.PEVD_obj = heatex('GTU-PEVD', 'PEVD-IVD', 'IVD-PEVD', 'PEVD-DROSVD',
                           KPD, calctolerance, gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams,heaters)
 
@@ -439,43 +438,41 @@ class cotel_all:
         self.water=water
         self.heaters=heaters
         self.electric=electric
-
-       
-
+        self.Pvd = Pvd
+        self.Pnd = Pnd
     def calc(self,maxiterations=50):
-
         it = maxiterations
         start_time = time.time()
-
+        self.water_streams.loc["PEVD-DROSVD", "P"] = self.Pvd
+        self.water_streams.loc["PPND-DROSND", "P"] = self.Pnd
         for i in range(it):
             # Связвка высокого давления
             for j in range(it):
-
+                
                 start_timePEVD = time.time()
-
+                
                 # Расчёт ПЕВД
                 PEVD = self.PEVD_obj.calc()
-                self.gas_streams.loc['PEVD-IVD', 'T':'G'] = [PEVD['Tg'],
-                                                        PEVD['Pg'], PEVD['Hg'], PEVD['Gg']]
-                self.water_streams.loc['PEVD-DROSVD', 'T':'G'] = [PEVD['Tw'],
-                                                     PEVD['Pw'], PEVD['Hw'], PEVD['Gw']]
-                self.heaters.loc['PEVD', 'Qw':'KPD'] = [PEVD['Qw'],PEVD['Qg'],PEVD['KPD']]
+                self.gas_streams.loc['PEVD-IVD', 'T':'G'] = [PEVD['Tg'], PEVD['Pg'], PEVD['Hg'], PEVD['Gg']]
+                self.water_streams.loc['PEVD-DROSVD', 'T':'G'] = [PEVD['Tw'], PEVD['Pw2'], PEVD['Hw'], PEVD['Gw']]
+                self.heaters.loc['PEVD', 'Qw':'KPD'] = [PEVD['Qw'], PEVD['Qg'], PEVD['KPD']]
+                self.water_streams.loc["IVD-PEVD":"PEN-EVD", "P"] = PEVD['Pw1']
                 print("PEVD:--- %s сек. ---" %
                       round((time.time() - start_timePEVD), 2))
 
                 start_timeIVD = time.time()
-
+                
                 # Расчёт ИВД
                 IVD = self.IVD_obj.calc()
                 self.gas_streams.loc['IVD-EVD', 'T':'G'] = [IVD['Tg'], IVD['Pg'], IVD['Hg'], IVD['Gg']]
                 self.water_streams.loc['IVD-PEVD','T':'G'] = [IVD['Tw'], IVD['Pw'], IVD['Hw'], IVD['Gw']]
                 self.heaters.loc['IVD', 'Qw':'KPD'] = [IVD['Qw'],IVD['Qg'],IVD['KPD']]
                 print("IVD:--- %s сек. ---" % round((time.time() - start_timeIVD), 2))
-
+                
                 # Переопределение расхода в ВД
                 self.water_streams.loc['PEVD-DROSVD':'PEN-EVD', 'G'] = IVD['Gw']
                 self.water_streams.loc['BND-PEN', 'G'] = IVD['Gw']
-
+                
                 start_timeEVD = time.time()
                 
                 # Расчёт ЭВД
@@ -485,7 +482,7 @@ class cotel_all:
                 self.gas_streams.loc['EVD-PPND', 'T':'G'] = [EVD['Tg'],
                                                 EVD['Pg'], EVD['Hg'], EVD['Gg']]
                 self.water_streams.loc['EVD-IVD', 'T':'G'] = [EVD['Tw'],
-                                                 EVD['Pw'], EVD['Hw'], EVD['Gw']]
+                                                 EVD['Pw2'], EVD['Hw'], EVD['Gw']]
                 self.heaters.loc['EVD', 'Qw':'KPD'] = [EVD['Qw'],EVD['Qg'],EVD['KPD']]
                 
                 # Баланс ПЕВ+ИВД+ЭВД
@@ -509,10 +506,11 @@ class cotel_all:
                 PPND = self.PPND_obj.calc()
                 self.gas_streams.loc['PPND-IND', 'T':'G'] = [PPND['Tg'],
                                                 PPND['Pg'], PPND['Hg'], PPND['Gg']]
-                self.water_streams.loc['PPND-DROSND',
-                          'T':'G'] = [PPND['Tw'], PPND['Pw'], PPND['Hw'], PPND['Gw']]
-                self.heaters.loc['PPND', 'Qw':'KPD'] = [PPND['Qw'],PPND['Qg'],PPND['KPD']]
-
+                self.water_streams.loc['PPND-DROSND', 'T':'G'] = [PPND['Tw'], PPND['Pw2'], PPND['Hw'], PPND['Gw']]
+                self.heaters.loc['PPND', 'Qw':'KPD'] = [PPND['Qw'], PPND['Qg'], PPND['KPD']]
+                self.water_streams.loc["IND-PPND":"SMESHOD-REC", "P"] = PPND['Pw1']
+                self.water_streams.loc["BND-PEN", "P"] = PPND['Pw1']
+                
                 # Расчёт ИНД
                 IND = self.IND_obj.calc()
                 self.gas_streams.loc['IND-GPK', 'T':'G'] = [IND['Tg'], IND['Pg'], IND['Hg'], IND['Gg']]
@@ -548,10 +546,8 @@ class cotel_all:
                     
                     # Расчёт ГПК
                     GPK = self.GPK_obj.calc()
-                    self.gas_streams.loc['GPK-out', 'T':'G'] = [GPK['Tg'],
-                                               GPK['Pg'], GPK['Hg'], GPK['Gg']]
-                    self.water_streams.loc['GPK-REC', 'T':'G'] = [GPK['Tw'],
-                                                 GPK['Pw'], GPK['Hw'], GPK['Gw']]
+                    self.gas_streams.loc['GPK-out', 'T':'G'] = [GPK['Tg'],GPK['Pg'], GPK['Hg'], GPK['Gg']]
+                    self.water_streams.loc['GPK-REC', 'T':'G'] = [GPK['Tw'],GPK['Pw2'], GPK['Hw'], GPK['Gw']]
                     Qw_gpk1= self.water_streams.at['GPK-IND', 'G']*(self.water_streams.at['GPK-IND', 'H']-self.water_streams.at['SMESHOD-REC', 'H'])
                     Qw_gpk2= self.water_streams.at['GPK-REC', 'G']*(self.water_streams.at['GPK-REC', 'H']-self.water_streams.at['REC-GPK', 'H'])
                     Error_gpk=(Qw_gpk1-Qw_gpk2)/Qw_gpk1*100
@@ -569,7 +565,6 @@ class cotel_all:
                     self.water_streams.at['REC-GPK', 'G'] = G_gpk
                     self.water_streams.loc['GPK-IND', 'T':'H']= self.water_streams.loc['GPK-REC', 'T':'H']
                     self.water_streams.at['GPK-IND', 'G'] = G_all
-                    
                     self.heaters.loc['GPK', 'Qw':'KPD'] = [GPK['Qw'],GPK['Qg'],GPK['KPD']]
                     if abs(Error_gpk) < self.calctolerance:
                         break
@@ -593,7 +588,7 @@ class cotel_all:
                 # print(Qwat1ND)
                 ErrorND=(Qgas1ND-Qwat1ND)/Qgas1ND*100
                 ErrorND2=(Qgas1ND-Qwat2ND)/Qgas1ND*100
-
+                
                 print('dQ/Q ППНД+ИНД+ГПК',ErrorND )
                 if abs(ErrorND) < self.calctolerance and abs(ErrorND2) < self.calctolerance:
                     break
@@ -613,4 +608,3 @@ class cotel_all:
                 print('dQ/Qvd',ErrorVD)
                 print('dQ/Qnd',ErrorND)
                 break
-            
