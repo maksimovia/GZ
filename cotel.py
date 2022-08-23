@@ -244,7 +244,7 @@ class evaporVD:
         self.Q0 = self.G01*(self.H011-self.H012)*self.KPD
         T011 = self.gas0.p_h(self.P01, self.H011)['T']
         T012 = self.gas0.p_h(self.P01, self.H012)['T']
-        T021 = self.water.p_h(self.P02, self.H021)['T']
+        T021 = self.water.p_q(self.P02, 0)['T']
         T022 = self.water.p_h(self.P02, self.H022)['T']
         T0np = self.water.p_q(self.P02, 1)['T']
         dTmin0 = min(T011-T0np, T012-T0np)
@@ -265,7 +265,7 @@ class evaporVD:
         T21 = self.water.p_h(P2, H21)['T']
         T11 = self.gas.p_h(P1, H11)['T']
         T11 = self.gas.p_h(P1, H11)['T']
-        T21 = self.water.p_h(P2, H21)['T']
+        T21 = self.water.p_q(P2, 0)['T']
 
         def T12sved(T12):
             T12 = float(T12)
@@ -339,7 +339,7 @@ class evaporND:
         self.Q0 = self.G01*(self.H011-self.H012)*self.KPD
         T011 = self.gas0.p_h(self.P01, self.H011)['T']
         T012 = self.gas0.p_h(self.P01, self.H012)['T']
-        T021 = self.water.p_h(self.P02, self.H021)['T']
+        T021 = self.water.p_q(self.P02, 0)['T']
         T022 = self.water.p_h(self.P02, self.H022)['T']
         T0np = self.water.p_q(self.P02, 1)['T']
         dTmin0 = min(T011-T0np, T012-T0np)
@@ -358,7 +358,7 @@ class evaporND:
         G1 = self.gas_streams.at[self.stream11, 'G']
         P1 = self.gas_streams.at[self.stream11, 'P']
         P2 = self.water_streams.at[self.stream21, 'P']
-        T21 = self.water.p_h(P2, H21)['T']
+        T21 = self.water.p_q(P2, 0)['T']
         T11 = self.gas.p_h(P1, H11)['T']
         Dvd = self.water_streams.at[self.streamVD, 'G']
 
