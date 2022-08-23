@@ -464,6 +464,8 @@ class cotel_all:
                 print('dQ/Q ПЕВД+ИВД+ЭВД', ErrorVD)
                 if abs(ErrorVD) < calctolerance:
                     break
+                if j == it - 1:
+                    print("Достигнуто максимальное количество итераций контура высокого давления")
             # Для сходимости
             if i == 0:
                 self.gas_streams.loc['PPND-IND', 'T'] = self.gas_streams.loc['EVD-PPND', 'T'] - 3
@@ -534,6 +536,8 @@ class cotel_all:
                     self.heaters.loc['GPK', 'Qw':'KPD'] = [GPK['Qw'],GPK['Qg'],GPK['KPD']]
                     if abs(Error_gpk) < calctolerance:
                         break
+                    if i == it - 1:
+                        print("Достигнуто максимальное количество итераций контура ГПК")
 
                     
                 # Баланс ППНД+ИНД+ГПК
@@ -555,6 +559,9 @@ class cotel_all:
                 print('dQ/Q ППНД+ИНД+ГПК',ErrorND )
                 if abs(ErrorND) < calctolerance and abs(ErrorND2) < calctolerance:
                     break
+                if j == it - 1:
+                    print("Достигнуто максимальное количество итераций контура низкого давления")
+
 
             # Баланс общий
             Qgasall = self.KPD*self.gas_streams.at['GTU-PEVD', 'G'] * \
@@ -570,3 +577,5 @@ class cotel_all:
                 print('dQ/Qvd',ErrorVD)
                 print('dQ/Qnd',ErrorND)
                 break
+            if i == it - 1:
+                print("Достигнуто максимальное количество итераций котла-утилизатора")

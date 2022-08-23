@@ -36,7 +36,7 @@ class nasos():
         if KN>0:
             KPDgm = 0.9736 * KN**(0.3358)
         else:
-            KPDgm=0
+            KPDgm=0.1
         return KPDgm
     
     
