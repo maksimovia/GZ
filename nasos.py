@@ -47,6 +47,6 @@ class nasos():
         h2teor = self.water.p_s(P2,s1)['h']
         h2real = h1+(h2teor-h1)/self.KPD(G1)
         T2=self.water.p_h(P2,h2real)['T']
-        Rabota = G1*(h2real - h1)
+        Rabota = G1*(h2real - h1)/1000
         Ngm = Rabota/self.KPDm()
         return {'T2': T2, 'P2': P2, 'h2real': h2real, 'G1': G1, 'Ni': Rabota, 'Ngm': Ngm, 'KPD': self.KPD(G1), 'KPDm': self.KPDm()}
