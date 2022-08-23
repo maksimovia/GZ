@@ -1,8 +1,10 @@
 class nasos():
-    def __init__(self,stream11,stream12,water, KPDnasos,  water_streams, water_streams0):
+    def __init__(self,stream11,stream12,water, KPDnasos,  water_streams, water_streams0,heaters,electric):
         self.KPDnasos = KPDnasos
         self.stream11=stream11
         self.stream12=stream12
+        self.heaters=heaters
+        self.electric=electric
         self.water=water
         self.water_streams=water_streams
         self.water_streams0=water_streams0
@@ -48,4 +50,5 @@ class nasos():
         h2real = h1+(h2teor-h1)/self.KPD(G1)
         T2=self.water.p_h(P2,h2real)['T']
         Rabota = G1*(h2real - h1)
-        return [T2, P2, h2real, G1, Rabota, self.KPD(G1),self.KPDm()]
+        Ngm = Rabota/self.KPDm()
+        return {'T2': T2, 'P2': P2, 'h2real': h2real, 'G1': G1, 'Ni': Rabota, 'Ngm': Ngm, 'KPD': self.KPD(G1), 'KPDm': self.KPDm()}
