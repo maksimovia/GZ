@@ -488,7 +488,7 @@ class cotel_all:
                 Qwat1VD = self.water_streams.at['PEVD-DROSVD', 'G']*(
                     self.water_streams.at['PEVD-DROSVD', 'H']-self.water_streams.at['EVD-IVD', 'H'])
                 ErrorVD = (Qgas1VD-Qwat1VD)/Qgas1VD*100
-                if k > 2:
+                if k > 5:
                     print('dQ/Q ПЕВД+ИВД+ЭВД', ErrorVD)
                 if abs(ErrorVD) < calctolerance:
                     break
@@ -612,7 +612,7 @@ class cotel_all:
                      self.water_streams.at['GPK-IND', 'H'])
                 ErrorND = (Qgas1ND-Qwat1ND)/Qgas1ND*100
                 ErrorND2 = (Qgas1ND-Qwat2ND)/Qgas1ND*100
-                if k > 2:
+                if k > 5:
                     print('dQ/Q ППНД+ИНД+ГПК', ErrorND)
                 if abs(ErrorND) < calctolerance and abs(ErrorND2) < calctolerance:
                     break
@@ -627,13 +627,13 @@ class cotel_all:
             Qwatall = self.water_streams.at['PPND-DROSND', 'G']*(self.water_streams.at['PPND-DROSND', 'H']-self.water_streams.at['SMESHOD-REC', 'H'])+self.water_streams.at['PEVD-DROSVD', 'G']*(
                 self.water_streams.at['PEVD-DROSVD', 'H']-self.water_streams.at['SMESHOD-REC', 'H'])-self.water_streams.at['BND-PEN', 'G']*(self.water_streams.at['PEN-EVD', 'H']-self.water_streams.at['BND-PEN', 'H'])
             ErrorALL = (Qgasall-Qwatall)/Qgasall*100
-            print('dQ/Qsumm', ErrorALL)
+            # print('dQ/Qsumm', ErrorALL)
             if abs((Qgasall-Qwatall)/Qgasall*100) < calctolerance:
-                print("Fin:--- %s сек. ---" %
+                print("Fin котел-утилизатора:--- %s сек. ---" %
                       round((time.time() - start_time), 2))
                 print('dQ/Qsumm', ErrorALL)
-                print('dQ/Qvd', ErrorVD)
-                print('dQ/Qnd', ErrorND)
+                # print('dQ/Qvd', ErrorVD)
+                # print('dQ/Qnd', ErrorND)
                 break
             if k == it - 1:
                 print("Достигнуто максимальное количество итераций котла-утилизатора")

@@ -36,74 +36,74 @@ class turboustanovka:
         self.KN = nasos.nasos('KOND-KN', 'KN-GPK', water,
                               KPDnasos, water_streams, water_streams0)
 
-    def Find_Potb2(self, Diafragma):
-        Diafragma_it = [0]
-        G_sp2_it = 1
-        G_sp1_it = 1
-        P_turb_it = 1
-        P_tepl_it = 1
-        for i in range(self.maxiterations):
-            Tepl_systema_res = self.Tepl_systema.calculate(
-                self.maxiterations, calctolerance
-            )
-            G_sp2 = Tepl_systema_res["SP2"]["Gotb"]
-            P_sp2 = Tepl_systema_res["SP2"]["p_otb"]
-            G_sp1 = Tepl_systema_res["SP1"]["Gotb"]
-            G_sp2 = max(0.01, G_sp2)
-            G_sp1 = max(0.01, G_sp1)
-            G_ots3 = max(
-                0.01, self.water_streams.at["DOOTB2", "G"] - G_sp2)
-            self.water_streams.at["DOOTB1", "G"] = G_ots3
-            G_CND = max(
-                0.001, self.water_streams.at["DOOTB1", "G"] - G_sp1)
-            self.water_streams.loc["INCND":"INKOND", "G"] = G_CND
-            self.water_streams.loc["OTB1-SP1", "T":"H"] = self.water_streams.loc[
-                "DOOTB1", "T":"H"
-            ]
-            self.water_streams.at["OTB2-SP2", "T"] = self.water_streams.at[
-                "DOOTB2", "T"
-            ]
-            self.water_streams.at["OTB2-SP2", "H"] = self.water_streams.at[
-                "DOOTB2", "H"
-            ]
-            Turb_res = self.Turb.calculate(
-                Diafragma, self.maxiterations, calctolerance)
-            Potb2_turb = self.water_streams.at["DOOTB2", "P"]
-            Potb2_teplof = self.water_streams.at["OTB2-SP2", "P"]
+#     def Find_Potb2(self, Diafragma):
+#         Diafragma_it = [0]
+#         G_sp2_it = 1
+#         G_sp1_it = 1
+#         P_turb_it = 1
+#         P_tepl_it = 1
+#         for i in range(self.maxiterations):
+#             Tepl_systema_res = self.Tepl_systema.calculate(
+#                 self.maxiterations, calctolerance
+#             )
+#             G_sp2 = Tepl_systema_res["SP2"]["Gotb"]
+#             P_sp2 = Tepl_systema_res["SP2"]["p_otb"]
+#             G_sp1 = Tepl_systema_res["SP1"]["Gotb"]
+#             G_sp2 = max(0.01, G_sp2)
+#             G_sp1 = max(0.01, G_sp1)
+#             G_ots3 = max(
+#                 0.01, self.water_streams.at["DOOTB2", "G"] - G_sp2)
+#             self.water_streams.at["DOOTB1", "G"] = G_ots3
+#             G_CND = max(
+#                 0.001, self.water_streams.at["DOOTB1", "G"] - G_sp1)
+#             self.water_streams.loc["INCND":"INKOND", "G"] = G_CND
+#             self.water_streams.loc["OTB1-SP1", "T":"H"] = self.water_streams.loc[
+#                 "DOOTB1", "T":"H"
+#             ]
+#             self.water_streams.at["OTB2-SP2", "T"] = self.water_streams.at[
+#                 "DOOTB2", "T"
+#             ]
+#             self.water_streams.at["OTB2-SP2", "H"] = self.water_streams.at[
+#                 "DOOTB2", "H"
+#             ]
+#             Turb_res = self.Turb.calculate(
+#                 Diafragma, self.maxiterations, calctolerance)
+#             Potb2_turb = self.water_streams.at["DOOTB2", "P"]
+#             Potb2_teplof = self.water_streams.at["OTB2-SP2", "P"]
 
-            Error_Gsp2 = (G_sp2_it-G_sp2)/G_sp2_it*100
-            Error_Gsp1 = (G_sp1_it-G_sp1)/G_sp1_it*100
-            Error_P_turb = (P_turb_it-Potb2_turb)/P_turb_it*100
-            Error_P_tepl = (P_tepl_it-Potb2_teplof)/P_tepl_it*100
-            G_sp2_it = G_sp2
-            G_sp1_it = G_sp1
-            P_turb_it = Potb2_turb
-            P_tepl_it = Potb2_teplof
+#             Error_Gsp2 = (G_sp2_it-G_sp2)/G_sp2_it*100
+#             Error_Gsp1 = (G_sp1_it-G_sp1)/G_sp1_it*100
+#             Error_P_turb = (P_turb_it-Potb2_turb)/P_turb_it*100
+#             Error_P_tepl = (P_tepl_it-Potb2_teplof)/P_tepl_it*100
+#             G_sp2_it = G_sp2
+#             G_sp1_it = G_sp1
+#             P_turb_it = Potb2_turb
+#             P_tepl_it = Potb2_teplof
 
-            Max_error = max(Error_Gsp2, Error_Gsp1, Error_P_turb, Error_P_tepl)
-            # print("Potb2_turb", Potb2_turb)
-            print("G_sp2", G_sp2)
-            print("G_sp2_it", G_sp2_it)
-            print("G_sp1", G_sp1)
-            print("G_sp1_it", G_sp1_it)
+#             Max_error = max(Error_Gsp2, Error_Gsp1, Error_P_turb, Error_P_tepl)
+#             # print("Potb2_turb", Potb2_turb)
 
-            # print("Diafragma", Diafragma)
-            if abs(Max_error) < calctolerance:
-                print("G_sp2", G_sp2, "G_sp1", G_sp1, "P_sp2", P_sp2)
-                print(
-                    "Выход из цикла сведения турбины и теплофикации",
-                    Max_error,
-                )
-                break
-            if i == self.maxiterations - 1:
-                print(
-                    "Достигнуто максимальное количество итераций нахождения давления в верхнем отборе")
 
-        Error_p = (Potb2_turb - Potb2_teplof) / Potb2_teplof * 100
-        Diafragma_it.append(Diafragma)
-        print("Error_p", Error_p)
-        print("Diafragma", Diafragma)
-        return Error_p
+#             # print("Diafragma", Diafragma)
+#             if abs(Max_error) < calctolerance:
+#                 print("G_sp2", G_sp2, "G_sp1", G_sp1, "P_sp2", P_sp2)
+#                 print(
+#                     "Выход из цикла сведения турбины и теплофикации",
+#                     Max_error,
+#                 )
+#                 break
+#             if i == self.maxiterations - 1:
+#                 print(
+#                     "Достигнуто максимальное количество итераций нахождения давления в верхнем отборе")
+#                 print('Расход в конденсатор',G_CND)
+#                 print('Расход в СП1',G_sp1)
+#                 print('Расход в СП2',G_sp2)
+
+#         Error_p = (Potb2_turb - Potb2_teplof) / Potb2_teplof * 100
+#         Diafragma_it.append(Diafragma)
+#         print("Error_p", Error_p)
+#         print("Diafragma", Diafragma)
+#         return Error_p
 
     def Find_Potb2_it(self, maxiterations, calctolerance):
         Diafragma = 0.05
@@ -160,20 +160,20 @@ class turboustanovka:
                 # print("G_sp1_it", G_sp1_it)
 
                 if abs(Max_error) < calctolerance:
-                    # print(
-                    #     "Выход из цикла сведения турбины и теплофикации",
-                    #     Max_error,
-                    # )
+                    # print("Выход из цикла сведения турбины и теплофикации",Max_error,)
                     break
-                if i == maxiterations - 1:
-                    print("Достигнуто максимальное количество итераций расход и давлений в турбине при работе с теплофикацией")
+                if j == maxiterations - 1:
+                    print("Достигнуто максимальное количество итераций расхода и давления в турбине при работе с теплофикацией")
+                    print('Расход в конденсатор',G_CND)
+                    print('Расход в СП1',G_sp1)
+                    print('Расход в СП2',G_sp2)
 
             Error_p = (Potb2_turb - Potb2_teplof) / Potb2_teplof * 100
             Diafragma = max(0, Diafragma - Error_p / 2500)
             Diafragma_it.append(Diafragma)
             # print("Diafragma", Diafragma)
             # print("Potb2_turb", Potb2_turb)
-            if abs(Error_p) < calctolerance/10:
+            if abs(Error_p) < calctolerance:
                 print(
                     "Максимальная погрешность определения давления в верхнем отборе",
                     Error_p,
@@ -184,7 +184,7 @@ class turboustanovka:
                     "Достигнуто максимальное количество итераций давления верхнего отбора"
                 )
         # print(Error_p)
-        # print(Diafragma_it)
+        print(Diafragma_it)
         return Diafragma
 
     def calculate_t_rejim(self, calcmethod, calctolerance, maxiterations):
