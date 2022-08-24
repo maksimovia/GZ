@@ -5,6 +5,7 @@ import SP
 import Turbine
 from scipy.optimize import root
 import nasos
+import time
 
 
 class turboustanovka:
@@ -81,6 +82,11 @@ class turboustanovka:
 
             Max_error = max(Error_Gsp2, Error_Gsp1, Error_P_turb, Error_P_tepl)
             # print("Potb2_turb", Potb2_turb)
+            print("G_sp2", G_sp2)
+            print("G_sp2_it", G_sp2_it)
+            print("G_sp1", G_sp1)
+            print("G_sp1_it", G_sp1_it)
+
             # print("Diafragma", Diafragma)
             if abs(Max_error) < calctolerance:
                 print("G_sp2", G_sp2, "G_sp1", G_sp1, "P_sp2", P_sp2)
@@ -89,6 +95,9 @@ class turboustanovka:
                     Max_error,
                 )
                 break
+            if i == self.maxiterations - 1:
+                print(
+                    "Достигнуто максимальное количество итераций нахождения давления в верхнем отборе")
 
         Error_p = (Potb2_turb - Potb2_teplof) / Potb2_teplof * 100
         Diafragma_it.append(Diafragma)
@@ -104,7 +113,7 @@ class turboustanovka:
             G_sp1_it = 1
             P_turb_it = 1
             P_tepl_it = 1
-            for i in range(maxiterations):
+            for j in range(maxiterations):
                 Tepl_systema_res = self.Tepl_systema.calculate(
                     maxiterations, calctolerance
                 )
@@ -145,7 +154,10 @@ class turboustanovka:
 
                 Max_error = max(Error_Gsp2, Error_Gsp1,
                                 Error_P_turb, Error_P_tepl)
-                # print("Potb2_turb", Potb2_turb)
+                # print("G_sp2", G_sp2)
+                # print("G_sp2_it", G_sp2_it)
+                # print("G_sp1", G_sp1)
+                # print("G_sp1_it", G_sp1_it)
 
                 if abs(Max_error) < calctolerance:
                     # print(
@@ -153,13 +165,15 @@ class turboustanovka:
                     #     Max_error,
                     # )
                     break
+                if i == maxiterations - 1:
+                    print("Достигнуто максимальное количество итераций расход и давлений в турбине при работе с теплофикацией")
 
             Error_p = (Potb2_turb - Potb2_teplof) / Potb2_teplof * 100
             Diafragma = max(0, Diafragma - Error_p / 2500)
             Diafragma_it.append(Diafragma)
             # print("Diafragma", Diafragma)
             # print("Potb2_turb", Potb2_turb)
-            if abs(Error_p) < calctolerance:
+            if abs(Error_p) < calctolerance/10:
                 print(
                     "Максимальная погрешность определения давления в верхнем отборе",
                     Error_p,
@@ -169,8 +183,8 @@ class turboustanovka:
                 print(
                     "Достигнуто максимальное количество итераций давления верхнего отбора"
                 )
-        print(Error_p)
-        print(Diafragma_it)
+        # print(Error_p)
+        # print(Diafragma_it)
         return Diafragma
 
     def calculate_t_rejim(self, calcmethod, calctolerance, maxiterations):
@@ -200,9 +214,13 @@ class turboustanovka:
         maxiterations=20,
     ):
 
+        start_time = time.time()
+
         if teplofikacia == 1:
             Result = self.calculate_t_rejim(
                 calcmethod, calctolerance, maxiterations)
+            self.water_streams.at['OTB2-SP2','G']=Result["Tepl_systema_res"]['SP2']['Gotb']
+            self.water_streams.at['OTB1-SP1','G']=Result["Tepl_systema_res"]['SP1']['Gotb']
             Qsp1 = Result['Tepl_systema_res']['SP1']['Qw']
             Qsp2 = Result['Tepl_systema_res']['SP2']['Qw']
             Qod = Result['Tepl_systema_res']['OD']['Qw']
@@ -215,20 +233,20 @@ class turboustanovka:
 
         if teplofikacia == 0:
             diafragma = 0
-            self.water_streams.loc["DOOTB1":"INKOND","G"] = self.water_streams.at["DROSVD-TURBVD", 'G']+self.water_streams.at["DROSND-TURBND", 'G']
+            self.water_streams.loc["DOOTB1":"INKOND", "G"] = self.water_streams.at["DROSVD-TURBVD",
+                                                                                   'G']+self.water_streams.at["DROSND-TURBND", 'G']
             Turb_res = self.Turb.calculate(
                 diafragma, maxiterations, calctolerance)
             Result = {"Turb_res": self.Turb.calculate_power()}
 
         # запись данных в таблицу блоков
-        
+
         Ni = Result['Turb_res']['Ni']
         Ni1 = Result['Turb_res']['Ni1']
         Ni2 = Result['Turb_res']['Ni2']
         Ni3 = Result['Turb_res']['Ni3']
         Ni4 = Result['Turb_res']['Ni4']
 
-       
         self.electric.at["Turbine", "Ni"] = Ni
         self.electric.loc["Tots1":"Tots4", "Ni"] = [Ni1, Ni2, Ni3, Ni4]
 
@@ -238,13 +256,16 @@ class turboustanovka:
         T_KNin = KONDout['T']
         H_KNin = KONDout['h']
         self.water_streams.loc["KOND-KN", "T":'H'] = [T_KNin, pk, H_KNin]
-        self.water_streams.at["KOND-KN","G"] = self.water_streams.at["INKOND", 'G']
+        self.water_streams.at["KOND-KN",
+                              "G"] = self.water_streams.at["INKOND", 'G']
         self.water_streams.at["KN-GPK",
                               "P"] = self.water_streams.at["SMESHOD-REC", "P"]
         KN_res = self.KN.calc()
         Result['KN'] = KN_res
-        self.water_streams.loc["KN-GPK",'T':'G'] = [KN_res['T2'], KN_res['P2'], KN_res['h2real'], KN_res['G1']]
-        self.electric.loc['KN', 'Ni':'KPD'] = [KN_res['Ni'], KN_res['Ngm'], KN_res['KPDm'], KN_res['KPD']]
+        self.water_streams.loc["KN-GPK", 'T':'G'] = [KN_res['T2'],
+                                                     KN_res['P2'], KN_res['h2real'], KN_res['G1']]
+        self.electric.loc['KN', 'Ni':'KPD'] = [KN_res['Ni'],
+                                               KN_res['Ngm'], KN_res['KPDm'], KN_res['KPD']]
         # Расчет смешения перед ГПК
         h_kn = self.water_streams.at["KN-GPK", "H"]
         G_kn = self.water_streams.at["KN-GPK", "G"]
@@ -252,8 +273,8 @@ class turboustanovka:
         h_od = self.water_streams.at["OD-GPK", "H"]
         G_od = self.water_streams.at["OD-GPK", "G"]
         if teplofikacia == 0:
-            G_od=0
-            h_od=0
+            G_od = 0
+            h_od = 0
         G_smeshod = G_kn+G_od
         h_smeshod = (h_od*G_od+h_kn*G_kn)/G_smeshod
         p_smeshod = self.water_streams.at["SMESHOD-REC", "P"]
@@ -261,6 +282,8 @@ class turboustanovka:
         self.water_streams.at["SMESHOD-REC", "T"] = t_smeshod
         self.water_streams.at["SMESHOD-REC", "H"] = h_smeshod
         self.water_streams.at["SMESHOD-REC", "G"] = G_smeshod
-        # print('G_smeshod',G_smeshod,'h_smeshod',h_smeshod,'t_smeshod',t_smeshod,)        
+        # print('G_smeshod',G_smeshod,'h_smeshod',h_smeshod,'t_smeshod',t_smeshod,)
+        print("Fin турбоустановка:--- %s сек. ---" %
+              round((time.time() - start_time), 2))
 
         return Result
