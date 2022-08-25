@@ -103,6 +103,9 @@ class turbine:
         self.effiency0_ots4 = (self.Hin_cnd0 - self.Hin_kond0) / (
             self.Hin_cnd0 - Hin_kondt0
         )
+        self.Tair = self.water_streams.at['AIR', "T"]
+        Hkond_out0 = water_streams0.at['KOND-KN', "H"]
+        self.Q_kond0 = self.Gin_kond0 * (self.Hin_kond0-Hkond_out0)*(10**-3)
 
     def expansion(self, p1, h1, p2, eff):
         s1 = self.water.p_h(p1, h1)["s"]
@@ -168,7 +171,19 @@ class turbine:
         self.Pin_kond = self.water_streams.at[self.stream8, "P"]
         self.Hin_kond = self.water_streams.at[self.stream8, "H"]
         self.Gin_kond = self.water_streams.at[self.stream8, "G"]
-
+        
+        
+        
+    def calculate_cond(self,tair,G):
+        T1v = 21.215*n.exp(0.0123*tair)
+        Q = self.Gin_kond * (self.Hin_kond-self.water.p_q(self.Pin_kond,0)['h'])*(10**-3)
+        q = Q/self.Q_kond0
+#         T1v = 15  #=15 для ISO
+        Pin_kond =((-0.0174000000+0.0169740000*q+0.0036920000*T1v-0.0001400000*(T1v**2)+0.0000022900*(T1v**3))/(1-0.5925300000*q+0.1835860000*(q**2)-0.0173900000*T1v+0.0002330000*(T1v**2)))*0.09806650124809235
+        return Pin_kond
+        
+        
+        
     def calculate_turbine_expansion(self):
 
         # Уточняем давления в смешении, на выходе из турбины и НД
@@ -200,10 +215,15 @@ class turbine:
         self.Pin_cnd = self.Potb1 - self.diafragma
         self.Hin_cnd = self.Hotb1
 
+        #расчет конденсатора
+        self.Pin_kond = self.calculate_cond(self.Tair, self.Gin_kond)
+#         print(self.Pin_kond,self.Gin_kond,self.Tair)
+        
         # отсек 4
         KPD_ots4 = self.effiency0_ots4
         ots4_out = self.expansion(self.Pin_cnd, self.Hin_cnd, self.Pin_kond, KPD_ots4)
         self.Hin_kond = ots4_out["h"]
+        
         return
 
     def calculate_turbine_stodol_flugel(self):
