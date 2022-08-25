@@ -32,7 +32,7 @@ class turboustanovka:
         self.heaters = heaters
         self.electric = electric
         self.water = water
-        self.Diafragma=0.05
+
         self.KN = nasos.nasos('KOND-KN', 'KN-GPK', water,
                               KPDnasos, water_streams, water_streams0)
 
@@ -106,7 +106,7 @@ class turboustanovka:
 #         return Error_p
 
     def Find_Potb2_it(self, maxiterations, calctolerance):
-        Diafragma = self.Diafragma
+        Diafragma = 0.05
         Diafragma_it = [0]
         for i in range(maxiterations):
             G_sp2_it = 1
@@ -187,10 +187,10 @@ class turboustanovka:
                 if Diafragma == 0:
                     print(
                         'Не возможно получить необходимое давление, диафрагма полностью открыта')
-                if G_CND < 0.01:
+                if G_CND == 0.001:
                     print('Расход в конденсатор равен нулю')
                 else:
-                    print('Недостаточное количество итераций')
+                    print('Недостаточное количетсво итераций')
                     # print(self.water_streams['SP1-OD':'KN-GPK','T':'G'])
                     # print(Potb2_turb - Potb2_teplof)
         # print(Error_p)
@@ -204,7 +204,6 @@ class turboustanovka:
         # Solution_Potb2 = root(self.Find_Potb2, 0.08,
         #                                       method=calcmethod, tol=calctolerance)
         # Diafragma = float(Solution_Potb2.x)
-        self.Diafragma=Diafragma
 
         Turb_res=self.Turb.calculate(Diafragma, maxiterations, calctolerance)
         Tepl_systema_res=self.Tepl_systema.calculate(
