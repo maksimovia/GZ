@@ -1,6 +1,21 @@
 import mat_properties as prop
 import numpy as n
 
+def Tset(Tnv):
+    if Tnv <=-23.459064:
+        Tpr=120
+    if Tnv>-23.459064 and Tnv<=6.190058:
+        Tpr=-1.01183432*Tnv+96.26331361
+    if Tnv>6.190058:
+        Tpr=90
+    if Tnv <=-27.1:
+        Tobr=70
+    if Tnv>-27.1 and Tnv<=6.190058:
+        Tobr=-1*Tnv+42.9
+    if Tnv>6.190058:
+        Tobr=0.1067856*Tnv+36.04893297
+    return Tpr, Tobr
+
 class od:
     def __init__(self,stream11,stream12,stream21,stream22,KPD,water,water_streams0,water_streams):
         self.KPD=KPD
