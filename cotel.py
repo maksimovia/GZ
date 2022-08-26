@@ -444,6 +444,8 @@ class cotel_all:
         self.gas_streams.loc['GTU-PEVD', 'H'] = self.gas1.p_t(
             self.gas_streams.loc['GTU-PEVD', 'P'], self.gas_streams.loc['GTU-PEVD', 'T'])['h']
         for k in range(it):
+            if k==it-3:
+                calctolerance=calctolerance/10
             # Связвка высокого давления
             for j in range(it):
 
