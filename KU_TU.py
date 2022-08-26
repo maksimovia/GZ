@@ -115,7 +115,7 @@ class ku_tu:
                 Calctolerance_new = Calctolerance*10
                 if i > 2:
                     Calctolerance_new = Calctolerance
-                    if i==3 nad j==0:
+                    if i==3 and j==0:
                         print('Переход к оригинально точности расчета', Calctolerance)
                 # if Max_error_P < Calctolerance:
                 #     print('Max_error_10', 0.01)
