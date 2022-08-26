@@ -66,8 +66,8 @@ class ku_tu:
         Pnd_1 = -0.0189+0.6885*g_gas
         self.water_streams.at["PPND-DROSND", 'P'] = Pnd_1
         self.water_streams.at["PEVD-DROSVD", 'P'] = Pvd_1
-        print('Pnd_1', Pnd_1)
-        print('Pvd_1', Pvd_1)
+        # print('Pnd_1', Pnd_1)
+        # print('Pvd_1', Pvd_1)
 
         for i in range(Maxiterations_KU_TU):
 
@@ -114,8 +114,9 @@ class ku_tu:
                 #     print('Max_error', 1)
                 Calctolerance_new = Calctolerance*10
                 if i > 2:
-                    print('Переход к оригинально точности расчета', Calctolerance)
                     Calctolerance_new = Calctolerance
+                    if i==3 nad j==0:
+                        print('Переход к оригинально точности расчета', Calctolerance)
                 # if Max_error_P < Calctolerance:
                 #     print('Max_error_10', 0.01)
                 #     Calctolerance_new = Calctolerance
@@ -130,10 +131,10 @@ class ku_tu:
                 Max_error_G = max(Error_water_G, Error_nd_G, Error_vd_G)
                 Max_error = max(Error_water_G, Error_nd_G,
                                 Error_vd_G, Error_nd_P, Error_vd_P)
-                print('Max_error_G', Max_error_G)
-                print('Error_nd_G', Error_nd_G)
-                print('Error_vd_G', Error_vd_G)
-                print('Error_water_G', Error_water_G)
+                # print('Max_error_G', Max_error_G)
+                # print('Error_nd_G', Error_nd_G)
+                # print('Error_vd_G', Error_vd_G)
+                # print('Error_water_G', Error_water_G)
                 if Error_water_G > 20:
                     Teplo_overflow = 1
                 if Error_water_G > 1:
@@ -174,10 +175,10 @@ class ku_tu:
             Error_vd_P = abs((P_kotel_vd - P_kotel_vd_new)/P_kotel_vd*100)
             Max_error = max(Error_water_G, Error_nd_G,
                             Error_vd_G, Error_nd_P, Error_vd_P)
-            print('Error_nd_P', Error_nd_P)
-            print('Error_vd_P', Error_vd_P)
+            # print('Error_nd_P', Error_nd_P)
+            # print('Error_vd_P', Error_vd_P)
             Max_error_P = max(Error_nd_P, Error_vd_P)
-            print('Max_error', Max_error)
+            # print('Max_error', Max_error)
             print(
                 f"Время {i+1} итерации расчета КУ+ТУ:--- %s сек. --- {round((time.time() - start_time), 1)}")
             if Teplo_overflow == 1:

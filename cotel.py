@@ -444,8 +444,12 @@ class cotel_all:
         self.gas_streams.loc['GTU-PEVD', 'H'] = self.gas1.p_t(
             self.gas_streams.loc['GTU-PEVD', 'P'], self.gas_streams.loc['GTU-PEVD', 'T'])['h']
         for k in range(it):
-            if k==it-3:
-                calctolerance=calctolerance/10
+            if k>it-it/2:
+                calctolerance_new=calctolerance/10
+                print('Повышена точность расчета котла для увеличения сходимости')
+
+            else:
+                calctolerance_new=calctolerance
             # Связвка высокого давления
             for j in range(it):
 
@@ -490,7 +494,7 @@ class cotel_all:
                 Qwat1VD = self.water_streams.at['PEVD-DROSVD', 'G']*(
                     self.water_streams.at['PEVD-DROSVD', 'H']-self.water_streams.at['EVD-IVD', 'H'])
                 ErrorVD = (Qgas1VD-Qwat1VD)/Qgas1VD*100
-                if k > 5:
+                if k > it/2:
                     print('dQ/Q ПЕВД+ИВД+ЭВД', ErrorVD)
                 if abs(ErrorVD) < calctolerance:
                     break
@@ -507,7 +511,7 @@ class cotel_all:
             # Связка низкого давления
             for j in range(it):
                 # Расчёт ППНД
-                PPND = self.PPND_obj.calc(calctolerance)
+                PPND = self.PPND_obj.calc(calctolerance_new)
                 self.gas_streams.loc['PPND-IND', 'T':'G'] = [PPND['Tg'],
                                                              PPND['Pg'], PPND['Hg'], PPND['Gg']]
                 self.water_streams.loc['PPND-DROSND', 'T':'G'] = [
@@ -519,7 +523,7 @@ class cotel_all:
                 self.water_streams.loc["BND-PEN", "P"] = PPND['Pw1']
 
                 # Расчёт ИНД
-                IND = self.IND_obj.calc(calctolerance)
+                IND = self.IND_obj.calc(calctolerance_new)
                 self.gas_streams.loc['IND-GPK', 'T':'G'] = [IND['Tg'],
                                                             IND['Pg'], IND['Hg'], IND['Gg']]
                 self.water_streams.loc['IND-PPND',
@@ -554,7 +558,7 @@ class cotel_all:
                 for i in range(it):
 
                     # Расчёт ГПК
-                    GPK = self.GPK_obj.calc(calctolerance)
+                    GPK = self.GPK_obj.calc(calctolerance_new)
                     self.gas_streams.loc['GPK-out', 'T':'G'] = [GPK['Tg'],
                                                                 GPK['Pg'], GPK['Hg'], GPK['Gg']]
                     self.water_streams.loc['GPK-REC', 'T':'G'] = [
@@ -590,7 +594,7 @@ class cotel_all:
                     self.water_streams.at['GPK-IND', 'G'] = G_all
                     self.heaters.loc['GPK', 'Qw':'KPD'] = [
                         GPK['Qw'], GPK['Qg'], GPK['KPD']]
-                    if abs(Error_gpk) < calctolerance:
+                    if abs(Error_gpk) < calctolerance_new:
                         break
                     if i == it - 1:
                         print(
@@ -614,7 +618,7 @@ class cotel_all:
                      self.water_streams.at['GPK-IND', 'H'])
                 ErrorND = (Qgas1ND-Qwat1ND)/Qgas1ND*100
                 ErrorND2 = (Qgas1ND-Qwat2ND)/Qgas1ND*100
-                if k > 5:
+                if k > it/2:
                     print('dQ/Q ППНД+ИНД+ГПК', ErrorND)
                 if abs(ErrorND) < calctolerance and abs(ErrorND2) < calctolerance:
                     break
