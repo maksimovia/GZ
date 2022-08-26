@@ -454,7 +454,7 @@ class cotel_all:
             for j in range(it):
 
                 # Расчёт ПЕВД
-                PEVD = self.PEVD_obj.calc(calctolerance)
+                PEVD = self.PEVD_obj.calc(calctolerance_new)
                 self.gas_streams.loc['PEVD-IVD', 'T':'G'] = [PEVD['Tg'],
                                                              PEVD['Pg'], PEVD['Hg'], PEVD['Gg']]
                 self.water_streams.loc['PEVD-DROSVD', 'T':'G'] = [
@@ -464,7 +464,7 @@ class cotel_all:
                 self.water_streams.loc["IVD-PEVD":"PEN-EVD", "P"] = PEVD['Pw1']
 
                 # Расчёт ИВД
-                IVD = self.IVD_obj.calc(calctolerance)
+                IVD = self.IVD_obj.calc(calctolerance_new)
                 self.gas_streams.loc['IVD-EVD', 'T':'G'] = [IVD['Tg'],
                                                             IVD['Pg'], IVD['Hg'], IVD['Gg']]
                 self.water_streams.loc['IVD-PEVD', 'T':'G'] = [
@@ -478,7 +478,7 @@ class cotel_all:
                 self.water_streams.loc['BND-PEN', 'G'] = IVD['Gw']
 
                 # Расчёт ЭВД
-                EVD = self.EVD_obj.calc(calctolerance)
+                EVD = self.EVD_obj.calc(calctolerance_new)
 
                 self.gas_streams.loc['EVD-PPND', 'T':'G'] = [EVD['Tg'],
                                                              EVD['Pg'], EVD['Hg'], EVD['Gg']]
