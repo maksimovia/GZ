@@ -1,6 +1,7 @@
 import mat_properties as prop
 import numpy as n
 
+
 class turbine:
     def __init__(
         self,
@@ -91,13 +92,16 @@ class turbine:
         self.Vin_kond0 = 1 / In_kond0["rho"]
 
         Hvd_outt0 = water.p_s(self.Pvd_out0, self.Svd0)["h"]
-        self.effiency0_ots1 = (self.Hvd0 - self.Hvd_out0) / (self.Hvd0 - Hvd_outt0)
+        self.effiency0_ots1 = (self.Hvd0 - self.Hvd_out0) / \
+            (self.Hvd0 - Hvd_outt0)
 
         Hotb2t0 = water.p_s(self.Potb20, self.Ssmesh0)["h"]
-        self.effiency0_ots2 = (self.Hsmesh0 - self.Hotb20) / (self.Hsmesh0 - Hotb2t0)
+        self.effiency0_ots2 = (self.Hsmesh0 - self.Hotb20) / \
+            (self.Hsmesh0 - Hotb2t0)
 
         Hotb1t0 = water.p_s(self.Potb10, self.Sotb20)["h"]
-        self.effiency0_ots3 = (self.Hotb20 - self.Hotb10) / (self.Hotb20 - Hotb1t0)
+        self.effiency0_ots3 = (self.Hotb20 - self.Hotb10) / \
+            (self.Hotb20 - Hotb1t0)
 
         Hin_kondt0 = water.p_s(self.Pin_kond0, self.Sin_cnd0)["h"]
         self.effiency0_ots4 = (self.Hin_cnd0 - self.Hin_kond0) / (
@@ -120,14 +124,78 @@ class turbine:
 
     def stodola_flugel(self, D0, D1, pn0, pv0, Vv0, pn1, pv1, Vv1):
         pv1 = n.sqrt(
-            pn1**2 + ((D1 / D0) ** 2) * (pv0**2 - pn0**2) * (pv1 * Vv1 / (pv0 * Vv0))
+            pn1**2 + ((D1 / D0) ** 2) * (pv0**2 - pn0**2) *
+            (pv1 * Vv1 / (pv0 * Vv0))
         )
         return pv1
-    
+
+    def calculate_cond(self, tair, G):
+        T1v = 21.215*n.exp(0.0123*tair)
+        Q = self.Gin_kond * \
+            (self.Hin_kond-self.water.p_q(self.Pin_kond, 0)['h'])*(10**-3)
+        q = Q/self.Q_kond0
+#         T1v = 15  #=15 для ISO
+        Pin_kond = max(0.0034, ((-0.0174000000+0.0169740000*q+0.0036920000*T1v-0.0001400000*(T1v**2)+0.0000022900*(
+            T1v**3))/(1-0.5925300000*q+0.1835860000*(q**2)-0.0173900000*T1v+0.0002330000*(T1v**2)))*0.09806650124809235)
+        return Pin_kond
+
+    def off_design_relative_efficiency(self, G0, Vin0, Vout0, G1, Vin1, Vout1):
+        Vave0 = (Vin0+Vout0)/2
+        Q0 = G0*Vave0
+        Vave1 = (Vin1+Vout1)/2
+        Q1 = G1*Vave1
+        eff_0 = 0.962
+        q = Q1/Q0
+        eff_1 = (-0.2366*q**2+0.475*q+0.7236)/eff_0
+        return eff_1
+
+    def off_design_relative_efficiency_CND(self, pin, Hin, pout, Hout, G0, Vin0, Vout0, G1, Vin1, Vout1):
+        betta_vl = 0.15
+        state0 = self.water.p_h(pin, Hin)
+        s0 = state0["s"]
+        x0 = state0["Q"]
+        Hteor_vl = self.water.s_q(s0, 1)
+        Hteor_out= self.water.p_s(pout, s0)['h']
+        H0=Hin-Hteor_out
+        if x0 < 0:
+            y0 = 0
+        else:
+            y0 = (1-x0)*1000
+        xz = self.water.p_h(pout, Hout)["Q"]
+        if xz < 0:
+            yz = 0
+        else:
+            yz = (1-xz)*1000
+
+        H_vl = 0
+        if yz > 0 and y0 > 0:
+            H_vl = Hin-Hout
+        if y0 == 0 and yz > 0:
+            H_vl = Hteor_vl-Hout
+        if y0 == 0 and yz == 0:
+            H_vl = 0
+        
+        print(H_vl)
+
+        K_vl = 1-0.4*(1-betta_vl)*(y0-yz)*H_vl/H0
+        Hvs = 40*(Vout1*G1/G0/Vout0)**2
+        print(K_vl)
+        KPD0i = 0.87*(1+(H0-400)/10000)*K_vl-Hvs/H0
+
+        Vave0 = (Vin0+Vout0)/2
+        Q0 = G0*Vave0
+        Vave1 = (Vin1+Vout1)/2
+        Q1 = G1*Vave1
+        q = Q1/Q0
+        eff_0 = 0.962
+        
+        eff_1 = (-0.2366*q**2+0.475*q+0.7236)/eff_0
+        return KPD0i-0.1
+
 #     def stodola_flugel(self, D0, D1, pn0, pv0, Vv0, pn1, pv1, Vv1):
 #         Tv1=self.water.p_rho(pv1, 1/Vv1)['T']
 #         Tv0=self.water.p_rho(pv0, 1/Vv0)['T']
-        
+
 #         pv1 = n.sqrt(
 #             pn1**2 + ((D1 / D0) ** 2) * (pv0**2 - pn0**2) * ((Tv1+273.15)/(Tv0+273.15))
 #         )
@@ -137,7 +205,7 @@ class turbine:
 #         print('dP',(pv0**2 - pn0**2))
 #         print('Pnd',pn1**2)
 #         return pv1
-    
+
     def retrive_values(self):
         # Параметры в точках из таблицы
         self.Pvd = self.water_streams.at[self.stream1, "P"]
@@ -154,7 +222,8 @@ class turbine:
 
         self.Psmesh = self.water_streams.at[self.stream4, "P"]
         self.Gsmesh = self.Gnd + self.Gvd
-        self.Hsmesh = (self.Hnd * self.Gnd + self.Hvd_out * self.Gvd) / self.Gsmesh
+        self.Hsmesh = (self.Hnd * self.Gnd +
+                       self.Hvd_out * self.Gvd) / self.Gsmesh
 
         self.Potb2 = self.water_streams.at[self.stream5, "P"]
         self.Hotb2 = self.water_streams.at[self.stream5, "H"]
@@ -171,19 +240,7 @@ class turbine:
         self.Pin_kond = self.water_streams.at[self.stream8, "P"]
         self.Hin_kond = self.water_streams.at[self.stream8, "H"]
         self.Gin_kond = self.water_streams.at[self.stream8, "G"]
-        
-        
-        
-    def calculate_cond(self,tair,G):
-        T1v = 21.215*n.exp(0.0123*tair)
-        Q = self.Gin_kond * (self.Hin_kond-self.water.p_q(self.Pin_kond,0)['h'])*(10**-3)
-        q = Q/self.Q_kond0
-#         T1v = 15  #=15 для ISO
-        Pin_kond = max(0.0034,((-0.0174000000+0.0169740000*q+0.0036920000*T1v-0.0001400000*(T1v**2)+0.0000022900*(T1v**3))/(1-0.5925300000*q+0.1835860000*(q**2)-0.0173900000*T1v+0.0002330000*(T1v**2)))*0.09806650124809235)
-        return Pin_kond
-        
-        
-        
+
     def calculate_turbine_expansion(self):
 
         # Уточняем давления в смешении, на выходе из турбины и НД
@@ -191,39 +248,56 @@ class turbine:
         self.Pvd_out = self.Psmesh
 
         # отсек 1
-        KPD_ots1 = self.effiency0_ots1
-        ots1_out = self.expansion(self.Pvd, self.Hvd, self.Pvd_out, KPD_ots1)
+        self.Gvd_out = self.Gvd
+        self.Vvd = 1 / self.water.p_h(self.Pvd, self.Hvd)["rho"]
+        self.Vvd_out = 1 / self.water.p_h(self.Pvd_out, self.Hvd_out)["rho"]
+        self.KPD_ots1 = self.effiency0_ots1*self.off_design_relative_efficiency(
+            self.Gvd0, self.Vvd0, self.Vvd_out0, self.Gvd_out, self.Vvd, self.Vvd_out)
+        ots1_out = self.expansion(
+            self.Pvd, self.Hvd, self.Pvd_out, self.KPD_ots1)
         self.Hvd_out = ots1_out["h"]
-        self.Gvd_out=self.Gvd
 
         # расчет смешения
         self.Gsmesh = self.Gnd + self.Gvd
-        self.Hsmesh = (self.Hnd * self.Gnd + self.Hvd_out * self.Gvd) / self.Gsmesh
+        self.Hsmesh = (self.Hnd * self.Gnd +
+                       self.Hvd_out * self.Gvd) / self.Gsmesh
 
         # отсек 2
-        KPD_ots2 = self.effiency0_ots2
-        ots2_out = self.expansion(self.Psmesh, self.Hsmesh, self.Potb2, KPD_ots2)
+        self.Gotb2 = self.Gsmesh
+        self.Vsmesh = 1 / self.water.p_h(self.Psmesh, self.Hsmesh)["rho"]
+        self.Votb2 = 1 / self.water.p_h(self.Potb2, self.Hotb2)["rho"]
+        self.KPD_ots2 = self.effiency0_ots2*self.off_design_relative_efficiency(
+            self.Gsmesh0, self.Vsmesh0, self.Votb20, self.Gsmesh, self.Vsmesh, self.Votb2)
+        ots2_out = self.expansion(
+            self.Psmesh, self.Hsmesh, self.Potb2, self.KPD_ots2)
         self.Hotb2 = ots2_out["h"]
-        self.Gotb2=self.Gsmesh
 
         # отсек 3
-        KPD_ots3 = self.effiency0_ots3
-        ots3_out = self.expansion(self.Potb2, self.Hotb2, self.Potb1, KPD_ots3)
+        self.Votb2 = 1 / self.water.p_h(self.Potb2, self.Hotb2)["rho"]
+        self.Votb1 = 1 / self.water.p_h(self.Potb1, self.Hotb1)["rho"]
+        self.KPD_ots3 = self.effiency0_ots3*self.off_design_relative_efficiency(
+            self.Gotb10, self.Votb20, self.Votb10, self.Gotb1, self.Votb2, self.Votb1)
+        ots3_out = self.expansion(
+            self.Potb2, self.Hotb2, self.Potb1, self.KPD_ots3)
         self.Hotb1 = ots3_out["h"]
 
         # диафрагма
         self.Pin_cnd = self.Potb1 - self.diafragma
         self.Hin_cnd = self.Hotb1
 
-        #расчет конденсатора
+        # расчет конденсатора
         self.Pin_kond = self.calculate_cond(self.Tair, self.Gin_kond)
 #         print(self.Pin_kond,self.Gin_kond,self.Tair)
-        
+
         # отсек 4
-        KPD_ots4 = self.effiency0_ots4
-        ots4_out = self.expansion(self.Pin_cnd, self.Hin_cnd, self.Pin_kond, KPD_ots4)
-        self.Hin_kond = ots4_out["h"]
+        self.Vin_cnd = 1 / self.water.p_h(self.Pin_cnd, self.Hin_cnd)["rho"]
+        self.Vin_kond = 1 / self.water.p_h(self.Pin_kond, self.Hin_kond)["rho"]
+        self.KPD_ots4 = self.off_design_relative_efficiency_CND( self.Pin_cnd, self.Hin_cnd, self.Pin_kond, self.Hin_kond,self.Gin_cnd0, self.Vin_cnd0, self.Vin_kond0, self.Gin_cnd, self.Vin_cnd, self.Vin_kond)
         
+        ots4_out = self.expansion(
+            self.Pin_cnd, self.Hin_cnd, self.Pin_kond, self.KPD_ots4)
+        self.Hin_kond = ots4_out["h"]
+
         return
 
     def calculate_turbine_stodol_flugel(self):
@@ -258,7 +332,6 @@ class turbine:
             self.Potb2,
             self.Votb2,
         )
-        
 
         # D0, D1, pn0, pv0, Vv0, pn1, pv1, Vv1
         # отсек 2
@@ -277,7 +350,8 @@ class turbine:
 
         # Уточняем давления в смешении, на выходе из турбины и НД
         self.Vnd = 1 / self.water.p_h(self.Pnd, self.Hnd)["rho"]
-        self.Pnd = self.Psmesh + self.delta_Pnd_smesh0 * (self.Gnd/self.Gnd0)**2
+        self.Pnd = self.Psmesh + self.delta_Pnd_smesh0 * \
+            (self.Gnd/self.Gnd0)**2
         # self.Pnd = self.Psmesh + self.delta_Pnd_smesh0 * (self.Gnd*self.Vnd/self.Gnd0*self.Vnd0)**2*self.Vnd/self.Vnd0
         self.Pvd_out = self.Psmesh
 
@@ -322,12 +396,17 @@ class turbine:
                 self.Potb1,
                 self.Pin_cnd,
                 self.Pin_kond]
-            P_out1=P_out.copy()
-            Eff_out = [
+            P_out1 = P_out.copy()
+            Eff_0 = [
                 self.effiency0_ots1,
                 self.effiency0_ots2,
                 self.effiency0_ots3,
                 self.effiency0_ots4]
+            Eff_out = [
+                self.KPD_ots1,
+                self.KPD_ots2,
+                self.KPD_ots3,
+                self.KPD_ots4]
             self.calculate_turbine_stodol_flugel()
             P_out = [
                 self.Pvd,
@@ -338,49 +417,55 @@ class turbine:
                 self.Potb1,
                 self.Pin_cnd,
                 self.Pin_kond]
-            P_out2=P_out.copy()
+            P_out2 = P_out.copy()
             Errors = list(map(lambda x, y: (x - y) / x * 100, P_out1, P_out2))
             Max_error = max(Errors)
-            if abs(Max_error) < calctolerance and i>1:
+            if abs(Max_error) < calctolerance and i > 1:
                 # print("Максимальная погрешность определения давления в отборах", Max_error)
                 break
-            if i==maxiterations-1:
+            if i == maxiterations-1:
                 print('Достигнуто максимальное количество итераций')
-        G_out=[self.Gvd,
-                self.Gvd_out,
-                self.Gnd,
-                self.Gsmesh,
-                self.Gotb2,
-                self.Gotb1,
-                self.Gin_cnd,
-                self.Gin_kond,]
-        self.water_streams.loc[self.stream1:self.stream8, "G"]=G_out
-        self.water_streams.loc[self.stream1:self.stream8, "P"]=P_out2
-        self.water_streams.loc[self.stream1:self.stream8, "H"]=H_out
-        Temperatures=list(map( lambda p,h: self.water.p_h(p, h)["T"],P_out2,H_out))
-        Entropies=list(map( lambda p,h: self.water.p_h(p, h)["s"],P_out2,H_out))
+        G_out = [self.Gvd,
+                 self.Gvd_out,
+                 self.Gnd,
+                 self.Gsmesh,
+                 self.Gotb2,
+                 self.Gotb1,
+                 self.Gin_cnd,
+                 self.Gin_kond, ]
+        self.water_streams.loc[self.stream1:self.stream8, "G"] = G_out
+        self.water_streams.loc[self.stream1:self.stream8, "P"] = P_out2
+        self.water_streams.loc[self.stream1:self.stream8, "H"] = H_out
+        Temperatures = list(
+            map(lambda p, h: self.water.p_h(p, h)["T"], P_out2, H_out))
+        Entropies = list(
+            map(lambda p, h: self.water.p_h(p, h)["s"], P_out2, H_out))
         # Humidities=list(map( lambda p,h: round((1-self.water.p_h(p, h)["Q"])*100,3),P_out2,H_out))
-        Humidities=list(map( lambda p,h: self.water.p_h(p, h)["Q"],P_out2,H_out))
-        Humidities=list(map( lambda x: 100 if x<0 else x*100,Humidities))
-        self.water_streams.loc[self.stream1:self.stream8, "T"]=Temperatures
-        self.water_streams.loc[self.stream1:self.stream8, "S"]=Entropies
-        self.water_streams.loc[self.stream1:self.stream8, "X"]=Humidities
-    
+        Humidities = list(
+            map(lambda p, h: self.water.p_h(p, h)["Q"], P_out2, H_out))
+        Humidities = list(map(lambda x: 100 if x < 0 else x*100, Humidities))
+        self.water_streams.loc[self.stream1:self.stream8, "T"] = Temperatures
+        self.water_streams.loc[self.stream1:self.stream8, "S"] = Entropies
+        self.water_streams.loc[self.stream1:self.stream8, "X"] = Humidities
+
+        print(Eff_out)
+        print(Eff_0)
+
     def calculate_power(self):
         self.retrive_values()
-        
+
         # отсек 1
-        N1=self.Gvd*(self.Hvd-self.Hvd_out)/1000
-        
+        N1 = self.Gvd*(self.Hvd-self.Hvd_out)/1000
+
         # отсек 2
-        N2=self.Gsmesh*(self.Hsmesh-self.Hotb2)/1000
-        
+        N2 = self.Gsmesh*(self.Hsmesh-self.Hotb2)/1000
+
         # отсек 3
-        N4=self.Gotb1*(self.Hotb2-self.Hotb1)/1000
-        
+        N4 = self.Gotb1*(self.Hotb2-self.Hotb1)/1000
+
         # отсек 4
-        N3=self.Gin_cnd*(self.Hin_cnd-self.Hin_kond)/1000
-        
-        Ni_all=N1+N2+N3+N4
-        
-        return {'Ni':Ni_all,'Ni1':N1,'Ni2':N2,'Ni3':N3,'Ni4':N4}
+        N3 = self.Gin_cnd*(self.Hin_cnd-self.Hin_kond)/1000
+
+        Ni_all = N1+N2+N3+N4
+
+        return {'Ni': Ni_all, 'Ni1': N1, 'Ni2': N2, 'Ni3': N3, 'Ni4': N4}
