@@ -162,6 +162,10 @@ class sp1:
         tsp1_in_0 = water_streams0.at[self.stream21,'T'] #температура холодного потока на входе в номинале 
         tw1_0 = water_streams0.at[self.stream22,'T'] #температура воды на выходе
         Gsv_0 =water_streams0.at[self.stream21,'G'] #расход нагреваемого потока
+        # print((tsp1_0-tsp1_in_0))
+        # print((tsp1_0-tw1_0))
+        # print(tsp1_0)
+        # print(tw1_0)
         self.KF=Gsv_0*self.Cp*n.log((tsp1_0-tsp1_in_0)/(tsp1_0-tw1_0))
 
     

@@ -183,13 +183,19 @@ class turbine:
         Hvs = 40*(Vout1*G1/G0/Vout0)**2
         KPD0i = 0.87*(1+(H0-400)/10000)*K_vl-Hvs/H0
         
-        Vave0 = (Vin0+Vout0)/2
-        Q0 = G0*Vave0
-        Vave1 = (Vin1+Vout1)/2
-        Q1 = G1*Vave1
-        q = Q1/Q0
-        Delta_eff = -1.0702*q**2+1.7951*q-0.6597
-        Efficiency_out = KPD0i-Delta_eff
+        # Vave0 = (Vin0+Vout0)/2
+        # Q0 = G0*Vave0
+        # Vave1 = (Vin1+Vout1)/2
+        # Q1 = G1*Vave1
+        # q = Q1/Q0
+        # Delta_eff = -1.0702*q**2+1.7951*q-0.6597
+        # Efficiency_out = KPD0i-Delta_eff
+        
+        q = G1/G0
+        Eff_massflow=2.2965*q**3-5.9155*q**2+4.8421*q-0.2163
+        if q>1:
+            Eff_massflow=1
+        Efficiency_out=KPD0i*Eff_massflow
 
         return Efficiency_out
 
