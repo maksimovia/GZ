@@ -131,11 +131,10 @@ class turbine:
 
     def calculate_cond(self, tair, G):
         T1v = 21.215*n.exp(0.0123*tair)
-        # Проверка по номиналу
-        # T1v = 15
         Q = self.Gin_kond * \
             (self.Hin_kond-self.water.p_q(self.Pin_kond, 0)['h'])*(10**-3)
         q = Q/self.Q_kond0
+#         T1v = 15  #=15 для ISO
         Pin_kond = max(0.0034, ((-0.0174000000+0.0169740000*q+0.0036920000*T1v-0.0001400000*(T1v**2)+0.0000022900*(
             T1v**3))/(1-0.5925300000*q+0.1835860000*(q**2)-0.0173900000*T1v+0.0002330000*(T1v**2)))*0.09806650124809235)
         return Pin_kond
@@ -155,43 +154,58 @@ class turbine:
         state0 = self.water.p_h(pin, Hin)
         s0 = state0["s"]
         x0 = state0["Q"]
-        Hteor_vl = self.water.s_q(s0, 1)['h']
+        Hteor_vl = self.water.s_q(s0, 1)
         Hteor_out = self.water.p_s(pout, s0)['h']
         H0 = Hin-Hteor_out
+
         if x0 < 0:
             y0 = 0
         else:
-            y0 = (1-x0)*100
+            y0 = (1-x0)*1000
         xz = self.water.p_h(pout, Hout)["Q"]
         if xz < 0:
             yz = 0
         else:
-            yz = (1-xz)*100
+            yz = (1-xz)*1000
 
         H_vl = 0
-        # все влажное
         if yz > 0 and y0 > 0:
-            H_vl = Hin-Hteor_out
-        # сухое на входе
+            H_vl = Hin-Hout
         if y0 == 0 and yz > 0:
-            H_vl = Hteor_vl-Hteor_out
-        # все сухое
+            H_vl = Hteor_vl-Hout
         if y0 == 0 and yz == 0:
             H_vl = 0
 
-        K_vl = 1-0.4*(1-betta_vl)*(y0-yz)/100*H_vl/H0
+        print(H_vl)
+
+        K_vl = 1-0.4*(1-betta_vl)*(y0-yz)*H_vl/H0
         Hvs = 40*(Vout1*G1/G0/Vout0)**2
+        print(K_vl)
         KPD0i = 0.87*(1+(H0-400)/10000)*K_vl-Hvs/H0
-        
+
         Vave0 = (Vin0+Vout0)/2
         Q0 = G0*Vave0
         Vave1 = (Vin1+Vout1)/2
         Q1 = G1*Vave1
         q = Q1/Q0
-        Delta_eff = -1.0702*q**2+1.7951*q-0.6597
-        Efficiency_out = KPD0i-Delta_eff
+        eff_0 = 0.962
 
-        return Efficiency_out
+        eff_1 = (-0.2366*q**2+0.475*q+0.7236)/eff_0
+        return KPD0i-0.1
+
+#     def stodola_flugel(self, D0, D1, pn0, pv0, Vv0, pn1, pv1, Vv1):
+#         Tv1=self.water.p_rho(pv1, 1/Vv1)['T']
+#         Tv0=self.water.p_rho(pv0, 1/Vv0)['T']
+
+#         pv1 = n.sqrt(
+#             pn1**2 + ((D1 / D0) ** 2) * (pv0**2 - pn0**2) * ((Tv1+273.15)/(Tv0+273.15))
+#         )
+#         print('dT',((Tv1+273.15)/(Tv0+273.15)))
+#         print('dpV',(pv1 * Vv1 / (pv0 * Vv0)))
+#         print('dG',(D1 / D0) ** 2)
+#         print('dP',(pv0**2 - pn0**2))
+#         print('Pnd',pn1**2)
+#         return pv1
 
     def retrive_values(self):
         # Параметры в точках из таблицы
@@ -274,6 +288,7 @@ class turbine:
 
         # расчет конденсатора
         self.Pin_kond = self.calculate_cond(self.Tair, self.Gin_kond)
+#         print(self.Pin_kond,self.Gin_kond,self.Tair)
 
         # отсек 4
         self.Vin_cnd = 1 / self.water.p_h(self.Pin_cnd, self.Hin_cnd)["rho"]
@@ -434,8 +449,9 @@ class turbine:
         self.water_streams.loc[self.stream1:self.stream8, "T"] = Temperatures
         self.water_streams.loc[self.stream1:self.stream8, "S"] = Entropies
         self.water_streams.loc[self.stream1:self.stream8, "X"] = Humidities
-        
-        return Eff_out
+
+        print(Eff_out)
+        print(Eff_0)
 
     def calculate_power(self):
         self.retrive_values()

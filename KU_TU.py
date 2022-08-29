@@ -66,8 +66,6 @@ class ku_tu:
         Pnd_1 = -0.0189+0.6885*g_gas
         self.water_streams.at["PPND-DROSND", 'P'] = Pnd_1
         self.water_streams.at["PEVD-DROSVD", 'P'] = Pvd_1
-        # print('Pnd_1', Pnd_1)
-        # print('Pvd_1', Pvd_1)
 
         for i in range(Maxiterations_KU_TU):
 
@@ -76,7 +74,6 @@ class ku_tu:
                 # Расчет котла
                 Cotel_result = self.Whole_cotel.calc(
                     Calctolerance_new, Maxiterations_cotel)
-                # print('КУ расчитан')
 
                 Gnd1 = self.water_streams.at["PPND-DROSND", "G"]
                 Gnd2 = self.water_streams.at["DROSND-TURBND", "G"]
@@ -94,7 +91,7 @@ class ku_tu:
                                       'H'] = self.water_streams.at["PPND-DROSND", 'H']
 
                 # В первм приближении для упрощения считаем конденсационный режим
-                if i > 1 and Teplo == 1:
+                if i > 0 and Teplo == 1:
                     teplofikacia = 1
                 else:
                     teplofikacia = 0
@@ -103,27 +100,14 @@ class ku_tu:
                 TU_res = self.TU.calculate(
                     teplofikacia, calcmethod="hybr", calctolerance=Calctolerance_new, maxiterations=Maxiterations_turbine
                 )
-                # print('ТУ рассчитана')
 
-                # основные потоки, которые надо сводить по расходу
-                # Calctolerance_new=Calctolerance
-                # if Max_error > 0.1 and Max_error <= 1:
-                #     print('Max_error', 0.01)
-                #     Calctolerance_new = Calctolerance*10
-                # if Max_error > 1:
-                #     print('Max_error', 1)
+              
                 Calctolerance_new = Calctolerance*10
                 if i > 2:
                     Calctolerance_new = Calctolerance
                     if i==3 and j==0:
                         print('Переход к оригинально точности расчета', Calctolerance)
-                # if Max_error_P < Calctolerance:
-                #     print('Max_error_10', 0.01)
-                #     Calctolerance_new = Calctolerance
-                # if Max_error < 0.01:
-                #     print('Max_error', 'else')
-                #     Calctolerance_new = Calctolerance
-
+            
                 Error_water_G = abs((self.water_streams.at["SMESHOD-REC", "G"] -
                                      self.water_streams.at["GPK-IND", "G"])/self.water_streams.at["GPK-IND", "G"]*100)
                 Error_nd_G = abs((Gnd1 - Gnd2)/Gnd1*100)
@@ -131,10 +115,7 @@ class ku_tu:
                 Max_error_G = max(Error_water_G, Error_nd_G, Error_vd_G)
                 Max_error = max(Error_water_G, Error_nd_G,
                                 Error_vd_G, Error_nd_P, Error_vd_P)
-                # print('Max_error_G', Max_error_G)
-                # print('Error_nd_G', Error_nd_G)
-                # print('Error_vd_G', Error_vd_G)
-                # print('Error_water_G', Error_water_G)
+               
                 if Error_water_G > 20:
                     Teplo_overflow = 1
                 if Error_water_G > 1:
