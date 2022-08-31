@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 
 def Q_t_diagram(gas_streams, water_streams, heaters, xsize=15, ysize=10):
-    fig = plt.figure(figsize=(xsize, ysize),dpi=300)
+    fig = plt.figure(figsize=(xsize, ysize),dpi=500)
     Qg = [0,
           heaters.loc['PEVD', 'Qg'],
           heaters.loc['PEVD', 'Qg']+heaters.loc['IVD', 'Qg'],
@@ -56,7 +56,7 @@ def Q_t_diagram(gas_streams, water_streams, heaters, xsize=15, ysize=10):
     plt.xlabel('Q')
     plt.ylabel('T')
     plt.legend(['gas', 'water'])
-    plt.show()
+    # plt.show()
     return fig
 
     
@@ -64,7 +64,7 @@ def H_S_diagram(water, water_streams, xsize=15, ysize=10):
     water_streams.at['PEVD-DROSVD', 'S'] = water.p_h(water_streams.at['PEVD-DROSVD', 'P'],water_streams.at['PEVD-DROSVD', 'H'])['s']
     water_streams.at['PPND-DROSND', 'S'] = water.p_h(water_streams.at['PPND-DROSND', 'P'],water_streams.at['PPND-DROSND', 'H'])['s']
 
-    fig=plt.figure(figsize=(xsize,ysize),dpi=300)
+    fig=plt.figure(figsize=(xsize,ysize),dpi=500)
     Hvd = [water_streams.at['PEVD-DROSVD', 'H'],
            water_streams.at['DROSVD-TURBVD', 'H'],
            water_streams.at['ENDOFVD', 'H'],
@@ -139,5 +139,5 @@ def H_S_diagram(water, water_streams, xsize=15, ysize=10):
     plt.plot(S3,H3,S4,H4,S5,H5,S6,H6,S7,H7,S8,H8,S9,H9,S10,H10,S11,H11, color = "gray", alpha=0.3)
     plt.xlabel('S')
     plt.ylabel('H')
-    plt.show()
+    # plt.show()
     return fig
