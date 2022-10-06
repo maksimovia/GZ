@@ -28,7 +28,7 @@ class nasos():
         G=self.water_streams.at[self.stream11,'G']
         H_otn = (P2-P1)/(self.P02-self.P01)
         Q_otn = G/self.G0
-        H0 = -0.1957 * Q_otn - 0.1254 * Q_otn + 1.3138
+        H0 = -0.1957 * Q_otn**2 - 0.1254 * Q_otn + 1.3138
         n = (H_otn/H0 -0.0233)/0.9402
         KN = 0.9402 * n + 0.0233
         if KN > 1:
