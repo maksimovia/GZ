@@ -34,7 +34,7 @@ def REFPROP_h_s(h, s, gas,fraction, RP):
     return res
 
 def REFPROP_p_t(p, t, gas,fraction, RP):
-    if fraction[0]==1:   
+    if fraction[0]==1 or gas.split("*")[0]!='Nitrogen':   
         RP.PREOSdll(0)
     else:
         RP.PREOSdll(2)
@@ -57,7 +57,7 @@ def REFPROP_p_t(p, t, gas,fraction, RP):
     return res
 
 def REFPROP_p_h(p, h, gas,fraction, RP):
-    if fraction[0]==1:   
+    if fraction[0]==1 or gas.split("*")[0]!='Nitrogen':   
         RP.PREOSdll(0)
     else:
         RP.PREOSdll(2)
