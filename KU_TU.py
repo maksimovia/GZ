@@ -106,7 +106,7 @@ class ku_tu:
                 if i > 2:
                     Calctolerance_new = Calctolerance
                     if i==3 and j==0:
-                        print('Переход к оригинально точности расчета', Calctolerance)
+                        print('Переход к оригинальной точности расчета', Calctolerance)
             
                 Error_water_G = abs((self.water_streams.at["SMESHOD-REC", "G"] -
                                      self.water_streams.at["GPK-IND", "G"])/self.water_streams.at["GPK-IND", "G"]*100)
