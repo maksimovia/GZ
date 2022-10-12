@@ -6,10 +6,15 @@ import pandas as pd
 
 
 class Accum():
-    def __init__(self,water,water_streams, **kwargs):
+    def __init__(self, **kwargs):
         
         # инициализация на случай если не введут set_construct
-        self._V = 1
+#         self._V = 1
+
+        if 'water_streams_eto_tyt' in kwargs.keys():
+            self.water_streams = kwargs['water_streams_eto_tyt']
+        if 'water' in kwargs.keys():
+            self._water = kwargs['water']
         self._D = 1
         self._F = 1
         self._H = 1
@@ -25,8 +30,8 @@ class Accum():
         self._lambda_min_vata = 0.045
         self.delta_min_vata = 0.01
         self._T_nar_vozd = 15
-        self._water = water    
-        self.water_streams=water_streams
+#         self._water = water    
+#         self.water_streams=water_streams
 
         if 'stream11' in kwargs.keys():
             self._stream11 = kwargs['stream11']

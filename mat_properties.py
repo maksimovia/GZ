@@ -38,6 +38,7 @@ def REFPROP_p_t(p, t, gas,fraction, RP):
         RP.PREOSdll(0)
     else:
         RP.PREOSdll(2)
+
     prop = RP.REFPROPdll(gas, 'PT', 'H;S;D;CV;CP;KV;Prandtl;TCX;VIS;Qmass', 21, 0, 0, p, t, fraction)
     res = dict()
     res['h'] = prop.Output[0]/1000
