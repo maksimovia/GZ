@@ -1,7 +1,19 @@
 import mat_properties as prop
 
 
-# SR = steam_transformer(stream11 = 'stream11', stream12 = 'streams12', stream21 = 'stream21', stream22 = 'stream22', water = 'water', water_streams = 'water_streams', heaters = 'heaters', Pdr1 = 2, Pdr2 = 0.8, P2 = 2, dT = 15, dTmin = 5, Tdec = 10)
+# SR = steam_transformer(stream11 = 'stream11', 
+#                         stream12 = 'streams12', 
+#                        stream21 = 'stream21', 
+#                        stream22 = 'stream22', 
+#                        water = water, 
+#                        water_streams = water_streams, 
+#                        heaters = heaters, 
+#                        Pdr1 = 2, 
+#                        Pdr2 = 0.8, 
+#                        P2 = 2, 
+#                        dT = 15, 
+#                        dTmin = 5, 
+#                        Tdec = 10)
 
 class steam_transformer:
     def __init__(self,**kwargs):
