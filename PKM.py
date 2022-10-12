@@ -1,26 +1,8 @@
 import mat_properties as prop
 
-
-# SR = steam_transformer(stream11 = 'stream11', 
-#                         stream12 = 'streams12', 
-#                        stream21 = 'stream21', 
-#                        stream22 = 'stream22', 
-#                        water = water, 
-#                        water_streams = water_streams, 
-#                        heaters = heaters, 
-#                        Pdr1 = 2, 
-#                        Pdr2 = 0.8, 
-#                        P2 = 2, 
-#                        dT = 15, 
-#                        dTmin = 5, 
-#                        Tdec = 10)
-
 class steam_transformer:
     def __init__(self,**kwargs):
         self.stream11 = kwargs['stream11']
-        self.stream12 = kwargs['stream12']
-        self.stream21 = kwargs['stream21']
-        self.stream22 = kwargs['stream22']
         self.water = kwargs['water']
         self.water_streams = kwargs['water_streams']
         self.heaters = kwargs['heaters']
@@ -39,14 +21,17 @@ class steam_transformer:
 
         Q12 = 0
         P12 = P11
+        
         H12 = self.water.p_q(P12, Q12)['h']
         T12 = self.water.p_q(P12, Q12)['T']
 
         P13 = self.Pdr1
         H13 = H12
+                
         T13 = self.water.p_h(P13, H13)['T']
         Q13 = self.water.p_h(P13, H13)['Q']
-
+        
+        
         P24 = self.P2
         T24 = T11-self.dT
         H24 = self.water.p_t(P24, T24)['h']
@@ -67,42 +52,44 @@ class steam_transformer:
         T15 = self.water.p_h(P15, H15)['T']
         Q15 = self.water.p_h(P15, H15)['Q']
 
-        T16 = T15 - self.Tdec
-        P16 = P15
-        H16 = self.water.p_t(P16, T16)['h']
-
-        P22 = P2
+        P22 = self.P2
         H22 = H23 - (G1*(H13-H14)/G2)
         T22 = self.water.p_h(P22, H22)['T']
 
-        P21 = P2
-        H21 = H22 - (G1*(H15-H16)/G2)
-        T21 = self.water.p_h(P21, H21)['T']
+        T21 = 15
+        P21 = self.P2
+        H21 = self.water.p_t(P21, T21)['h']
+
+        H16 = H15 - G2*(H22-H21)/G1
+        P16 = P15
+        T16 = self.water.p_h(P16, H16)['T']
+
+        Qtrans = G1*(H11-H16)
         
-        
-        
-        
-        return {'T12': ,}
-        
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return {'H11': H11,'H12': H12,'H13': H13,'H14': H14,'H15': H15,'H16': H16,
+               'H21': H21,'H22': H22,'H23': H23,'H24': H24, 'G1':G1, 'G2':G2,'Q':Qtrans, 'P2':self.P2, 'P16':P16,
+               'T11': T11,'T12': T12,'T13': T13,'T14': T14,'T15': T15,'T16': T16,
+               'T21': T21,'T22': T22,'T23': T23,'T24': T24}
 
 class reformer:
     def __init__(self, stream11, gas, water, Methane, waterMethane, gas_streams, water_streams, heaters, P11, P12, P13, P2, Tref):
         
         
+        
+       
+        
+    def calc(self):
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        return {}
+
         
         
