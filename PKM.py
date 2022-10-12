@@ -1,5 +1,8 @@
 import mat_properties as prop
 
+
+# SR = steam_transformer(stream11 = 'stream11', stream12 = 'streams12', stream21 = 'stream21', stream22 = 'stream22', water = 'water', water_streams = 'water_streams', heaters = 'heaters', Pdr1 = 2, Pdr2 = 0.8, P2 = 2, dT = 15, dTmin = 5, Tdec = 10)
+
 class steam_transformer:
     def __init__(self,**kwargs):
         self.stream11 = kwargs['stream11']
@@ -20,7 +23,7 @@ class steam_transformer:
         P11 = self.water_streams.at[self.stream11, 'P']
         T11 = self.water_streams.at[self.stream11, 'T']
         H11 = self.water_streams.at[self.stream11, 'H']
-        G1 = self.water_streams.at[self.stream11, 'G']
+        G1  = self.water_streams.at[self.stream11, 'G']
 
         Q12 = 0
         P12 = P11
@@ -29,32 +32,40 @@ class steam_transformer:
 
         P13 = self.Pdr1
         H13 = H12
-        T13 = water.p_h(P13, H13)['T']
-        Q13 = water.p_h(P13, H13)['Q']
-    
-        P22 = self.P2
-        T22 = T11-self.dT
-        H22 = water.p_t(P22, T22)['h']
+        T13 = self.water.p_h(P13, H13)['T']
+        Q13 = self.water.p_h(P13, H13)['Q']
 
-        T21 = T13-self.dTmin
-        P21 = P22
-        H21 = water.p_t(P21, T21)['h']
+        P24 = self.P2
+        T24 = T11-self.dT
+        H24 = self.water.p_t(P24, T24)['h']
 
-        G2 = G1 * ((H11-H12)/(H22-H21))
-        
+        T23 = T13-self.dTmin
+        P23 = P24
+        H23 = self.water.p_t(P23, T23)['h']
+
+        G2 = G1 * ((H11-H12)/(H24-H23))
+
         Q14 = 0
         P14 = P13
         H14 = self.water.p_q(P14, Q14)['h']
         T14 = self.water.p_q(P14, Q14)['T']
-        
+
         P15 = self.Pdr2
         H15 = H14
-        T15 = water.p_h(P15, H15)['T']
-        Q15 = water.p_h(P15, H15)['Q']
-        
+        T15 = self.water.p_h(P15, H15)['T']
+        Q15 = self.water.p_h(P15, H15)['Q']
+
         T16 = T15 - self.Tdec
         P16 = P15
-        H16 = water.p_t(P16, T16)['h']
+        H16 = self.water.p_t(P16, T16)['h']
+
+        P22 = P2
+        H22 = H23 - (G1*(H13-H14)/G2)
+        T22 = self.water.p_h(P22, H22)['T']
+
+        P21 = P2
+        H21 = H22 - (G1*(H15-H16)/G2)
+        T21 = self.water.p_h(P21, H21)['T']
         
         
         

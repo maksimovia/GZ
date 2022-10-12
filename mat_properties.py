@@ -1,5 +1,6 @@
 from ctREFPROP.ctREFPROP import REFPROPFunctionLibrary
 import os
+import CoolProp.CoolProp as CP
 os.environ["RPPREFIX"] = r"C:/Program Files (x86)/REFPROP"
 
 def init_REFPROP(path_to_refplot):
@@ -38,7 +39,6 @@ def REFPROP_p_t(p, t, gas,fraction, RP):
         RP.PREOSdll(0)
     else:
         RP.PREOSdll(2)
-
     prop = RP.REFPROPdll(gas, 'PT', 'H;S;D;CV;CP;KV;Prandtl;TCX;VIS;Qmass', 21, 0, 0, p, t, fraction)
     res = dict()
     res['h'] = prop.Output[0]/1000
@@ -58,28 +58,36 @@ def REFPROP_p_t(p, t, gas,fraction, RP):
     return res
 
 def REFPROP_p_h(p, h, gas,fraction, RP):
-    if fraction[0]==1 or gas.split("*")[0]!='Nitrogen':   
-        RP.PREOSdll(0)
-    else:
-        RP.PREOSdll(2)
-    prop = RP.REFPROPdll(gas, 'PH', 'T;S;D;CV;CP;KV;Q;Prandtl;TCX;VIS;QMass', 21, 0, 0, p, h, fraction)
-    res = dict()
-    res['T'] = prop.Output[0]-273.15
-    res['s'] = prop.Output[1]/1000
-    res['rho'] = prop.Output[2]
-    res['cv'] = prop.Output[3]
-    res['cp'] = prop.Output[4]
-    k = prop.Output[5]
-    res['q']  = prop.Output[6]
-    fraction_local=list(fraction)
-    if fraction_local[3]>0.05:
-        fraction_local[2]=fraction_local[2]+fraction_local[3]-0.05
-        fraction_local[3]=0.05
-    prop1 = RP.REFPROPdll(gas, 'PH', 'T;S;D;CV;CP;KV;Prandtl;TCX;VIS;Qmass', 21, 0, 0, p, h, fraction_local)
-    res['nu'] = prop1.Output[5] / 100.
-    res['Prandtl'] = prop1.Output[6] 
-    res['L'] = prop1.Output[7] 
-    res['Q'] = prop1.Output[9]
+    if h<200000 and gas == "water":
+        res = dict()
+        res['T'] = CP.PropsSI('T','P', p,'H',h,gas)-273.15
+        res['s'] = CP.PropsSI('S','P', p,'H',h,gas)/1000
+        res['rho'] = CP.PropsSI('D','P', p,'H',h,gas)
+        res['cv'] = CP.PropsSI('C','P', p,'H',h,gas)
+        res['cp'] = CP.PropsSI('C','P', p,'H',h,gas)
+    else:    
+        if fraction[0]==1 or gas.split("*")[0]!='Nitrogen':   
+            RP.PREOSdll(0)
+        else:
+            RP.PREOSdll(2)
+        prop = RP.REFPROPdll(gas, 'PH', 'T;S;D;CV;CP;KV;Q;Prandtl;TCX;VIS;QMass', 21, 0, 0, p, h, fraction)
+        res = dict()
+        res['T'] = prop.Output[0]-273.15
+        res['s'] = prop.Output[1]/1000
+        res['rho'] = prop.Output[2]
+        res['cv'] = prop.Output[3]
+        res['cp'] = prop.Output[4]
+        k = prop.Output[5]
+        res['q']  = prop.Output[6]
+        fraction_local=list(fraction)
+        if fraction_local[3]>0.05:
+            fraction_local[2]=fraction_local[2]+fraction_local[3]-0.05
+            fraction_local[3]=0.05
+        prop1 = RP.REFPROPdll(gas, 'PH', 'T;S;D;CV;CP;KV;Prandtl;TCX;VIS;Qmass', 21, 0, 0, p, h, fraction_local)
+        res['nu'] = prop1.Output[5] / 100.
+        res['Prandtl'] = prop1.Output[6] 
+        res['L'] = prop1.Output[7] 
+        res['Q'] = prop1.Output[9]
     return res
 
 def REFPROP_p_s(p, s, gas,fraction, RP):
