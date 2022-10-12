@@ -72,24 +72,37 @@ class steam_transformer:
                'T21': T21,'T22': T22,'T23': T23,'T24': T24}
 
 class reformer:
-    def __init__(self, stream11, gas, water, Methane, waterMethane, gas_streams, water_streams, heaters, P11, P12, P13, P2, Tref):
-        
-        
-        
-       
+    def __init__(self, **kwargs):
+        self.stream11 = kwargs['stream11']
+        self.water = kwargs['water']
+        self.water_streams = kwargs['water_streams']
+        self.heaters = kwargs['heaters']
+        self.Methane = kwargs['Methane']
+        self.waterMethane = kwargs['waterMethane']
+        self.Tref = kwargs['Tref']
+        self.Pref = kwargs['Pref']
+        self.gas = kwargs['gas']
         
     def calc(self):
+        Gsteam = self.water_streams.at[self.stream11,'G']
+        Hsteam = self.water_streams.at[self.stream11,'H']
+        Gmeth = (0.151140511695727/0.848859488304273)*Gsteam
         
+        Gref = Gmeth + Gsteam
+        Tmeth = 121.53615158005
+        Hmeth = self.Methane.p_t(self.Pref, Tmeth)['h']
+        H1r = (Gsteam*Hsteam + Gmeth*Hmeth) / Gref
+        H2r = self.waterMethane.p_t(self.Pref, self.Tref)['h']
+        Qdt = Gref*(H2r-H1r)
         
+        Qreac = (52166.505091208484/44.6397313913235)*Gref
+        Qref = Qdt+Qreac
+        T1gas = 1969
+        T2gas = 800
+        H1gas = self.gas.p_t(0.1, T1gas)['h']
+        H2gas = self.gas.p_t(0.1, T2gas)['h']
+        Ggas = Qref/(H1gas-H2gas)
+        Gair = Ggas*48.5966429877363/51.2672005145991
+        Gch4 = Ggas*2.67055752686283/51.2672005145991
         
-        
-        
-        
-        
-        
-        
-        
-        return {}
-
-        
-        
+        return {'Q':Qref,'Ggas':Ggas,'Gair':Gair,'Gch4':Gch4}
