@@ -99,10 +99,8 @@ class reformer:
         
         Qreac = (52166.505091208484/44.6397313913235)*Gref
         Qref = Qdt+Qreac
-        H1gas = self.gas_KU.p_t(0.1, 1968.58395330148)['h']
-        print(H1gas)
-        H1gas = self.gas_KU.p_t(0.1, 1968.58395330148)['h']
-        print(H1gas)
+#         H1gas = self.gas_KU.p_t(0.1, 1968.58395330148)['h']
+        H1gas = 3191.2518095937544
         H2gas = self.gas_KU.p_t(0.1, self.T2gas)['h']
         
         Ggas = Qref/(H1gas-H2gas)
@@ -111,11 +109,11 @@ class reformer:
         Hsg = H2r + (Qreac/Gref)
                 
         SGsost = ['N2','O2','CO2','Ar','H2O','CH4','H2','CO']
-        SGfrac = [0,4.30E-22,0.191699427,0,0.662440028,0.055012013,0.045018405,0.045830127]
+        SGfrac = [0,1.96010880218854E-22,0.06356655972348,0,0.536615036955725,0.0500421242206529,0.325898769048586,0.0238775100515557]
         SGfrac = dict(zip(SGsost,SGfrac))
 
         Gassost = ['N2','O2','CO2','H2O','Ar']
-        Gasfrac = [0.715784,0.011473,0.143332,0.116992,0.012419]
+        Gasfrac = [0.710320591016015,0.00996710270335893,0.090538556815177,0.180531273012258,0.00864247645319178]
         Gasfrac = dict(zip(Gassost,Gasfrac))
         
         return {'Q':Qref,'Ggas':Ggas,'Gair':Gair,'Gch4':Gch4, 'Tref':self.Tref,
