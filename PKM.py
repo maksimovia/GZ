@@ -81,7 +81,9 @@ class reformer:
         self.waterMethane = kwargs['waterMethane']
         self.Tref = kwargs['Tref']
         self.Pref = kwargs['Pref']
-        self.gas = kwargs['gas']
+        self.gas_KU = kwargs['gas_KU']
+        self.T1gas = kwargs['T1gas']
+        self.T2gas = kwargs['T2gas']
         
     def calc(self):
         Gsteam = self.water_streams.at[self.stream11,'G']
@@ -97,12 +99,24 @@ class reformer:
         
         Qreac = (52166.505091208484/44.6397313913235)*Gref
         Qref = Qdt+Qreac
-        T1gas = 1969
-        T2gas = 800
-        H1gas = self.gas.p_t(0.1, T1gas)['h']
-        H2gas = self.gas.p_t(0.1, T2gas)['h']
+        H1gas = self.gas_KU.p_t(0.1, 1968.58395330148)['h']
+        print(H1gas)
+        H1gas = self.gas_KU.p_t(0.1, 1968.58395330148)['h']
+        print(H1gas)
+        H2gas = self.gas_KU.p_t(0.1, self.T2gas)['h']
+        
         Ggas = Qref/(H1gas-H2gas)
         Gair = Ggas*48.5966429877363/51.2672005145991
         Gch4 = Ggas*2.67055752686283/51.2672005145991
+        Hsg = H2r + (Qreac/Gref)
+                
+        SGsost = ['N2','O2','CO2','Ar','H2O','CH4','H2','CO']
+        SGfrac = [0,4.30E-22,0.191699427,0,0.662440028,0.055012013,0.045018405,0.045830127]
+        SGfrac = dict(zip(SGsost,SGfrac))
+
+        Gassost = ['N2','O2','CO2','H2O','Ar']
+        Gasfrac = [0.715784,0.011473,0.143332,0.116992,0.012419]
+        Gasfrac = dict(zip(Gassost,Gasfrac))
         
-        return {'Q':Qref,'Ggas':Ggas,'Gair':Gair,'Gch4':Gch4}
+        return {'Q':Qref,'Ggas':Ggas,'Gair':Gair,'Gch4':Gch4, 'Tref':self.Tref,
+                'Gref':Gref, 'Pref':self.Pref,'Hsg':Hsg,'SGfrac':SGfrac,'H2gas':H2gas,'Gasfrac':Gasfrac}
