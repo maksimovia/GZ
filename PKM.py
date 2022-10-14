@@ -31,7 +31,6 @@ class steam_transformer:
         T13 = self.water.p_h(P13, H13)['T']
         Q13 = self.water.p_h(P13, H13)['Q']
         
-        
         P24 = self.P2
         T24 = T11-self.dT
         H24 = self.water.p_t(P24, T24)['h']
@@ -41,7 +40,7 @@ class steam_transformer:
         H23 = self.water.p_t(P23, T23)['h']
 
         G2 = G1 * ((H11-H12)/(H24-H23))
-
+                
         Q14 = 0
         P14 = P13
         H14 = self.water.p_q(P14, Q14)['h']
@@ -96,14 +95,13 @@ class reformer:
         H1r = (Gsteam*Hsteam + Gmeth*Hmeth) / Gref
         H2r = self.waterMethane.p_t(self.Pref, self.Tref)['h']
         Qdt = Gref*(H2r-H1r)
-        
         Qreac = (52166.505091208484/44.6397313913235)*Gref
         Qref = Qdt+Qreac
-#         H1gas = self.gas_KU.p_t(0.1, 1968.58395330148)['h']
         H1gas = 3191.2518095937544
         H2gas = self.gas_KU.p_t(0.1, self.T2gas)['h']
         
         Ggas = Qref/(H1gas-H2gas)
+        
         Gair = Ggas*48.5966429877363/51.2672005145991
         Gch4 = Ggas*2.67055752686283/51.2672005145991
         Hsg = H2r + (Qreac/Gref)
