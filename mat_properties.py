@@ -65,6 +65,7 @@ def REFPROP_p_h(p, h, gas,fraction, RP):
         res['rho'] = CP.PropsSI('D','P', p,'H',h,gas)
         res['cv'] = CP.PropsSI('C','P', p,'H',h,gas)
         res['cp'] = CP.PropsSI('C','P', p,'H',h,gas)
+        res['Q'] = CP.PropsSI('Q','P', p,'H',h,gas)
     else:    
         if fraction[0]==1 or gas.split("*")[0]!='Nitrogen':   
             RP.PREOSdll(0)
