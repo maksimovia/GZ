@@ -20,12 +20,15 @@ Maxiterations_turbine = 30
 
 
 class ku_tu:
-    def __init__(self, gas0, gas1,  water, gas_streams0, gas_streams, water_streams0, water_streams, heaters, electric, streamKU_VD, streamKU_ND, streamST_VD, streamST_ND, steamVD_fraction_to_turbine, Calcmethod, KPD_SP, KPKN, KPD_to, KPDPN):
+    def __init__(self, gas0, gas1,  water, gas_streams0, gas_streams, water_streams0, water_streams, heaters, electric, streamKU_VD, streamKU_ND, streamST_VD, streamST_ND, Calcmethod, KPD_SP, KPKN, KPD_to, KPDPN, steamVD_fraction_to_turbine=1,steamVD_to_turbine=0):
 
         self.TU = Turboustanovka.turboustanovka(
             water, water_streams0, water_streams, heaters, electric, KPD_SP, KPKN)
         self.Whole_cotel = cotel.cotel_all(KPD_to, KPDPN,  gas0, gas1, water, Calcmethod,
                                            gas_streams0, water_streams0, gas_streams, water_streams, heaters, electric)
+        
+        self.steamVD_to_turbine=steamVD_to_turbine
+
         self.streamKU_VD=streamKU_VD
         self.streamKU_ND=streamKU_ND
         self.streamST_VD=streamST_VD
@@ -81,11 +84,16 @@ class ku_tu:
 
                 Gnd1 = self.water_streams.at[self.streamKU_ND, "G"]
                 Gnd2 = self.water_streams.at[self.streamST_ND, "G"]
-                Gvd1 = self.water_streams.at[self.streamKU_VD, "G"]*self.steamVD_fraction_to_turbine
+                Gvd1 = self.water_streams.at[self.streamKU_VD, "G"]
                 Gvd2 = self.water_streams.at[self.streamST_VD, "G"]
 
                 # Перекидываем расходы с учетом расхода в другие места
-                self.water_streams.at[self.streamST_VD, 'G'] = Gvd1
+                if self.steamVD_to_turbine==0:
+                    new_VD_massflow=Gvd1*self.steamVD_fraction_to_turbine
+                else:
+                    new_VD_massflow=self.steamVD_to_turbine
+                
+                self.water_streams.at[self.streamST_VD, 'G'] = new_VD_massflow
                 self.water_streams.at[self.streamST_ND, 'G'] = Gnd1
 
                 # Перекидываем энтальпии
@@ -112,19 +120,23 @@ class ku_tu:
                     if i==3 and j==0:
                         print('Переход к оригинальной точности расчета', Calctolerance)
             
-                Error_water_G = abs((self.water_streams.at["KN-GPK", "G"] + Gvd1*(1-self.steamVD_fraction_to_turbine)-
-                                     self.water_streams.at["GPK-IND", "G"])/self.water_streams.at["GPK-IND", "G"]*100)
+                G_turb=self.water_streams.at["SMESHOD-REC", "G"]
+                G_ku=self.water_streams.at["GPK-IND", "G"]-(Gvd1-new_VD_massflow)
+                Error_water_G = abs((self.water_streams.at["SMESHOD-REC", "G"]-
+                                     (self.water_streams.at["GPK-IND", "G"]-(Gvd1-new_VD_massflow)))/(self.water_streams.at["GPK-IND", "G"]-(Gvd1-new_VD_massflow))*100)
                 Error_nd_G = abs((Gnd1 - Gnd2)/Gnd1*100)
-                Error_vd_G = abs((Gvd1 - Gvd2)/Gvd1*100)
+                Error_vd_G = abs((new_VD_massflow - Gvd2)/(new_VD_massflow)*100)
                 Max_error_G = max(Error_water_G, Error_nd_G, Error_vd_G)
                 Max_error = max(Error_water_G, Error_nd_G,
                                 Error_vd_G, Error_nd_P, Error_vd_P)
                
                 if Error_water_G > 20:
                     Teplo_overflow = 1
+                    print(f"Расход из турбины G>1: {G_turb}")
+                    print( f"Расход в ГПК G>1: {G_ku}")
+                    print( f"Расход в ГПК G>1: {G_ku}")
+                    print(self.water_streams)
                 if Error_water_G > 1:
-                    G_turb=self.water_streams.at["SMESHOD-REC", "G"]
-                    G_ku=self.water_streams.at["KN-GPK", "G"]
                     print("Погрешность определения расхода выше допустимой")
                     print(f"Расход из турбины: {G_turb}")
                     print( f"Расход в ГПК: {G_ku}")
@@ -134,6 +146,7 @@ class ku_tu:
                     break
                 if j == Maxiterations_cotel - 1:
                     print("Достигнуто максимальное количество итераций расхода КУ+ПТУ")
+                    print(f"Error_water_G: {Error_water_G}, Error_nd_G: {Error_nd_G}, Error_vd_G: {Error_vd_G}")
 
             # Переписываю давления
             P_turb_vd = self.water_streams.at[self.streamST_VD, 'P']
