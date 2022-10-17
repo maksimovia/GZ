@@ -119,6 +119,9 @@ class ku_tu:
                     Calctolerance_new = Calctolerance
                     if i==3 and j==0:
                         print('Переход к оригинальной точности расчета', Calctolerance)
+                # точка смешения на входе в ГПК НАДО ПЕРЕДЕЛАТЬ ДЛЯ ПКМ
+                self.water_streams.loc["SMESH-GPK", "T":"G"]=self.water_streams.loc["SMESHOD-REC", "T":"G"]
+                        
             
                 G_turb=self.water_streams.at["SMESHOD-REC", "G"]
                 G_ku=self.water_streams.at["GPK-IND", "G"]-(Gvd1-new_VD_massflow)
