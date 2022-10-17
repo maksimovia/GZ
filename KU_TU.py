@@ -1,7 +1,6 @@
 
 # Импорт библиотек
 import matplotlib
-import matplotlib.pyplot as plt
 import time
 import cotel
 import Turboustanovka
