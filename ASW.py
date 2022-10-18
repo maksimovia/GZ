@@ -4,7 +4,7 @@ import numpy as n
 import pandas as pd
 
 class Accum():
-    def __init__(self, water, water_streams, heaters, **kwargs):
+    def __init__(self, water, water_streams, accumulation, **kwargs):
         
         self._V = 1
         self._D = 1
@@ -22,7 +22,7 @@ class Accum():
         
         self._water = water    
         self.water_streams=water_streams
-        self.heaters=heaters
+        self.accumulation = accumulation
         
         
         self._T_nar_vozd = self.water_streams.at['AIR','T']
@@ -87,7 +87,9 @@ class Accum():
             self._Mass = self._kolichestvo*self._V *self._water.p_t(self._P_accum, self._T_accum)['rho']
             self._Q = self._Mass* (self._h_accum - self._h_obr_set_voda)#kJ
             self._f = 1
-            self.heaters.at["ASW", "Qw"]=self._Q
+            print(self._Q) 
+            self.accumulation.at["ASW", "Qw"]=self._Q
+            self.accumulation.at["ASW", "T"]=self._T_accum
         else:
             print("Аккумулятор заполнен")
         return {'T_accum': self._T_accum,'Q': self._Q,'G': self._G }
@@ -105,7 +107,8 @@ class Accum():
             self.water_streams.at[self._stream11,'P'] = "None"
             self.water_streams.at[self._stream11,'G'] = "None"  
             self._Q = 0
-            self.heaters.at["ASW", "Qw"]=self._Q
+            self.accumulation.at["ASW", "Qw"]=self._Q
+            self.accumulation.at["ASW", "T"]=self._T_accum
         else:
             print("Аккумулятор пустой")
 
@@ -124,6 +127,7 @@ class Accum():
         self.water_streams.at[self._stream11,'H'] = "None"
         self.water_streams.at[self._stream11,'P'] = "None"
         self.water_streams.at[self._stream11,'G'] = "None"  
-        self.heaters.at["ASW", "Qw"]=self._Q
+        self.accumulation.at["ASW", "Qw"]=self._Q
+        self.accumulation.at["ASW", "T"]=self._T_accum
         return {'T_accum': self._T_accum, 'poteri': self._poteri, 'Q': self._Q}
    
