@@ -19,10 +19,13 @@ class Accum():
         self._khi = 1
         self._lambda_min_vata = 0.045
         self.delta_min_vata = 0.01
-        self._T_nar_vozd = 15
+        
         self._water = water    
         self.water_streams=water_streams
         self.heaters=heaters
+        
+        
+        self._T_nar_vozd = self.water_streams.at['AIR','T']
 
         if 'stream11' in kwargs.keys():
             self._stream11 = kwargs['stream11']
@@ -72,8 +75,10 @@ class Accum():
         
         if self._f == 0:
             self._T_accum = self.water_streams.at[self._stream_pryamoi_setevoi_vody,'T'] # тут уточнить
-            self._h_accum = self.water_streams.at[self._stream_pryamoi_setevoi_vody,'H']# тут уточнить
+#             self._h_accum = self.water_streams.at[self._stream_pryamoi_setevoi_vody,'H']# тут уточнить
+            
             self._P_accum = self.water_streams.at[self._stream_pryamoi_setevoi_vody,'P']# тут уточнить
+            self._h_accum = self._water.p_t(self._P_accum,self._T_accum)['h']
             self.water_streams.at[self._stream11,'T'] = self._T_accum
             self.water_streams.at[self._stream11,'H'] = self._h_accum 
             self.water_streams.at[self._stream11,'P'] = self._P_accum
@@ -85,7 +90,7 @@ class Accum():
             self.heaters.at["ASW", "Qw"]=self._Q
         else:
             print("Аккумулятор заполнен")
-        return {'T_accum': self._T_accum,'Q': self._Q}
+        return {'T_accum': self._T_accum,'Q': self._Q,'G': self._G }
      
     def razryadka(self,tau):
         if self._f == 1:
@@ -95,18 +100,19 @@ class Accum():
             self._G = self._Mass/(tau*3600)    
             self.water_streams.at[self._stream12,'G'] = self._G 
             self._f=0
-            self._T_accum = "None"
-            self._h_accum = "None"
-            self._P_accum = "None"
-            self._G = "None" 
+            self.water_streams.at[self._stream11,'T'] = "None"
+            self.water_streams.at[self._stream11,'H'] = "None"
+            self.water_streams.at[self._stream11,'P'] = "None"
+            self.water_streams.at[self._stream11,'G'] = "None"  
             self._Q = 0
             self.heaters.at["ASW", "Qw"]=self._Q
         else:
             print("Аккумулятор пустой")
-            self._T_accum = "None"
-            self._h_accum = "None"
-            self._P_accum = "None"
-            self._G = "None" 
+
+            self.water_streams.at[self._stream11,'T'] = "None"
+            self.water_streams.at[self._stream11,'H'] = "None"
+            self.water_streams.at[self._stream11,'P'] = "None"
+            self.water_streams.at[self._stream11,'G'] = "None"  
         return {'T_accum': self._T_accum,'h_accum': self._h_accum,'P_accum': self._P_accum,'G': self._G,} 
                 
     def jdat(self,tau):
