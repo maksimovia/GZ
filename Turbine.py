@@ -452,10 +452,10 @@ class turbine:
         N2 = self.Gsmesh*(self.Hsmesh-self.Hotb2)/1000
 
         # отсек 3
-        N4 = self.Gotb1*(self.Hotb2-self.Hotb1)/1000
+        N3 = self.Gotb1*(self.Hotb2-self.Hotb1)/1000
 
         # отсек 4
-        N3 = self.Gin_cnd*(self.Hin_cnd-self.Hin_kond)/1000
+        N4 = self.Gin_cnd*(self.Hin_cnd-self.Hin_kond)/1000
 
         Ni_all = N1+N2+N3+N4
 

@@ -518,7 +518,7 @@ class cotel_all:
                     PPND['Tw'], PPND['Pw2'], PPND['Hw'], PPND['Gw']]
                 self.heaters.loc['PPND', 'Qw':'KPD'] = [
                     PPND['Qw'], PPND['Qg'], PPND['KPD']]
-                self.water_streams.loc["IND-PPND":"SMESHOD-REC",
+                self.water_streams.loc["IND-PPND":"SMESH-GPK",
                                        "P"] = PPND['Pw1']
                 self.water_streams.loc["BND-PEN", "P"] = PPND['Pw1']
 
@@ -564,16 +564,16 @@ class cotel_all:
                     self.water_streams.loc['GPK-REC', 'T':'G'] = [
                         GPK['Tw'], GPK['Pw2'], GPK['Hw'], GPK['Gw']]
                     Qw_gpk1 = self.water_streams.at['GPK-IND', 'G']*(
-                        self.water_streams.at['GPK-IND', 'H']-self.water_streams.at['SMESHOD-REC', 'H'])
+                        self.water_streams.at['GPK-IND', 'H']-self.water_streams.at['SMESH-GPK', 'H'])
                     Qw_gpk2 = self.water_streams.at['GPK-REC', 'G']*(
                         self.water_streams.at['GPK-REC', 'H']-self.water_streams.at['REC-GPK', 'H'])
                     Error_gpk = (Qw_gpk1-Qw_gpk2)/Qw_gpk1*100
 
                     # Расчёт расхода в ГПК (рециркуляция)
-                    tgpk_in = self.water_streams.at['SMESHOD-REC', 'T']
+                    tgpk_in = self.water_streams.at['SMESH-GPK', 'T']
                     tgpk_in0 = self.water_streams0.at['REC-GPK', 'T']
                     p_gpk = self.water_streams.at['REC-GPK', 'P']
-                    h_gpk_in_rec = self.water_streams.at['SMESHOD-REC', 'H']
+                    h_gpk_in_rec = self.water_streams.at['SMESH-GPK', 'H']
                     h_gpk_in_60 = self.water.p_t(p_gpk, tgpk_in0)['h']
                     h_gpk_out = self.water_streams.at['GPK-REC', 'H']
                     G_all = self.water_streams.at['PPND-DROSND',
@@ -586,7 +586,7 @@ class cotel_all:
                     else:
                         G_rec = 0
                         self.water_streams.loc['REC-GPK',
-                                              'T':'H'] = self.water_streams.loc['SMESHOD-REC', 'T':'H']
+                                              'T':'H'] = self.water_streams.loc['SMESH-GPK', 'T':'H']
                     G_gpk = G_all+G_rec
                     self.water_streams.at['REC-GPK', 'G'] = G_gpk
                     self.water_streams.loc['GPK-IND',
@@ -604,7 +604,7 @@ class cotel_all:
                 Qgas1ND = self.KPD*self.gas_streams.at['EVD-PPND', 'G'] * \
                     (self.gas_streams.at['EVD-PPND', 'H'] -
                      self.gas_streams.at['GPK-out', 'H'])
-                Qwat1ND = self.water_streams.at['GPK-IND', 'G']*(self.water_streams.at['GPK-IND', 'H']-self.water_streams.at['SMESHOD-REC', 'H']) +\
+                Qwat1ND = self.water_streams.at['GPK-IND', 'G']*(self.water_streams.at['GPK-IND', 'H']-self.water_streams.at['SMESH-GPK', 'H']) +\
                     self.water_streams.at['IND-PPND', 'G']*(self.water_streams.at['IND-PPND', 'H']-self.water_streams.at['GPK-IND', 'H']) +\
                     self.water_streams.at['PPND-DROSND', 'G']*(self.water_streams.at['PPND-DROSND', 'H']-self.water_streams.at['IND-PPND', 'H']) +\
                     self.water_streams.at['BND-PEN', 'G'] * \
@@ -630,8 +630,8 @@ class cotel_all:
             Qgasall = self.KPD*self.gas_streams.at['GTU-PEVD', 'G'] * \
                 (self.gas_streams.at['GTU-PEVD', 'H'] -
                  self.gas_streams.at['GPK-out', 'H'])
-            Qwatall = self.water_streams.at['PPND-DROSND', 'G']*(self.water_streams.at['PPND-DROSND', 'H']-self.water_streams.at['SMESHOD-REC', 'H'])+self.water_streams.at['PEVD-DROSVD', 'G']*(
-                self.water_streams.at['PEVD-DROSVD', 'H']-self.water_streams.at['SMESHOD-REC', 'H'])-self.water_streams.at['BND-PEN', 'G']*(self.water_streams.at['PEN-EVD', 'H']-self.water_streams.at['BND-PEN', 'H'])
+            Qwatall = self.water_streams.at['PPND-DROSND', 'G']*(self.water_streams.at['PPND-DROSND', 'H']-self.water_streams.at['SMESH-GPK', 'H'])+self.water_streams.at['PEVD-DROSVD', 'G']*(
+                self.water_streams.at['PEVD-DROSVD', 'H']-self.water_streams.at['SMESH-GPK', 'H'])-self.water_streams.at['BND-PEN', 'G']*(self.water_streams.at['PEN-EVD', 'H']-self.water_streams.at['BND-PEN', 'H'])
             ErrorALL = (Qgasall-Qwatall)/Qgasall*100
             # print('dQ/Qsumm', ErrorALL)
             if abs((Qgasall-Qwatall)/Qgasall*100) < calctolerance:
