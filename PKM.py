@@ -107,7 +107,9 @@ class reformer:
         Hsg = H2r + (Qreac/Gref)
                 
         SGsost = ['N2','O2','CO2','Ar','H2O','CH4','H2','CO']
-        SGfrac = [0,1.96010880218854E-22,0.06356655972348,0,0.536615036955725,0.0500421242206529,0.325898769048586,0.0238775100515557]
+        SGfrac = [0,0,0.06356,0,0.53662,0.05004,0.32590,0.02388]
+        # All_in_one=sum(SGfrac)
+        # SGfrac= map(lambda x: x/All_in_one,SGfrac)
         SGfrac = dict(zip(SGsost,SGfrac))
 
         Gassost = ['N2','O2','CO2','H2O','Ar']
