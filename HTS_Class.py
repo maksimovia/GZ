@@ -1,7 +1,7 @@
 import mat_properties as prop
 import pandas as pd
 
-class cooler:
+class HTS:
     def __init__(self,stream11,table,Tout, KPD):
         self.KPD=KPD
         self.table=table
@@ -33,8 +33,22 @@ class cooler:
         h_sg1=gas_KU.p_t(psyngas,tsyngas)['h']
 
         #Параметры газа на выходе
+        # SGfrac1=  [0.0, 0, 0.06356, 0.0, 0.536615, 0.0500421, 0.325899, 0.0238773000]
+                gas_KU1 = prop.Materials_prop(
+        syngas_mix,
+        SGfrac1,
+        prop.REFPROP_h_s,
+        prop.REFPROP_p_t,
+        prop.REFPROP_p_h,
+        prop.REFPROP_p_s,
+        prop.REFPROP_p_q,
+        prop.REFPROP_t_q,
+        prop.REFPROP_p_rho,
+        prop.REFPROP_s_q,
+        RP=RP,
+        )
         Tout = self.Tout
-        h_sg2 = gas_KU.p_t(psyngas,self.Tout)['h']
+        h_sg2 = gas_KU1.p_t(psyngas,self.Tout)['h']
 
         #Разность энтальпий
         Hc_syngas = h_sg1 - h_sg2
@@ -44,7 +58,7 @@ class cooler:
 
         Qc_syngas = Hc_syngas * gsyngas
         Qc_sg_w = Hc_syngas * gsyngas* self.KPD
-        res = {"T":Tout,"Qc_syngas":Qc_syngas,"Qc_sg_w":Qc_sg_w,"psyngas":psyngas,"Hc_syngas":Hc_syngas,"gsyngas":gsyngas,"h_sg1":h_sg1,"h_sg2":h_sg2,"KPD":KPD,"SGfrac":SGfrac,"KPD":KPD}
+        res = {"T":Tout,"Qc_syngas":Qc_syngas,"Qc_sg_w":Qc_sg_w,"psyngas":psyngas,"Hc_syngas":Hc_syngas,"gsyngas":gsyngas,"h_sg1":h_sg1,"h_sg2":h_sg2,"KPD":KPD,"SGfrac":SGfrac,"KPD":KPD,"SGfrac":SGfrac}
         
         return res
     
