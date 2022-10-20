@@ -53,11 +53,11 @@ def Q_t_diagram(gas_streams, water_streams, heaters, xsize=15, ysize=10):
     plt.plot(Qw[5:7], Tw[5:7], color='blue')
     plt.plot(Qw[6:8], Tw[6:8], color='blue')
     plt.plot(Qw[8:10], Tw[8:10], color='blue')
-    plt.xlabel('Q')
-    plt.ylabel('T')
+    plt.xlabel('Q, МВт')
+    plt.ylabel('T, °С')
     plt.legend(['gas', 'water'])
     # plt.show()
-    return fig
+    return 
 
     
 def H_S_diagram(water, water_streams, xsize=15, ysize=10):
@@ -137,7 +137,7 @@ def H_S_diagram(water, water_streams, xsize=15, ysize=10):
     plt.plot(Ssm,Hsm)
     plt.plot(Snd,Hnd)
     plt.plot(S3,H3,S4,H4,S5,H5,S6,H6,S7,H7,S8,H8,S9,H9,S10,H10,S11,H11, color = "gray", alpha=0.3)
-    plt.xlabel('S')
-    plt.ylabel('H')
+    plt.xlabel('S, кДж/кг⋅К')
+    plt.ylabel('H, кДж/кг')
     # plt.show()
-    return fig
+    return 

@@ -252,9 +252,8 @@ def gtu_raschet(ISO, n, T, Pin, Pout):
 
 
 class gtu:
-    def __init__(self, ISO_input, GTU_input, streamout):
+    def __init__(self, ISO_input, streamout):
         self.streamout = streamout
-        self.GTU_input = GTU_input
         self.ISO = {
     "N": ISO_input.loc["Value", "N"],
     "eff": ISO_input.loc["Value", "eff"],
@@ -263,11 +262,12 @@ class gtu:
 }
        
 
-    def calc(self):
-        T = self.GTU_input.at["tair", 1]
-        n = self.GTU_input.at['n', 1]
-        Pin = self.GTU_input.at['Pin', 1]
-        Pout = self.GTU_input.at['Pout', 1]
+    def calc(self,GTU_input):
+        T = GTU_input.at["tair", 1]
+        n = GTU_input.at['n', 1]
+        print(f"Относительная мощность ГТУ в ГТУ {n}")
+        Pin = GTU_input.at['Pin', 1]
+        Pout = GTU_input.at['Pout', 1]
         GTU_res = gtu_raschet(self.ISO, n, T, Pin , Pout)
         return GTU_res
 
