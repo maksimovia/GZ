@@ -36,6 +36,7 @@ class heatex:
         T022 = self.water.p_h(self.P022, self.H022)['T']
         dTmin0 = min(T011-T022, T012-T021)
         dTmax0 = max(T011-T022, T012-T021)
+        
         self.LMTD0 = (dTmax0 - dTmin0) / (n.log(dTmax0/dTmin0))
         T01av = (T011+T012)/2
         T02av = (T021+T022)/2
@@ -421,12 +422,12 @@ class cotel_all:
 
         self.PPND_obj = heatexPEND('EVD-PPND', 'PPND-IND', 'IND-PPND', 'PPND-DROSND',
                                    KPD,  gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams, heaters)
-
+        
         self.IND_obj = evaporND('PPND-IND', 'IND-GPK', 'GPK-IND', 'IND-PPND',  'PEVD-DROSVD',
                                 KPD, gas1, gas0, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams, heaters)
 
         self.GPK_obj = heatex('IND-GPK', 'GPK-out', 'REC-GPK', 'GPK-REC',
-                              KPD,  gas1, gas0, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams, heaters)
+                              KPD,  gas0, gas1, water, calcmethod, gas_streams0, water_streams0, gas_streams, water_streams, heaters)
         self.KPD = KPD
         self.water_streams = water_streams
         self.gas_streams = gas_streams
@@ -438,9 +439,11 @@ class cotel_all:
         self.electric = electric
 
     def calc(self, calctolerance, maxiterations=50):
+        
         it = maxiterations
         start_time = time.time()
-
+        
+        
         self.gas_streams.loc['GTU-PEVD', 'H'] = self.gas1.p_t(
             self.gas_streams.loc['GTU-PEVD', 'P'], self.gas_streams.loc['GTU-PEVD', 'T'])['h']
         for k in range(it):
