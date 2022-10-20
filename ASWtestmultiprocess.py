@@ -142,8 +142,8 @@ def test(args):
     # print(water_streams)
     ############################################################
     #--------------------------------Расчет ГТУ
-    Gas_turbine = GTU.gtu(GTU_ISO, GTU_input, "GTU-KU")
-    Gas_turbine_res = Gas_turbine.calc()
+    Gas_turbine = GTU.gtu(GTU_ISO, "GTU-KU")
+    Gas_turbine_res = Gas_turbine.calc(GTU_input)
     electric.at["GTU", "N"] = Gas_turbine_res["N"]
     electric.at["GTU", "KPD"] = Gas_turbine_res["eff"]
     electric.at["DK", "N"] = Gas_turbine_res["Ndk"]
@@ -241,7 +241,20 @@ def test(args):
     )
 
     print(f"fin КУ и ТУ:--- {round((time.time() - start_time), 1)} сек. ---")
+    
+    result = {
+    "Initial_parameters":{"Tair":t_air_list,"n_GTU": nagr},
+    "GTU": round(electric.at["GTU", "N"], 4),
+    "GTU_KPD": round(electric.at["GTU", "KPD"], 4),
+    "Turbine": round(electric.at["Turbine", "Ni"], 4),
+    "KN": round(electric.at["KN", "Ni"], 4),
+    "DK": round(electric.at["DK", "N"], 4),
+    "PEN": round(electric.at["PEN", "Ni"], 4),
+    "Turbine_Qt":round(heaters.at["SP2", "Qw"]+heaters.at["SP1", "Qw"]+heaters.at["OD", "Qw"], 4),
+    "ASW_Qt":round(accumulation.at["ASW", "Qw"]/(vremya*3600), 4)
+    }
 
-    return {'GTU':electric.at("GTU","N"), "Turbine":electric.at("Turbine","Ni"),"KN":electric.at("KN","Ni"),"DK":electric.at("DK","N"),"PEN":electric.at("PEN","Ni")}
+
+    return result
     
 

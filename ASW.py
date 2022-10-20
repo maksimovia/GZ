@@ -88,7 +88,7 @@ class Accum():
             self._Q = self._Mass* (self._h_accum - self._h_obr_set_voda)#kJ
             self._f = 1
             print(self._Q) 
-            self.accumulation.at["ASW", "Qw"]=self._Q
+            self.accumulation.at["ASW", "Qw"]=self._Q/1000
             self.accumulation.at["ASW", "T"]=self._T_accum
         else:
             print("Аккумулятор заполнен")
@@ -107,7 +107,7 @@ class Accum():
             self.water_streams.at[self._stream11,'P'] = "None"
             self.water_streams.at[self._stream11,'G'] = "None"  
             self._Q = 0
-            self.accumulation.at["ASW", "Qw"]=self._Q
+            self.accumulation.at["ASW", "Qw"]=self._Q/1000
             self.accumulation.at["ASW", "T"]=self._T_accum
         else:
             print("Аккумулятор пустой")
@@ -127,7 +127,7 @@ class Accum():
         self.water_streams.at[self._stream11,'H'] = "None"
         self.water_streams.at[self._stream11,'P'] = "None"
         self.water_streams.at[self._stream11,'G'] = "None"  
-        self.accumulation.at["ASW", "Qw"]=self._Q
+        self.accumulation.at["ASW", "Qw"]=self._Q/1000
         self.accumulation.at["ASW", "T"]=self._T_accum
         return {'T_accum': self._T_accum, 'poteri': self._poteri, 'Q': self._Q}
    
