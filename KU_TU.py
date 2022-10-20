@@ -52,7 +52,18 @@ class ku_tu:
         self.gas0 = gas0
         self.gas1 = gas1
         self.water = water
-
+        
+        # Первое приближение по давлению
+        if self.water_streams0.at[self.streamKU_ND, 'P']==self.water_streams.at[self.streamKU_ND, 'P']:
+            G_gas1 = self.gas_streams.at["GTU-PEVD", "G"]
+            G_gas0 = self.gas_streams0.at["GTU-PEVD", "G"]
+            g_gas = G_gas1/G_gas0
+            Pvd_1 = 0.4538+7.7601*g_gas
+            Pnd_1 = -0.0189+0.6885*g_gas
+            self.water_streams.at[self.streamKU_ND, 'P'] = Pnd_1
+            self.water_streams.at[self.streamKU_VD, 'P'] = Pvd_1
+        
+        
     def calculate(self, Teplo, Calctolerance, Maxiterations_KU_TU, Maxiterations_cotel, Maxiterations_turbine):
         Pnd_it = []
         Pvd_it = []
@@ -64,23 +75,17 @@ class ku_tu:
         Error_vd_P = 2
         Calctolerance_new = 10**-1
         Teplo_overflow = 0
+        Maxiterations_cotel_new=5
 
-        # Первое приближение по давлению
-        G_gas1 = self.gas_streams.at["GTU-PEVD", "G"]
-        G_gas0 = self.gas_streams0.at["GTU-PEVD", "G"]
-        g_gas = G_gas1/G_gas0
-        Pvd_1 = 0.4538+7.7601*g_gas
-        Pnd_1 = -0.0189+0.6885*g_gas
-        self.water_streams.at[self.streamKU_ND, 'P'] = Pnd_1
-        self.water_streams.at[self.streamKU_VD, 'P'] = Pvd_1
+
 
         for i in range(Maxiterations_KU_TU):
 
-            for j in range(Maxiterations_cotel):
+            for j in range(Maxiterations_cotel_new):
 
                 # Расчет котла
                 Cotel_result = self.Whole_cotel.calc(
-                    Calctolerance_new, Maxiterations_cotel)
+                    Calctolerance_new, Maxiterations_cotel_new)
 
                 Gnd1 = self.water_streams.at[self.streamKU_ND, "G"]
                 Gnd2 = self.water_streams.at[self.streamST_ND, "G"]
@@ -114,11 +119,13 @@ class ku_tu:
                 )
 
               
-                Calctolerance_new = Calctolerance*10
+                Calctolerance_new = Calctolerance
                 if i > 2:
                     Calctolerance_new = Calctolerance
+                    Maxiterations_cotel_new=Maxiterations_cotel
                     if i==3 and j==0:
                         print('Переход к оригинальной точности расчета', Calctolerance)
+                        print('Переход к оригинальному количетсву итераций', Maxiterations_cotel)
                 # точка смешения на входе в ГПК НАДО ПЕРЕДЕЛАТЬ ДЛЯ ПКМ
                 # точка смешения на входе в ГПК НАДО ПЕРЕДЕЛАТЬ ДЛЯ ПКМ
                 # точка смешения на входе в ГПК НАДО ПЕРЕДЕЛАТЬ ДЛЯ ПКМ
