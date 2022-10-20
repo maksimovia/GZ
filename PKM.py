@@ -1,5 +1,53 @@
 import mat_properties as prop
 
+def mixing_gases_molar(stream1, stream2, stream3, working_table):
+    fractions1 = working_table.loc[stream1, "N2":]
+    fractions2 = working_table.loc[stream2, "N2":]
+    [gas1_T, gas1_P, gas1_H, gas1_G] = working_table.loc[stream1, "T":"G"]
+    [gas2_T, gas2_P, gas2_H, gas2_G] = working_table.loc[stream2, "T":"G"]
+    molar_mases = {
+        "N2": 0.0280134,
+        "O2": 0.03199806,
+        "CO2": 0.0440095,
+        "H2O": 0.01801528,
+        "Ar": 0.039948,
+    }
+    components = list(working_table.columns)[4:]
+    Sr_mol_mass1 = sum(map(lambda x1, x2: molar_mases[x1] * x2, components, fractions1))
+    Sr_mol_mass2 = sum(map(lambda x1, x2: molar_mases[x1] * x2, components, fractions2))
+    Molar_flow1 = gas1_G / Sr_mol_mass1
+    Molar_flow2 = gas2_G / Sr_mol_mass2
+    Molar_flow_components = list(
+        map(lambda x1, x2: x1 * Molar_flow1 + x2 * Molar_flow2, fractions1, fractions2)
+    )
+    fractions3 = list(map(lambda x: x / sum(Molar_flow_components),Molar_flow_components))
+    gas3_G = gas1_G + gas2_G
+    gas3_H = (gas1_H * gas1_G + gas2_H * gas2_G) / gas3_G
+    
+    gasmix = "Nitrogen*Oxygen*CO2*Water*Argon"
+    RP = prop.init_REFPROP(r"C:\Program Files (x86)\REFPROP")
+
+    gas_s_prop = prop.Materials_prop(
+        gasmix,
+        fractions3,
+        prop.REFPROP_h_s,
+        prop.REFPROP_p_t,
+        prop.REFPROP_p_h,
+        prop.REFPROP_p_s,
+        prop.REFPROP_p_q,
+        prop.REFPROP_t_q,
+        prop.REFPROP_p_rho,
+        prop.REFPROP_s_q,
+        RP=RP,
+    )
+
+    gas3_P = min(gas2_P, gas1_P)
+    gas3_T = gas_s_prop.p_h(gas3_P, gas3_H)["T"]
+    gas3_properties = [gas3_T, gas3_P, gas3_H, gas3_G] + fractions3
+    working_table.loc[stream3, :] = gas3_properties
+    gas3_properties_return = dict(zip(working_table.columns, gas3_properties))
+    return gas3_properties_return
+
 class steam_transformer:
     def __init__(self,**kwargs):
         self.stream11 = kwargs['stream11']
@@ -65,10 +113,15 @@ class steam_transformer:
 
         Qtrans = G1*(H11-H16)
         
+        
+        T17 = 80
+        P17 = P16
+        H17 = self.water.p_t(P17, T17)['h']
+        Qcool80 = G1*(H16-H17)
         return {'H11': H11,'H12': H12,'H13': H13,'H14': H14,'H15': H15,'H16': H16,
-               'H21': H21,'H22': H22,'H23': H23,'H24': H24, 'G1':G1, 'G2':G2,'Q':Qtrans, 'P2':self.P2, 'P16':P16,
-               'T11': T11,'T12': T12,'T13': T13,'T14': T14,'T15': T15,'T16': T16,
-               'T21': T21,'T22': T22,'T23': T23,'T24': T24}
+               'H21': H21,'H22': H22,'H23': H23,'H24': H24, 'G1':G1, 'G2':G2,'Q':Qtrans, 'P2':self.P2, 'P17':P17,
+               'T11': T11,'T12': T12,'T13': T13,'T14': T14,'T15': T15,'T16': T16, 'T17':T17,'H17':H17, 
+               'T21': T21,'T22': T22,'T23': T23,'T24': T24, 'Qcool80':Qcool80}
 
 class reformer:
     def __init__(self, **kwargs):
@@ -95,7 +148,7 @@ class reformer:
         H1r = (Gsteam*Hsteam + Gmeth*Hmeth) / Gref
         H2r = self.waterMethane.p_t(self.Pref, self.Tref)['h']
         Qdt = Gref*(H2r-H1r)
-        Qreac = (52166.505091208484/44.6397313913235)*Gref
+        Qreac = (53634.90756/44.6397313913235)*Gref
         Qref = Qdt+Qreac
         H1gas = 3191.2518095937544
         H2gas = self.gas_KU.p_t(0.1, self.T2gas)['h']
@@ -115,6 +168,5 @@ class reformer:
         Gassost = ['N2','O2','CO2','H2O','Ar']
         Gasfrac = [0.710320591016015,0.00996710270335893,0.090538556815177,0.180531273012258,0.00864247645319178]
         Gasfrac = dict(zip(Gassost,Gasfrac))
-        
         return {'Q':Qref,'Ggas':Ggas,'Gair':Gair,'Gch4':Gch4, 'Tref':self.Tref,
                 'Gref':Gref, 'Pref':self.Pref,'Hsg':Hsg,'SGfrac':SGfrac,'H2gas':H2gas,'Gasfrac':Gasfrac}

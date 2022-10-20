@@ -128,8 +128,14 @@ class ku_tu:
                         print('Переход к оригинальному количетсву итераций', Maxiterations_cotel)
                 # точка смешения на входе в ГПК НАДО ПЕРЕДЕЛАТЬ ДЛЯ ПКМ
                 # точка смешения на входе в ГПК НАДО ПЕРЕДЕЛАТЬ ДЛЯ ПКМ
-                # точка смешения на входе в ГПК НАДО ПЕРЕДЕЛАТЬ ДЛЯ ПКМ
-                self.water_streams.loc["SMESH-GPK", "T":"G"]=self.water_streams.loc["SMESHOD-REC", "T":"G"]
+                ######### Максимов 
+                self.water_streams.loc["SMESH-GPK", "G"] = self.water_streams.loc["SMESHOD-REC","G"] + self.water_streams.loc["ST-GPK","G"]
+                self.water_streams.loc["SMESH-GPK", "P"] = self.water_streams.loc["SMESHOD-REC","P"]
+                self.water_streams.loc["SMESH-GPK", "H"] = ((self.water_streams.loc["SMESHOD-REC","H"]*self.water_streams.loc["SMESHOD-REC","G"])+(self.water_streams.loc["ST-GPK","H"]*self.water_streams.loc["ST-GPK","G"]))/self.water_streams.loc["SMESH-GPK", "G"]
+                self.water_streams.loc["SMESH-GPK", "T"] = self.water.p_h(self.water_streams.loc["SMESH-GPK", "P"],self.water_streams.loc["SMESH-GPK", "H"])["T"]
+                ##################
+                
+                
                         
             
                 G_turb=self.water_streams.at["SMESHOD-REC", "G"]
@@ -147,7 +153,7 @@ class ku_tu:
                     print(f"Расход из турбины G>1: {G_turb}")
                     print( f"Расход в ГПК G>1: {G_ku}")
                     print( f"Расход в ГПК G>1: {G_ku}")
-                    print(self.water_streams)
+#                     print(self.water_streams)
                 if Error_water_G > 1:
                     print("Погрешность определения расхода выше допустимой")
                     print(f"Расход из турбины: {G_turb}")
