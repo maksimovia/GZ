@@ -113,7 +113,7 @@ def test(args):
 
     Calctolerance = 10**-2
     Teplo = 1
-    Maxiterations_KU_TU = 20
+    Maxiterations_KU_TU = 10
     Maxiterations_cotel = 4
     Maxiterations_turbine = 30
     steamVD_fraction_to_turbine=1
@@ -242,6 +242,11 @@ def test(args):
 
     print(f"fin КУ и ТУ:--- {round((time.time() - start_time), 1)} сек. ---")
     
+#     Перепад на дифрагму для проверки параметров работы программы при данных исходных данных
+    P_pered_diafragma=water_streams.at["DOOTB1", "P"]
+    P_posle_diafragma=water_streams.at["INCND", "P"]
+    Delta_P_Diafragma=P_pered_diafragma-P_posle_diafragma
+    
     result = {
     "Initial_parameters":{"Tair":t_air_list,"n_GTU": nagr},
     "GTU": round(electric.at["GTU", "N"], 4),
@@ -251,7 +256,8 @@ def test(args):
     "DK": round(electric.at["DK", "N"], 4),
     "PEN": round(electric.at["PEN", "Ni"], 4),
     "Turbine_Qt":round(heaters.at["SP2", "Qw"]+heaters.at["SP1", "Qw"]+heaters.at["OD", "Qw"], 4),
-    "ASW_Qt":round(accumulation.at["ASW", "Qw"]/(vremya*3600), 4)
+    "ASW_Qt":round(accumulation.at["ASW", "Qw"]/(vremya*3600), 4),
+    "Delta_P_Diafragma":round(Delta_P_Diafragma, 4)
     }
 
 

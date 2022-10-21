@@ -48,6 +48,13 @@ class od:
         pdr_out=pdr_in
         Delta=tdr_in-tw_in
         epsilon=min(0.999, 1/(0.35*min(Gdr,God)/max(Gdr,God)+0.65+1/self.F*n.sqrt(min(Gdr,God)/max(Gdr,God))))
+        # try:
+        #     epsilon=min(0.999, 1/(0.35*min(Gdr,God)/max(Gdr,God)+0.65+1/self.F*n.sqrt(min(Gdr,God)/max(Gdr,God))))
+        # except ValueError:
+        #     print(Exception)
+        #     epsilon=0.8
+        #     print("Gdr",Gdr)
+        #     print("God",God)
         Q=min(epsilon,1)*min(Gdr,God)*self.Cp*Delta/1000
         tod_out=tw_in+Q*1000*self.KPD/God/self.Cp
         Hdr_out=Hdr_in-Q*1000/Gdr

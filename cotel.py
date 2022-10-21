@@ -449,6 +449,7 @@ class cotel_all:
         for k in range(it):
             if k>it-it/2:
                 calctolerance_new=calctolerance/10
+                # print( self.water_streams)
                 print('Повышена точность расчета котла для увеличения сходимости')
 
             else:

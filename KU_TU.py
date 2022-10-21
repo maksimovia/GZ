@@ -20,25 +20,25 @@ Maxiterations_turbine = 30
 
 
 class ku_tu:
-    def __init__(self, gas0, gas1,  water, gas_streams0, gas_streams, water_streams0, water_streams, heaters, electric, streamKU_VD, streamKU_ND, streamST_VD, streamST_ND, Calcmethod, KPD_SP, KPKN, KPD_to, KPDPN, steamVD_fraction_to_turbine=1,steamVD_to_turbine=0):
+    def __init__(self, gas0, gas1,  water, gas_streams0, gas_streams, water_streams0, water_streams, heaters, electric, streamKU_VD, streamKU_ND, streamST_VD, streamST_ND, Calcmethod, KPD_SP, KPKN, KPD_to, KPDPN, steamVD_fraction_to_turbine=1, steamVD_to_turbine=0):
 
         self.TU = Turboustanovka.turboustanovka(
             water, water_streams0, water_streams, heaters, electric, KPD_SP, KPKN)
         self.Whole_cotel = cotel.cotel_all(KPD_to, KPDPN,  gas0, gas1, water, Calcmethod,
                                            gas_streams0, water_streams0, gas_streams, water_streams, heaters, electric)
-        
-        self.steamVD_to_turbine=steamVD_to_turbine
 
-        self.streamKU_VD=streamKU_VD
-        self.streamKU_ND=streamKU_ND
-        self.streamST_VD=streamST_VD
-        self.streamST_ND=streamST_ND   
+        self.steamVD_to_turbine = steamVD_to_turbine
+
+        self.streamKU_VD = streamKU_VD
+        self.streamKU_ND = streamKU_ND
+        self.streamST_VD = streamST_VD
+        self.streamST_ND = streamST_ND
         self.steamVD_fraction_to_turbine = steamVD_fraction_to_turbine
 
         self.Vvd0 = 1/water.p_h(water_streams0.at[self.streamKU_VD, 'P'],
-                           water_streams0.at[self.streamKU_VD, 'H'])['rho']
+                                water_streams0.at[self.streamKU_VD, 'H'])['rho']
         self.Vnd0 = 1/water.p_h(water_streams0.at[self.streamKU_ND, 'P'],
-                           water_streams0.at[self.streamKU_ND, 'H'])['rho']
+                                water_streams0.at[self.streamKU_ND, 'H'])['rho']
         self.Gvd0 = water_streams0.at[self.streamKU_VD, 'G']
         self.Gnd0 = water_streams0.at[self.streamKU_ND, 'G']
         self.dPvd0 = water_streams0.at[self.streamKU_VD, 'P'] - \
@@ -52,9 +52,9 @@ class ku_tu:
         self.gas0 = gas0
         self.gas1 = gas1
         self.water = water
-        
+
         # Первое приближение по давлению
-        if self.water_streams0.at[self.streamKU_ND, 'P']==self.water_streams.at[self.streamKU_ND, 'P']:
+        if self.water_streams0.at[self.streamKU_ND, 'P'] == self.water_streams.at[self.streamKU_ND, 'P']:
             G_gas1 = self.gas_streams.at["GTU-PEVD", "G"]
             G_gas0 = self.gas_streams0.at["GTU-PEVD", "G"]
             g_gas = G_gas1/G_gas0
@@ -62,8 +62,7 @@ class ku_tu:
             Pnd_1 = -0.0189+0.6885*g_gas
             self.water_streams.at[self.streamKU_ND, 'P'] = Pnd_1
             self.water_streams.at[self.streamKU_VD, 'P'] = Pvd_1
-        
-        
+
     def calculate(self, Teplo, Calctolerance, Maxiterations_KU_TU, Maxiterations_cotel, Maxiterations_turbine):
         Pnd_it = []
         Pvd_it = []
@@ -75,9 +74,7 @@ class ku_tu:
         Error_vd_P = 2
         Calctolerance_new = 10**-1
         Teplo_overflow = 0
-        Maxiterations_cotel_new=5
-
-
+        Maxiterations_cotel_new = 5
 
         for i in range(Maxiterations_KU_TU):
 
@@ -93,11 +90,11 @@ class ku_tu:
                 Gvd2 = self.water_streams.at[self.streamST_VD, "G"]
 
                 # Перекидываем расходы с учетом расхода в другие места
-                if self.steamVD_to_turbine==0:
-                    new_VD_massflow=Gvd1*self.steamVD_fraction_to_turbine
+                if self.steamVD_to_turbine == 0:
+                    new_VD_massflow = Gvd1*self.steamVD_fraction_to_turbine
                 else:
-                    new_VD_massflow=self.steamVD_to_turbine
-                
+                    new_VD_massflow = self.steamVD_to_turbine
+
                 self.water_streams.at[self.streamST_VD, 'G'] = new_VD_massflow
                 self.water_streams.at[self.streamST_ND, 'G'] = Gnd1
 
@@ -118,53 +115,63 @@ class ku_tu:
                     teplofikacia, calcmethod="hybr", calctolerance=Calctolerance_new, maxiterations=Maxiterations_turbine
                 )
 
-              
                 Calctolerance_new = Calctolerance
                 if i > 2:
                     Calctolerance_new = Calctolerance
-                    Maxiterations_cotel_new=Maxiterations_cotel
-                    if i==3 and j==0:
-                        print('Переход к оригинальной точности расчета', Calctolerance)
-                        print('Переход к оригинальному количетсву итераций', Maxiterations_cotel)
+                    Maxiterations_cotel_new = Maxiterations_cotel
+                    if i == 3 and j == 0:
+                        print('Переход к оригинальной точности расчета',
+                              Calctolerance)
+                        print('Переход к оригинальному количетсву итераций',
+                              Maxiterations_cotel)
                 # точка смешения на входе в ГПК НАДО ПЕРЕДЕЛАТЬ ДЛЯ ПКМ
                 # точка смешения на входе в ГПК НАДО ПЕРЕДЕЛАТЬ ДЛЯ ПКМ
-                ######### Максимов 
-                self.water_streams.loc["SMESH-GPK", "G"] = self.water_streams.loc["SMESHOD-REC","G"] + self.water_streams.loc["ST-GPK","G"]
-                self.water_streams.loc["SMESH-GPK", "P"] = self.water_streams.loc["SMESHOD-REC","P"]
-                self.water_streams.loc["SMESH-GPK", "H"] = ((self.water_streams.loc["SMESHOD-REC","H"]*self.water_streams.loc["SMESHOD-REC","G"])+(self.water_streams.loc["ST-GPK","H"]*self.water_streams.loc["ST-GPK","G"]))/self.water_streams.loc["SMESH-GPK", "G"]
-                self.water_streams.loc["SMESH-GPK", "T"] = self.water.p_h(self.water_streams.loc["SMESH-GPK", "P"],self.water_streams.loc["SMESH-GPK", "H"])["T"]
+                # Максимов
+#                 Смешение ломается если ничего нет в ячейке
+
+                
+                G_smesh_od = self.water_streams.at["SMESHOD-REC", "G"]
+                H_smesh_od = self.water_streams.at["SMESHOD-REC", "H"]
+                G_smesh_PKM = self.water_streams.at["ST-GPK", "G"]
+                H_smesh_PKM = self.water_streams.at["ST-GPK", "H"]
+                G_v_GPK = G_smesh_od+G_smesh_PKM
+                P_v_GPK = self.water_streams.at["SMESHOD-REC", "P"]
+                H_v_GPK = (G_smesh_od*H_smesh_od +
+                           G_smesh_PKM*H_smesh_PKM)/G_v_GPK
+                T_v_GPK = self.water.p_h(P_v_GPK, H_v_GPK)["T"]
+                self.water_streams.loc["SMESH-GPK",
+                                      "T":"G"] = T_v_GPK, P_v_GPK, H_v_GPK, G_v_GPK
+
                 ##################
-                
-                
-                        
-            
-                G_turb=self.water_streams.at["SMESHOD-REC", "G"]
-                G_ku=self.water_streams.at["GPK-IND", "G"]-(Gvd1-new_VD_massflow)
-                Error_water_G = abs((self.water_streams.at["SMESHOD-REC", "G"]-
+
+                G_turb = self.water_streams.at["SMESHOD-REC", "G"]
+                G_ku = self.water_streams.at["GPK-IND",
+                                             "G"]-(Gvd1-new_VD_massflow)
+                Error_water_G = abs((self.water_streams.at["SMESHOD-REC", "G"] -
                                      (self.water_streams.at["GPK-IND", "G"]-(Gvd1-new_VD_massflow)))/(self.water_streams.at["GPK-IND", "G"]-(Gvd1-new_VD_massflow))*100)
                 Error_nd_G = abs((Gnd1 - Gnd2)/Gnd1*100)
-                Error_vd_G = abs((new_VD_massflow - Gvd2)/(new_VD_massflow)*100)
+                Error_vd_G = abs((new_VD_massflow - Gvd2) /
+                                 (new_VD_massflow)*100)
                 Max_error_G = max(Error_water_G, Error_nd_G, Error_vd_G)
                 Max_error = max(Error_water_G, Error_nd_G,
                                 Error_vd_G, Error_nd_P, Error_vd_P)
-               
+
                 if Error_water_G > 20:
                     Teplo_overflow = 1
-                    print(f"Расход из турбины G>1: {G_turb}")
-                    print( f"Расход в ГПК G>1: {G_ku}")
-                    print( f"Расход в ГПК G>1: {G_ku}")
-#                     print(self.water_streams)
-                if Error_water_G > 1:
+                    print(f"Расход из турбины G: {G_turb}")
+                    print(f"Расход в ГПК G: {G_ku}")
+                if Error_water_G > 1 and Error_water_G < 20:
                     print("Погрешность определения расхода выше допустимой")
                     print(f"Расход из турбины: {G_turb}")
-                    print( f"Расход в ГПК: {G_ku}")
+                    print(f"Расход в ГПК: {G_ku}")
                 if abs(Max_error_G) < Calctolerance_new:
                     print(
                         "Максимальная погрешность определения расхода в КУ+ПТУ", Max_error_G)
                     break
                 if j == Maxiterations_cotel - 1:
                     print("Достигнуто максимальное количество итераций расхода КУ+ПТУ")
-                    print(f"Error_water_G: {Error_water_G}, Error_nd_G: {Error_nd_G}, Error_vd_G: {Error_vd_G}")
+                    print(
+                        f"Error_water_G: {Error_water_G}, Error_nd_G: {Error_nd_G}, Error_vd_G: {Error_vd_G}")
 
             # Переписываю давления
             P_turb_vd = self.water_streams.at[self.streamST_VD, 'P']
@@ -173,7 +180,8 @@ class ku_tu:
                                     self.water_streams.at[self.streamKU_VD, 'H'])['rho']
             Vnd1 = 1/self.water.p_h(self.water_streams.at[self.streamKU_ND, 'P'],
                                     self.water_streams.at[self.streamKU_ND, 'H'])['rho']
-            dPvd = self.dPvd0 * (Gvd1*Vvd1/self.Gvd0/self.Vvd0)**2*self.Vvd0/Vvd1
+            dPvd = self.dPvd0 * (Gvd1*Vvd1/self.Gvd0 /
+                                 self.Vvd0)**2*self.Vvd0/Vvd1
             dPnd = self.dPnd0*(Gnd1*Vnd1/self.Gnd0/self.Vnd0)**2*self.Vnd0/Vnd1
             P_kotel_vd = self.water_streams.at[self.streamKU_VD, 'P']
             P_kotel_nd = self.water_streams.at[self.streamKU_ND, 'P']
@@ -185,8 +193,10 @@ class ku_tu:
                                   'P'] = (P_kotel_vd_new+P_kotel_vd)/2
 
             # Закидываю давления в массив
-            Pnd_it.append(round(self.water_streams.loc[self.streamKU_ND, 'P'], 5))
-            Pvd_it.append(round(self.water_streams.loc[self.streamKU_VD, 'P'], 5))
+            Pnd_it.append(
+                round(self.water_streams.loc[self.streamKU_ND, 'P'], 5))
+            Pvd_it.append(
+                round(self.water_streams.loc[self.streamKU_VD, 'P'], 5))
             print('Pnd_it', Pnd_it)
             print('Pvd_it', Pvd_it)
 
