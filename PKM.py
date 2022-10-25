@@ -118,6 +118,9 @@ class steam_transformer:
         P17 = P16
         H17 = self.water.p_t(P17, T17)['h']
         Qcool80 = G1*(H16-H17)
+        self.heaters.loc['Strans','Qw'] = Qtrans
+        self.heaters.loc['Strans_cool','Qw'] = Qcool80
+
         return {'H11': H11,'H12': H12,'H13': H13,'H14': H14,'H15': H15,'H16': H16,
                'H21': H21,'H22': H22,'H23': H23,'H24': H24, 'G1':G1, 'G2':G2,'Q':Qtrans, 'P2':self.P2, 'P17':P17,
                'T11': T11,'T12': T12,'T13': T13,'T14': T14,'T15': T15,'T16': T16, 'T17':T17,'H17':H17, 
@@ -168,5 +171,64 @@ class reformer:
         Gassost = ['N2','O2','CO2','H2O','Ar']
         Gasfrac = [0.710320591016015,0.00996710270335893,0.090538556815177,0.180531273012258,0.00864247645319178]
         Gasfrac = dict(zip(Gassost,Gasfrac))
+        self.heaters.loc['Reformer','Qw'] = Qref
         return {'Q':Qref,'Ggas':Ggas,'Gair':Gair,'Gch4':Gch4, 'Tref':self.Tref,
                 'Gref':Gref, 'Pref':self.Pref,'Hsg':Hsg,'SGfrac':SGfrac,'H2gas':H2gas,'Gasfrac':Gasfrac}
+
+class PKM_cooler:
+    def __init__(self, stream1, stream2, syngas_streams, heaters, Tout):
+        self.stream1 = stream1
+        self.stream2 = stream2
+        self.syngas_streams = syngas_streams
+        self.heaters = heaters
+        self.Tout = Tout
+    def calc(self):
+        SGsost = "Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO"
+        SGfrac = (0,0,0.06356,0,0.53662,0.05004,0.32590,0.02388)
+        Tin    = self.syngas_streams.at[self.stream1,'T']
+        Pin    = self.syngas_streams.at[self.stream1,'P']
+        G      = self.syngas_streams.at[self.stream1,'G']
+        RP = prop.init_REFPROP(r"C:\Program Files (x86)\REFPROP")
+        SG = prop.Materials_prop(SGsost,SGfrac,prop.REFPROP_h_s,prop.REFPROP_p_t,prop.REFPROP_p_h,
+                                     prop.REFPROP_p_s,prop.REFPROP_p_q,prop.REFPROP_t_q,prop.REFPROP_p_rho,prop.REFPROP_s_q,RP=RP)
+        Hin  = SG.p_t(Pin,Tin)['h']
+        Tout = self.Tout
+        Hout = SG.p_t(Pin,Tout)['h']
+        Qcooler = G*(Hin-Hout)
+        self.syngas_streams.loc[self.stream2,'T':'G'] = [Tout, Pin, Hout, G]
+        self.syngas_streams.loc['REF-COOL','H'] = Hin
+        self.syngas_streams.loc[self.stream2,'N2':'CO'] = self.syngas_streams.loc[self.stream1,'N2':'CO']
+        self.heaters.loc['Ref_cooler','Qw'] = Qcooler
+        return {'Tout':Tout, 'Hout':Hout, 'Pout':Pin,'G':G, 'Qcooler':Qcooler}
+    
+class HTS:
+    def __init__(self, stream1, stream2, syngas_streams, heaters, Tout):
+        self.stream1 = stream1
+        self.stream2 = stream2
+        self.syngas_streams = syngas_streams
+        self.heaters = heaters
+        self.Tout = Tout
+        
+    def calc(self):
+        SGsost = "Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO"
+        SGfrac = (0,0,0.06356,0,0.53662,0.05004,0.32590,0.02388)
+        Tin    = self.syngas_streams.at[self.stream1,'T']
+        Pin    = self.syngas_streams.at[self.stream1,'P']
+        G      = self.syngas_streams.at[self.stream1,'G']
+        RP = prop.init_REFPROP(r"C:\Program Files (x86)\REFPROP")
+        SG = prop.Materials_prop(SGsost,SGfrac,prop.REFPROP_h_s,prop.REFPROP_p_t,prop.REFPROP_p_h,
+                                     prop.REFPROP_p_s,prop.REFPROP_p_q,prop.REFPROP_t_q,prop.REFPROP_p_rho,prop.REFPROP_s_q,RP=RP)
+        Hin  = SG.p_t(Pin,Tin)['h']
+#         Hdt = SG.p_t(Pin,self.Tout)['h']
+#         Qdt = G*(Hin-Hdt)
+#         Qreac = (2701.173347/44.6397313913235)*G
+#         Qhts = Qdt+Qreac
+        SGfracnew = (0,0,0.0864149892361543,0,0.513766606256586,0.0500421238434872,0.348747199710724,0.00102908095304842)
+        SGnew = prop.Materials_prop(SGsost,SGfracnew,prop.REFPROP_h_s,prop.REFPROP_p_t,prop.REFPROP_p_h,
+                                     prop.REFPROP_p_s,prop.REFPROP_p_q,prop.REFPROP_t_q,prop.REFPROP_p_rho,prop.REFPROP_s_q,RP=RP)
+        Hout  = SGnew.p_t(Pin,self.Tout)['h']
+        Qhts = G*(Hin-Hout)
+        self.syngas_streams.loc[self.stream2,'T':'G'] = [self.Tout, Pin, Hout, G]
+        self.syngas_streams.loc[self.stream2,'N2':'CO'] = list(SGfracnew)
+        self.heaters.loc['Ref_HTS','Qw'] = Qhts
+        return {'Qhts':Qhts, 'Tout': self.Tout, 'Pout':Pin, 'Hout':Hout, 'G':G}

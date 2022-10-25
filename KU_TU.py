@@ -124,24 +124,22 @@ class ku_tu:
                               Calctolerance)
                         print('Переход к оригинальному количетсву итераций',
                               Maxiterations_cotel)
-                # точка смешения на входе в ГПК НАДО ПЕРЕДЕЛАТЬ ДЛЯ ПКМ
-                # точка смешения на входе в ГПК НАДО ПЕРЕДЕЛАТЬ ДЛЯ ПКМ
-                # Максимов
-#                 Смешение ломается если ничего нет в ячейке
-
+                        
+                # точка смешения на входе в ГПК с ПКМ   
                 
-                G_smesh_od = self.water_streams.at["SMESHOD-REC", "G"]
-                H_smesh_od = self.water_streams.at["SMESHOD-REC", "H"]
-                G_smesh_PKM = self.water_streams.at["ST-GPK", "G"]
-                H_smesh_PKM = self.water_streams.at["ST-GPK", "H"]
-                G_v_GPK = G_smesh_od+G_smesh_PKM
-                P_v_GPK = self.water_streams.at["SMESHOD-REC", "P"]
-                H_v_GPK = (G_smesh_od*H_smesh_od +
-                           G_smesh_PKM*H_smesh_PKM)/G_v_GPK
-                T_v_GPK = self.water.p_h(P_v_GPK, H_v_GPK)["T"]
-                self.water_streams.loc["SMESH-GPK",
-                                      "T":"G"] = T_v_GPK, P_v_GPK, H_v_GPK, G_v_GPK
-
+                if self.water_streams.at["ST-GPK", "G"]>0:
+                    G_smesh_od = self.water_streams.at["SMESHOD-REC", "G"]
+                    H_smesh_od = self.water_streams.at["SMESHOD-REC", "H"]
+                    G_smesh_PKM = self.water_streams.at["ST-GPK", "G"]
+                    H_smesh_PKM = self.water_streams.at["ST-GPK", "H"]
+                    G_v_GPK = G_smesh_od+G_smesh_PKM
+                    P_v_GPK = self.water_streams.at["SMESHOD-REC", "P"]
+                    H_v_GPK = (G_smesh_od*H_smesh_od + G_smesh_PKM*H_smesh_PKM)/G_v_GPK
+                    T_v_GPK = self.water.p_h(P_v_GPK, H_v_GPK)["T"]
+                    self.water_streams.loc["SMESH-GPK","T":"G"] = T_v_GPK, P_v_GPK, H_v_GPK, G_v_GPK
+                else:
+                    self.water_streams.loc["SMESH-GPK","T":"G"] = self.water_streams.loc["SMESHOD-REC", "T":"G"]
+                
                 ##################
 
                 G_turb = self.water_streams.at["SMESHOD-REC", "G"]
