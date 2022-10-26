@@ -2,47 +2,39 @@ import mat_properties as prop
 import numpy as n
 import pandas as pd
 
+RP = prop.init_REFPROP(r"C:\Program Files (x86)\REFPROP")
 
 def mixing_gases_molar(stream1, stream2, stream3, working_table):
     fractions1 = working_table.loc[stream1, "N2":]
     fractions2 = working_table.loc[stream2, "N2":]
     [gas1_T, gas1_P, gas1_H, gas1_G] = working_table.loc[stream1, "T":"G"]
     [gas2_T, gas2_P, gas2_H, gas2_G] = working_table.loc[stream2, "T":"G"]
-    molar_mases = {
-        "N2": 0.0280134,
-        "O2": 0.03199806,
-        "CO2": 0.0440095,
-        "H2O": 0.01801528,
-        "Ar": 0.039948,
-    }
+    molar_mases = {"N2": 0.0280134,
+                   "O2": 0.03199806,
+                   "CO2": 0.0440095,
+                   "H2O": 0.01801528,
+                   "Ar": 0.039948}
     components = list(working_table.columns)[4:]
     Sr_mol_mass1 = sum(map(lambda x1, x2: molar_mases[x1] * x2, components, fractions1))
     Sr_mol_mass2 = sum(map(lambda x1, x2: molar_mases[x1] * x2, components, fractions2))
     Molar_flow1 = gas1_G / Sr_mol_mass1
     Molar_flow2 = gas2_G / Sr_mol_mass2
-    Molar_flow_components = list(
-        map(lambda x1, x2: x1 * Molar_flow1 + x2 * Molar_flow2, fractions1, fractions2)
-    )
+    Molar_flow_components = list(map(lambda x1, x2: x1 * Molar_flow1 + x2 * Molar_flow2, fractions1, fractions2))
     fractions3 = list(map(lambda x: x / sum(Molar_flow_components),Molar_flow_components))
     gas3_G = gas1_G + gas2_G
     gas3_H = (gas1_H * gas1_G + gas2_H * gas2_G) / gas3_G
     
-    gasmix = "Nitrogen*Oxygen*CO2*Water*Argon"
-    RP = prop.init_REFPROP(r"C:\Program Files (x86)\REFPROP")
-
-    gas_s_prop = prop.Materials_prop(
-        gasmix,
-        fractions3,
-        prop.REFPROP_h_s,
-        prop.REFPROP_p_t,
-        prop.REFPROP_p_h,
-        prop.REFPROP_p_s,
-        prop.REFPROP_p_q,
-        prop.REFPROP_t_q,
-        prop.REFPROP_p_rho,
-        prop.REFPROP_s_q,
-        RP=RP,
-    )
+    gas_s_prop = prop.Materials_prop("Nitrogen*Oxygen*CO2*Water*Argon",
+                                     fractions3,
+                                     prop.REFPROP_h_s,
+                                     prop.REFPROP_p_t,
+                                     prop.REFPROP_p_h,
+                                     prop.REFPROP_p_s,
+                                     prop.REFPROP_p_q,
+                                     prop.REFPROP_t_q,
+                                     prop.REFPROP_p_rho,
+                                     prop.REFPROP_s_q,
+                                     RP=RP)
 
     gas3_P = min(gas2_P, gas1_P)
     gas3_T = gas_s_prop.p_h(gas3_P, gas3_H)["T"]
@@ -124,10 +116,8 @@ class steam_transformer:
         self.heaters.loc['Strans','Qw'] = Qtrans
         self.heaters.loc['Strans_cool','Qw'] = Qcool80
 
-        return {'H11': H11,'H12': H12,'H13': H13,'H14': H14,'H15': H15,'H16': H16,
-               'H21': H21,'H22': H22,'H23': H23,'H24': H24, 'G1':G1, 'G2':G2,'Q':Qtrans, 'P2':self.P2, 'P17':P17,
-               'T11': T11,'T12': T12,'T13': T13,'T14': T14,'T15': T15,'T16': T16, 'T17':T17,'H17':H17, 
-               'T21': T21,'T22': T22,'T23': T23,'T24': T24, 'Qcool80':Qcool80}
+        return {'H11': H11,'H16': H16,'H21': H21,'H24': H24, 'G1':G1, 'G2':G2,'Q':Qtrans, 'P2':self.P2, 'P17':P17,
+                'T11': T11,'T17':T17,'H17':H17, 'T21': T21,'T24': T24, 'Qcool80':Qcool80}
 
 class reformer:
     def __init__(self, **kwargs):
@@ -192,8 +182,17 @@ class PKM_cooler:
         Pin    = self.syngas_streams.at[self.stream1,'P']
         G      = self.syngas_streams.at[self.stream1,'G']
         RP = prop.init_REFPROP(r"C:\Program Files (x86)\REFPROP")
-        SG = prop.Materials_prop(SGsost,SGfrac,prop.REFPROP_h_s,prop.REFPROP_p_t,prop.REFPROP_p_h,
-                                     prop.REFPROP_p_s,prop.REFPROP_p_q,prop.REFPROP_t_q,prop.REFPROP_p_rho,prop.REFPROP_s_q,RP=RP)
+        SG = prop.Materials_prop(SGsost,
+                                 SGfrac,
+                                 prop.REFPROP_h_s,
+                                 prop.REFPROP_p_t,
+                                 prop.REFPROP_p_h,
+                                 prop.REFPROP_p_s,
+                                 prop.REFPROP_p_q,
+                                 prop.REFPROP_t_q,
+                                 prop.REFPROP_p_rho,
+                                 prop.REFPROP_s_q,
+                                 RP=RP)
         Hin  = SG.p_t(Pin,Tin)['h']
         Tout = self.Tout
         Hout = SG.p_t(Pin,Tout)['h']
@@ -219,16 +218,34 @@ class HTS:
         Pin    = self.syngas_streams.at[self.stream1,'P']
         G      = self.syngas_streams.at[self.stream1,'G']
         RP = prop.init_REFPROP(r"C:\Program Files (x86)\REFPROP")
-        SG = prop.Materials_prop(SGsost,SGfrac,prop.REFPROP_h_s,prop.REFPROP_p_t,prop.REFPROP_p_h,
-                                     prop.REFPROP_p_s,prop.REFPROP_p_q,prop.REFPROP_t_q,prop.REFPROP_p_rho,prop.REFPROP_s_q,RP=RP)
+        SG = prop.Materials_prop(SGsost,
+                                 SGfrac,
+                                 prop.REFPROP_h_s,
+                                 prop.REFPROP_p_t,
+                                 prop.REFPROP_p_h,
+                                 prop.REFPROP_p_s,
+                                 prop.REFPROP_p_q,
+                                 prop.REFPROP_t_q,
+                                 prop.REFPROP_p_rho,
+                                 prop.REFPROP_s_q,
+                                 RP=RP)
         Hin  = SG.p_t(Pin,Tin)['h']
 #         Hdt = SG.p_t(Pin,self.Tout)['h']
 #         Qdt = G*(Hin-Hdt)
 #         Qreac = (2701.173347/44.6397313913235)*G
 #         Qhts = Qdt+Qreac
         SGfracnew = (0,0,0.0864149892361543,0,0.513766606256586,0.0500421238434872,0.348747199710724,0.00102908095304842)
-        SGnew = prop.Materials_prop(SGsost,SGfracnew,prop.REFPROP_h_s,prop.REFPROP_p_t,prop.REFPROP_p_h,
-                                     prop.REFPROP_p_s,prop.REFPROP_p_q,prop.REFPROP_t_q,prop.REFPROP_p_rho,prop.REFPROP_s_q,RP=RP)
+        SGnew = prop.Materials_prop(SGsost,
+                                    SGfracnew,
+                                    prop.REFPROP_h_s,
+                                    prop.REFPROP_p_t,
+                                    prop.REFPROP_p_h,
+                                    prop.REFPROP_p_s,
+                                    prop.REFPROP_p_q,
+                                    prop.REFPROP_t_q,
+                                    prop.REFPROP_p_rho,
+                                    prop.REFPROP_s_q,
+                                    RP=RP)
         Hout  = SGnew.p_t(Pin,self.Tout)['h']
         Qhts = G*(Hin-Hout)
         self.syngas_streams.loc[self.stream2,'T':'G'] = [self.Tout, Pin, Hout, G]
@@ -241,60 +258,110 @@ class PKM_all:
     def calc(PKM_zaryad,gas_streams,syngas_streams,water_streams,water_streams0,heaters):
         
         RP = prop.init_REFPROP(r"C:\Program Files (x86)\REFPROP")
-        water = prop.Materials_prop(
-            "water",
-            [1.0, 0, 0, 0, 0],
-            prop.REFPROP_h_s,
-            prop.REFPROP_p_t,
-            prop.REFPROP_p_h,
-            prop.REFPROP_p_s,
-            prop.REFPROP_p_q,
-            prop.REFPROP_t_q,
-            prop.REFPROP_p_rho,
-            prop.REFPROP_s_q,
-            RP=RP,
-        )
-        waterMethane = prop.Materials_prop(
-            "Water*METHANE",
-            (0.833372660622383, 0.166627339377617, 0, 0, 0),
-            prop.REFPROP_h_s,
-            prop.REFPROP_p_t,
-            prop.REFPROP_p_h,
-            prop.REFPROP_p_s,
-            prop.REFPROP_p_q,
-            prop.REFPROP_t_q,
-            prop.REFPROP_p_rho,
-            prop.REFPROP_s_q,
-            RP=RP,
-        )
-        Methane = prop.Materials_prop(
-            "METHANE",
-            [1.0, 0, 0, 0, 0],
-            prop.REFPROP_h_s,
-            prop.REFPROP_p_t,
-            prop.REFPROP_p_h,
-            prop.REFPROP_p_s,
-            prop.REFPROP_p_q,
-            prop.REFPROP_t_q,
-            prop.REFPROP_p_rho,
-            prop.REFPROP_s_q,
-            RP=RP,
-        )
-        gas_KU_PKM = prop.Materials_prop(
-            "Nitrogen*Oxygen*CO2*Water*Argon",
-            (0.710320591016015,0.00996710270335893,0.090538556815177,0.180531273012258,0.00864247645319178),
-            prop.REFPROP_h_s,
-            prop.REFPROP_p_t,
-            prop.REFPROP_p_h,
-            prop.REFPROP_p_s,
-            prop.REFPROP_p_q,
-            prop.REFPROP_t_q,
-            prop.REFPROP_p_rho,
-            prop.REFPROP_s_q,
-            RP=RP,
-        )
-        
-        
-        
-        
+        water = prop.Materials_prop("water",
+                                    [1.0, 0, 0, 0, 0],
+                                    prop.REFPROP_h_s,
+                                    prop.REFPROP_p_t,
+                                    prop.REFPROP_p_h,
+                                    prop.REFPROP_p_s,
+                                    prop.REFPROP_p_q,
+                                    prop.REFPROP_t_q,
+                                    prop.REFPROP_p_rho,
+                                    prop.REFPROP_s_q,
+                                    RP=RP)
+        waterMethane = prop.Materials_prop("Water*METHANE",
+                                           (0.833372660622383, 0.166627339377617, 0, 0, 0),
+                                           prop.REFPROP_h_s,
+                                           prop.REFPROP_p_t,
+                                           prop.REFPROP_p_h,
+                                           prop.REFPROP_p_s,
+                                           prop.REFPROP_p_q,
+                                           prop.REFPROP_t_q,
+                                           prop.REFPROP_p_rho,
+                                           prop.REFPROP_s_q,
+                                           RP=RP)
+        Methane = prop.Materials_prop("METHANE",
+                                      [1.0, 0, 0, 0, 0],
+                                      prop.REFPROP_h_s,
+                                      prop.REFPROP_p_t,
+                                      prop.REFPROP_p_h,
+                                      prop.REFPROP_p_s,
+                                      prop.REFPROP_p_q,
+                                      prop.REFPROP_t_q,
+                                      prop.REFPROP_p_rho,
+                                      prop.REFPROP_s_q,
+                                      RP=RP)
+        gas_KU_PKM = prop.Materials_prop("Nitrogen*Oxygen*CO2*Water*Argon",
+                                         (0.710320591016015,0.00996710270335893,0.090538556815177,0.180531273012258,0.00864247645319178),
+                                         prop.REFPROP_h_s,
+                                         prop.REFPROP_p_t,
+                                         prop.REFPROP_p_h,
+                                         prop.REFPROP_p_s,
+                                         prop.REFPROP_p_q,
+                                         prop.REFPROP_t_q,
+                                         prop.REFPROP_p_rho,
+                                         prop.REFPROP_s_q,
+                                         RP=RP)
+        if PKM_zaryad == True:
+            
+            #Пар в паротрансформатор и ЦВД
+            water_streams.loc["DROSVD-TURBVD", "G"] = 0.25*water_streams0.at["PEVD-DROSVD", "G"]
+            water_streams.loc["DROSVD-ST", "T":"H"] = water_streams.loc["PEVD-DROSVD", "T":"H"]
+            water_streams.loc["DROSVD-ST", "G"] = water_streams.at["PEVD-DROSVD", "G"] - water_streams.loc["DROSVD-TURBVD", "G"]
+
+            # паротрансформатор
+            ST = steam_transformer(stream11="DROSVD-ST",
+                                   water=water,
+                                   water_streams=water_streams,
+                                   heaters=heaters,
+                                   Pdr1=2,Pdr2=0.8,P2=2,dT=15,dTmin=5,Tdec=10)
+            steam_trans = ST.calc()
+
+            # Ввод в табл выходов из паротрансформатора
+            water_streams.loc["ST-GPK", "T":"G"] = [steam_trans["T17"],steam_trans["P17"],steam_trans["H17"],steam_trans["G1"]]
+            water_streams.loc["ST-PKM", "T":"G"] = [steam_trans["T24"],steam_trans["P2"],steam_trans["H24"],steam_trans["G2"]]
+
+
+            # реформер
+            from PKM import reformer
+
+            ref = reformer(stream11="ST-PKM",
+                           water=water,
+                           gas_KU=gas_KU_PKM,
+                           Methane=Methane,
+                           waterMethane=waterMethane,
+                           water_streams=water_streams,
+                           heaters=heaters,
+                           Tref=700,Pref=2,T1gas=1968.58395330148,T2gas=800)
+            reform = ref.calc()
+
+            #Синтезгаз из рефрмера
+            syngas_streams.loc["REF-COOL", "T":"G"] = [reform["Tref"],reform["Pref"],reform["Hsg"],reform["Gref"],]
+            syngas_streams.loc["REF-COOL", "N2":"CO"] = list(reform["SGfrac"].values())
+
+            # Газы реформера
+            gas_streams.loc["AIR-REF", "T":"G"] = [15, 0.1, 414.38, reform["Gair"]]
+            gas_streams.loc["CH4-REF", "T":"G"] = [15, 0.7, 881.50, reform["Gch4"]]
+            gas_streams.loc["REF-SMESH", "T":"G"] = [800, 0.1, reform["H2gas"], reform["Ggas"]]
+            gas_streams.loc["REF-SMESH", "N2":"Ar"] = list(reform["Gasfrac"].values())
+
+            # Смешение
+            gas_streams.loc["GTU-PEVD", "G"] = (gas_streams.at["REF-SMESH", "G"] + gas_streams.at["GTU-KU", "G"])
+            gas_streams.loc["GTU-PEVD", "H"] = (gas_streams.at["REF-SMESH", "G"] * gas_streams.at["REF-SMESH", "H"] + gas_streams.at["GTU-KU", "G"] * gas_streams.at["GTU-KU", "H"]) / gas_streams.loc["GTU-PEVD", "G"]
+            gas_streams.loc["GTU-PEVD", "P"] = 0.1
+            from PKM import mixing_gases_molar
+            mixing_gases_molar("GTU-KU", "REF-SMESH", "GTU-PEVD", gas_streams)
+            for stream in gas_streams.index[4:10]:
+                gas_streams.loc[stream, "N2":"Ar"] = gas_streams.loc["GTU-PEVD", "N2":"Ar"]
+            #Cooler + HTS
+            cool = PKM_cooler('REF-COOL', 'COOL-HTS', syngas_streams,heaters,450).calc()
+            hts = HTS('COOL-HTS', 'HTS-X', syngas_streams,heaters,275).calc()
+
+        else:
+            water_streams.loc["DROSVD-TURBVD", "G"] = water_streams.loc["PEVD-DROSVD", "G"]
+            gas_streams.loc["GTU-PEVD", "T":"Ar"] = gas_streams.loc["GTU-KU", "T":"Ar"]
+            water_streams.loc["ST-GPK", "T":"G"] = [80,2,320,0]
+            steamVD_to_turbine=water_streams0.at["PEVD-DROSVD", "G"]
+            heaters.loc["Strans":"Ref_HTS", "Qw"] = 0
+        return {'steamVD_to_turbine':steamVD_to_turbine}
         
