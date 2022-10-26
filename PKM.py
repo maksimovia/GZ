@@ -1,4 +1,7 @@
 import mat_properties as prop
+import numpy as n
+import pandas as pd
+
 
 def mixing_gases_molar(stream1, stream2, stream3, working_table):
     fractions1 = working_table.loc[stream1, "N2":]
@@ -232,3 +235,66 @@ class HTS:
         self.syngas_streams.loc[self.stream2,'N2':'CO'] = list(SGfracnew)
         self.heaters.loc['Ref_HTS','Qw'] = Qhts
         return {'Qhts':Qhts, 'Tout': self.Tout, 'Pout':Pin, 'Hout':Hout, 'G':G}
+    
+    
+class PKM_all:
+    def calc(PKM_zaryad,gas_streams,syngas_streams,water_streams,water_streams0,heaters):
+        
+        RP = prop.init_REFPROP(r"C:\Program Files (x86)\REFPROP")
+        water = prop.Materials_prop(
+            "water",
+            [1.0, 0, 0, 0, 0],
+            prop.REFPROP_h_s,
+            prop.REFPROP_p_t,
+            prop.REFPROP_p_h,
+            prop.REFPROP_p_s,
+            prop.REFPROP_p_q,
+            prop.REFPROP_t_q,
+            prop.REFPROP_p_rho,
+            prop.REFPROP_s_q,
+            RP=RP,
+        )
+        waterMethane = prop.Materials_prop(
+            "Water*METHANE",
+            (0.833372660622383, 0.166627339377617, 0, 0, 0),
+            prop.REFPROP_h_s,
+            prop.REFPROP_p_t,
+            prop.REFPROP_p_h,
+            prop.REFPROP_p_s,
+            prop.REFPROP_p_q,
+            prop.REFPROP_t_q,
+            prop.REFPROP_p_rho,
+            prop.REFPROP_s_q,
+            RP=RP,
+        )
+        Methane = prop.Materials_prop(
+            "METHANE",
+            [1.0, 0, 0, 0, 0],
+            prop.REFPROP_h_s,
+            prop.REFPROP_p_t,
+            prop.REFPROP_p_h,
+            prop.REFPROP_p_s,
+            prop.REFPROP_p_q,
+            prop.REFPROP_t_q,
+            prop.REFPROP_p_rho,
+            prop.REFPROP_s_q,
+            RP=RP,
+        )
+        gas_KU_PKM = prop.Materials_prop(
+            "Nitrogen*Oxygen*CO2*Water*Argon",
+            (0.710320591016015,0.00996710270335893,0.090538556815177,0.180531273012258,0.00864247645319178),
+            prop.REFPROP_h_s,
+            prop.REFPROP_p_t,
+            prop.REFPROP_p_h,
+            prop.REFPROP_p_s,
+            prop.REFPROP_p_q,
+            prop.REFPROP_t_q,
+            prop.REFPROP_p_rho,
+            prop.REFPROP_s_q,
+            RP=RP,
+        )
+        
+        
+        
+        
+        
