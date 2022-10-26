@@ -356,12 +356,12 @@ class PKM_all:
             #Cooler + HTS
             cool = PKM_cooler('REF-COOL', 'COOL-HTS', syngas_streams,heaters,450).calc()
             hts = HTS('COOL-HTS', 'HTS-X', syngas_streams,heaters,275).calc()
-
+            print('PKM+')
         else:
             water_streams.loc["DROSVD-TURBVD", "G"] = water_streams.loc["PEVD-DROSVD", "G"]
             gas_streams.loc["GTU-PEVD", "T":"Ar"] = gas_streams.loc["GTU-KU", "T":"Ar"]
             water_streams.loc["ST-GPK", "T":"G"] = [80,2,320,0]
             steamVD_to_turbine=water_streams0.at["PEVD-DROSVD", "G"]
             heaters.loc["Strans":"Ref_HTS", "Qw"] = 0
-        return {'steamVD_to_turbine':steamVD_to_turbine}
+        return {'steamVD_to_turbine':water_streams0.at["PEVD-DROSVD", "G"]}
         
