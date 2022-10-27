@@ -5,7 +5,7 @@ import pandas as pd
 
 
 class Accum():
-    def __init__(self, water, water_streams, accumulation, **kwargs):
+    def __init__(self, water, water_streams, accumulation, ASWatm, **kwargs):
 
         self._V = 1
         self._D = 1
@@ -24,6 +24,7 @@ class Accum():
         self._water = water
         self.water_streams = water_streams
         self.accumulation = accumulation
+        self.ASWatm=ASWatm
 
         self._T_nar_vozd = self.water_streams.at['AIR', 'T']
 
@@ -80,7 +81,13 @@ class Accum():
 #             self._h_accum = self.water_streams.at[self._stream_pryamoi_setevoi_vody,'H']# тут уточнить
 
             # тут уточнить
-            self._P_accum = self.water_streams.at[self._stream_pryamoi_setevoi_vody, 'P']
+        
+            if self.ASWatm = False:
+                self._P_accum = self.water_streams.at[self._stream_pryamoi_setevoi_vody, 'P']
+            else:
+                self._P_accum = 0.1
+                self._T_accum = 95
+                
             self._h_accum = self._water.p_t(self._P_accum, self._T_accum)['h']
             self.water_streams.at[self._stream11, 'T'] = self._T_accum
             self.water_streams.at[self._stream11, 'H'] = self._h_accum
@@ -92,7 +99,7 @@ class Accum():
                 self._water.p_t(self._P_accum, self._T_accum)['rho']
             self._Q = self._Mass * (self._h_accum - self._h_obr_set_voda)  # kJ
             self._f = 1
-            print(self._Q)
+#             print(self._Q)
             self.accumulation.at["ASW", "Qw"] = self._Q/1000
             self.accumulation.at["ASW", "T"] = self._T_accum
         else:
