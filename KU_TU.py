@@ -119,29 +119,27 @@ class ku_tu:
                 if i > 2:
                     Calctolerance_new = Calctolerance
                     Maxiterations_cotel_new = Maxiterations_cotel
-                    if i == 3 and j == 0:
-                        print('Переход к оригинальной точности расчета',
-                              Calctolerance)
-                        print('Переход к оригинальному количетсву итераций',
-                              Maxiterations_cotel)
-                # точка смешения на входе в ГПК НАДО ПЕРЕДЕЛАТЬ ДЛЯ ПКМ
-                # точка смешения на входе в ГПК НАДО ПЕРЕДЕЛАТЬ ДЛЯ ПКМ
-                # Максимов
-#                 Смешение ломается если ничего нет в ячейке
-
+#                     if i == 3 and j == 0:
+#                         print('Переход к оригинальной точности расчета',
+#                               Calctolerance)
+#                         print('Переход к оригинальному количетсву итераций',
+#                               Maxiterations_cotel)
+                        
+                # точка смешения на входе в ГПК с ПКМ   
                 
-                G_smesh_od = self.water_streams.at["SMESHOD-REC", "G"]
-                H_smesh_od = self.water_streams.at["SMESHOD-REC", "H"]
-                G_smesh_PKM = self.water_streams.at["ST-GPK", "G"]
-                H_smesh_PKM = self.water_streams.at["ST-GPK", "H"]
-                G_v_GPK = G_smesh_od+G_smesh_PKM
-                P_v_GPK = self.water_streams.at["SMESHOD-REC", "P"]
-                H_v_GPK = (G_smesh_od*H_smesh_od +
-                           G_smesh_PKM*H_smesh_PKM)/G_v_GPK
-                T_v_GPK = self.water.p_h(P_v_GPK, H_v_GPK)["T"]
-                self.water_streams.loc["SMESH-GPK",
-                                      "T":"G"] = T_v_GPK, P_v_GPK, H_v_GPK, G_v_GPK
-
+                if self.water_streams.at["ST-GPK", "G"]>0:
+                    G_smesh_od = self.water_streams.at["SMESHOD-REC", "G"]
+                    H_smesh_od = self.water_streams.at["SMESHOD-REC", "H"]
+                    G_smesh_PKM = self.water_streams.at["ST-GPK", "G"]
+                    H_smesh_PKM = self.water_streams.at["ST-GPK", "H"]
+                    G_v_GPK = G_smesh_od+G_smesh_PKM
+                    P_v_GPK = self.water_streams.at["SMESHOD-REC", "P"]
+                    H_v_GPK = (G_smesh_od*H_smesh_od + G_smesh_PKM*H_smesh_PKM)/G_v_GPK
+                    T_v_GPK = self.water.p_h(P_v_GPK, H_v_GPK)["T"]
+                    self.water_streams.loc["SMESH-GPK","T":"G"] = T_v_GPK, P_v_GPK, H_v_GPK, G_v_GPK
+                else:
+                    self.water_streams.loc["SMESH-GPK","T":"G"] = self.water_streams.loc["SMESHOD-REC", "T":"G"]
+                
                 ##################
 
                 G_turb = self.water_streams.at["SMESHOD-REC", "G"]
@@ -158,20 +156,20 @@ class ku_tu:
 
                 if Error_water_G > 20:
                     Teplo_overflow = 1
-                    print(f"Расход из турбины G: {G_turb}")
-                    print(f"Расход в ГПК G: {G_ku}")
-                if Error_water_G > 1 and Error_water_G < 20:
-                    print("Погрешность определения расхода выше допустимой")
-                    print(f"Расход из турбины: {G_turb}")
-                    print(f"Расход в ГПК: {G_ku}")
+#                     print(f"Расход из турбины G: {G_turb}")
+#                     print(f"Расход в ГПК G: {G_ku}")
+#                 if Error_water_G > 1 and Error_water_G < 20:
+#                     print("Погрешность определения расхода выше допустимой")
+#                     print(f"Расход из турбины: {G_turb}")
+#                     print(f"Расход в ГПК: {G_ku}")
                 if abs(Max_error_G) < Calctolerance_new:
-                    print(
-                        "Максимальная погрешность определения расхода в КУ+ПТУ", Max_error_G)
+#                     print(
+#                         "Максимальная погрешность определения расхода в КУ+ПТУ", Max_error_G)
                     break
-                if j == Maxiterations_cotel - 1:
-                    print("Достигнуто максимальное количество итераций расхода КУ+ПТУ")
-                    print(
-                        f"Error_water_G: {Error_water_G}, Error_nd_G: {Error_nd_G}, Error_vd_G: {Error_vd_G}")
+#                 if j == Maxiterations_cotel - 1:
+#                     print("Достигнуто максимальное количество итераций расхода КУ+ПТУ")
+#                     print(
+#                         f"Error_water_G: {Error_water_G}, Error_nd_G: {Error_nd_G}, Error_vd_G: {Error_vd_G}")
 
             # Переписываю давления
             P_turb_vd = self.water_streams.at[self.streamST_VD, 'P']
@@ -197,8 +195,8 @@ class ku_tu:
                 round(self.water_streams.loc[self.streamKU_ND, 'P'], 5))
             Pvd_it.append(
                 round(self.water_streams.loc[self.streamKU_VD, 'P'], 5))
-            print('Pnd_it', Pnd_it)
-            print('Pvd_it', Pvd_it)
+#             print('Pnd_it', Pnd_it)
+#             print('Pvd_it', Pvd_it)
 
             # Ошибки расчета
             Error_nd_P = abs((P_kotel_nd - P_kotel_nd_new)/P_kotel_nd*100)
@@ -209,15 +207,15 @@ class ku_tu:
             # print('Error_vd_P', Error_vd_P)
             Max_error_P = max(Error_nd_P, Error_vd_P)
             # print('Max_error', Max_error)
-            print(
-                f"Время {i+1} итерации расчета КУ+ТУ:--- %s сек. --- {round((time.time() - start_time), 1)}")
-            if Teplo_overflow == 1:
-                print('Слишком большая теплофикационная мощность, расчет окончен.')
-                print(
-                    'Для правильного расчета необходимо повысить мощность ГТУ или уменьшить мощность теплофикации.')
+#             print(
+#                 f"Время {i+1} итерации расчета КУ+ТУ:--- %s сек. --- {round((time.time() - start_time), 1)}")
+#             if Teplo_overflow == 1:
+#                 print('Слишком большая теплофикационная мощность, расчет окончен.')
+#                 print(
+#                     'Для правильного расчета необходимо повысить мощность ГТУ или уменьшить мощность теплофикации.')
             if abs(Max_error) < Calctolerance and Calctolerance_new == Calctolerance:
-                print(
-                    "Максимальная погрешность определения расходов", Error_water_G)
+#                 print(
+#                     "Максимальная погрешность определения расходов", Error_water_G)
                 break
-            if i == Maxiterations_KU_TU - 1:
-                print("Достигнуто максимальное количество итераций давления КУ+ПТУ", i+1)
+#             if i == Maxiterations_KU_TU - 1:
+#                 print("Достигнуто максимальное количество итераций давления КУ+ПТУ", i+1)

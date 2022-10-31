@@ -215,7 +215,7 @@ class turboustanovka:
         self.water_streams.at["SMESHOD-REC", "T"]=t_smeshod
         self.water_streams.at["SMESHOD-REC", "H"]=h_smeshod
         self.water_streams.at["SMESHOD-REC", "G"]=G_smeshod
-        print("Fin турбоустановка:--- %s сек. ---" %
-              round((time.time() - start_time), 2))
+#         print("Fin турбоустановка:--- %s сек. ---" %
+#               round((time.time() - start_time), 2))
 
         return Result
