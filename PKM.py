@@ -320,8 +320,7 @@ class PKM_all:
             # Ввод в табл выходов из паротрансформатора
             water_streams.loc["ST-GPK", "T":"G"] = [steam_trans["T17"],steam_trans["P17"],steam_trans["H17"],steam_trans["G1"]]
             water_streams.loc["ST-PKM", "T":"G"] = [steam_trans["T24"],steam_trans["P2"],steam_trans["H24"],steam_trans["G2"]]
-
-
+            
             # реформер
             from PKM import reformer
 
@@ -356,12 +355,15 @@ class PKM_all:
             #Cooler + HTS
             cool = PKM_cooler('REF-COOL', 'COOL-HTS', syngas_streams,heaters,450).calc()
             hts = HTS('COOL-HTS', 'HTS-X', syngas_streams,heaters,275).calc()
-            print('PKM+')
+            steamVD_to_turbine = water_streams.loc["DROSVD-TURBVD", "G"]
+            Qref_all = heaters.loc["Strans", "Qw"] + heaters.loc["Ref_cooler", "Qw"] + heaters.loc["Strans_cool", "Qw"]
         else:
             water_streams.loc["DROSVD-TURBVD", "G"] = water_streams.loc["PEVD-DROSVD", "G"]
             gas_streams.loc["GTU-PEVD", "T":"Ar"] = gas_streams.loc["GTU-KU", "T":"Ar"]
             water_streams.loc["ST-GPK", "T":"G"] = [80,2,320,0]
-            steamVD_to_turbine=water_streams0.at["PEVD-DROSVD", "G"]
             heaters.loc["Strans":"Ref_HTS", "Qw"] = 0
-        return {'steamVD_to_turbine':water_streams0.at["PEVD-DROSVD", "G"]}
+            Qref_all = 0
+        steamVD_to_turbine = water_streams.loc["DROSVD-TURBVD", "G"]
+        heaters.loc["Ref_all", "Qw"] = Qref_all
+        return {'steamVD_to_turbine':steamVD_to_turbine, 'Qref_all':Qref_all}
         
