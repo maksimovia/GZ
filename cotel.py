@@ -502,9 +502,9 @@ class cotel_all:
 #                     print('dQ/Q ПЕВД+ИВД+ЭВД', ErrorVD)
                 if abs(ErrorVD) < calctolerance:
                     break
-#                 if j == it - 1:
-#                     print(
-#                         "Достигнуто максимальное количество итераций контура высокого давления")
+                if j == it - 1:
+                    print(
+                        "Достигнуто максимальное количество итераций контура высокого давления")
             # Для сходимости
             if k == 0:
                 self.gas_streams.loc['PPND-IND',
@@ -600,9 +600,9 @@ class cotel_all:
                         GPK['Qw'], GPK['Qg'], GPK['KPD']]
                     if abs(Error_gpk) < calctolerance_new:
                         break
-#                     if i == it - 1:
-#                         print(
-#                             "Достигнуто максимальное количество итераций контура ГПК")
+                    if i == it - 1:
+                        print(
+                            "Достигнуто максимальное количество итераций контура ГПК")
 
                 # Баланс ППНД+ИНД+ГПК
                 Qgas1ND = self.KPD*self.gas_streams.at['EVD-PPND', 'G'] * \
@@ -626,9 +626,9 @@ class cotel_all:
 #                     print('dQ/Q ППНД+ИНД+ГПК', ErrorND)
                 if abs(ErrorND) < calctolerance and abs(ErrorND2) < calctolerance:
                     break
-#                 if j == it - 1:
-#                     print(
-#                         "Достигнуто максимальное количество итераций контура низкого давления")
+                if j == it - 1:
+                    print(
+                        "Достигнуто максимальное количество итераций контура низкого давления")
 
             # Баланс общий
             Qgasall = self.KPD*self.gas_streams.at['GTU-PEVD', 'G'] * \
@@ -645,5 +645,5 @@ class cotel_all:
                 # print('dQ/Qvd', ErrorVD)
                 # print('dQ/Qnd', ErrorND)
                 break
-#             if k == it - 1:
-#                 print("Достигнуто максимальное количество итераций котла-утилизатора")
+            if k == it - 1:
+                print("Достигнуто максимальное количество итераций котла-утилизатора")

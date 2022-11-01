@@ -348,7 +348,7 @@ class PKM_all:
             gas_streams.loc["GTU-PEVD", "G"] = (gas_streams.at["REF-SMESH", "G"] + gas_streams.at["GTU-KU", "G"])
             gas_streams.loc["GTU-PEVD", "H"] = (gas_streams.at["REF-SMESH", "G"] * gas_streams.at["REF-SMESH", "H"] + gas_streams.at["GTU-KU", "G"] * gas_streams.at["GTU-KU", "H"]) / gas_streams.loc["GTU-PEVD", "G"]
             gas_streams.loc["GTU-PEVD", "P"] = 0.1
-            from PKM import mixing_gases_molar
+            # from PKM import mixing_gases_molar
             mixing_gases_molar("GTU-KU", "REF-SMESH", "GTU-PEVD", gas_streams)
             for stream in gas_streams.index[4:10]:
                 gas_streams.loc[stream, "N2":"Ar"] = gas_streams.loc["GTU-PEVD", "N2":"Ar"]
