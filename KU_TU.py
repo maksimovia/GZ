@@ -156,8 +156,8 @@ class ku_tu:
 
                 if Error_water_G > 20:
                     Teplo_overflow = 1
-#                     print(f"Расход из турбины G: {G_turb}")
-#                     print(f"Расход в ГПК G: {G_ku}")
+                    print(f"Расход из турбины G: {G_turb}")
+                    print(f"Расход в ГПК G: {G_ku}")
 #                 if Error_water_G > 1 and Error_water_G < 20:
 #                     print("Погрешность определения расхода выше допустимой")
 #                     print(f"Расход из турбины: {G_turb}")
@@ -207,15 +207,15 @@ class ku_tu:
             # print('Error_vd_P', Error_vd_P)
             Max_error_P = max(Error_nd_P, Error_vd_P)
             # print('Max_error', Max_error)
-#             print(
-#                 f"Время {i+1} итерации расчета КУ+ТУ:--- %s сек. --- {round((time.time() - start_time), 1)}")
-#             if Teplo_overflow == 1:
-#                 print('Слишком большая теплофикационная мощность, расчет окончен.')
-#                 print(
-#                     'Для правильного расчета необходимо повысить мощность ГТУ или уменьшить мощность теплофикации.')
+            print(
+                f"Время {i+1} итерации расчета КУ+ТУ:---  {round((time.time() - start_time), 1)} сек. ---")
+            if Teplo_overflow == 1:
+                print('Слишком большая теплофикационная мощность, расчет окончен.')
+                print(
+                    'Для правильного расчета необходимо повысить мощность ГТУ или уменьшить мощность теплофикации.')
             if abs(Max_error) < Calctolerance and Calctolerance_new == Calctolerance:
-#                 print(
-#                     "Максимальная погрешность определения расходов", Error_water_G)
+                print(
+                    "Максимальная погрешность определения расходов при расчете КУ+ПТУ", Error_water_G)
                 break
-#             if i == Maxiterations_KU_TU - 1:
-#                 print("Достигнуто максимальное количество итераций давления КУ+ПТУ", i+1)
+            if i == Maxiterations_KU_TU - 1:
+                print("Достигнуто максимальное количество итераций давления КУ+ПТУ", i+1)
