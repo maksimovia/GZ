@@ -26,7 +26,6 @@ class ku_tu:
             water, water_streams0, water_streams, heaters, electric, KPD_SP, KPKN)
         self.Whole_cotel = cotel.cotel_all(KPD_to, KPDPN,  gas0, gas1, water, Calcmethod,
                                            gas_streams0, water_streams0, gas_streams, water_streams, heaters, electric)
-
         self.steamVD_to_turbine = steamVD_to_turbine
 
         self.streamKU_VD = streamKU_VD
@@ -83,7 +82,7 @@ class ku_tu:
                 # Расчет котла
                 Cotel_result = self.Whole_cotel.calc(
                     Calctolerance_new, Maxiterations_cotel_new)
-
+                
                 Gnd1 = self.water_streams.at[self.streamKU_ND, "G"]
                 Gnd2 = self.water_streams.at[self.streamST_ND, "G"]
                 Gvd1 = self.water_streams.at[self.streamKU_VD, "G"]
