@@ -115,9 +115,15 @@ def calculate_CCGT_PKM(arguments_all):
     print(f"fin КУ и ТУ:--- {round((time.time() - start_time), 1)} сек. ---")
     return gas_streams
 
-def Calculate_CCGT_PKM_iter(arguments_all_it):
-    Maxiterations_KU_TU,
-    Maxiterations_cotel = arguments_all_it[0], arguments_all_it[1]
+def Calculate_CCGT_PKM_iter(arguments_all_it,Iter_pkm,pkm_pgu_tol):
+    Maxiterations_KU_TU,    Maxiterations_cotel = arguments_all_it[0], arguments_all_it[1]
+    start_time = time.time()
+    water_streams0=arguments_all_it[4]
+    water_streams=arguments_all_it[8]
+
+    Gst = [water_streams0.at["DROSVD-ST", "G"]]
+    Ggpk = [water_streams0.at["SMESH-GPK", "G"]]
+
     for i in range(Iter_pkm):
         if i < 6:
             Maxiterations_KU_TU_new = int(2)
@@ -161,3 +167,4 @@ def Calculate_CCGT_PKM_iter(arguments_all_it):
             print(Err1, Err3)
 
             break
+    return gas_streams
