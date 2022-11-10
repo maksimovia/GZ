@@ -195,6 +195,9 @@ class turbine:
         if q>1:
             Eff_massflow=1
         Efficiency_out=KPD0i*Eff_massflow
+#         print(Efficiency_out,'check')
+        Efficiency_out=max(Efficiency_out,0)
+        Efficiency_out=min(Efficiency_out,1) # Опарин внес
 
         return Efficiency_out
 
@@ -275,6 +278,10 @@ class turbine:
 
         # диафрагма
         self.Pin_cnd = self.Potb1 - self.diafragma
+        if self.Pin_cnd<0:
+            self.Pin_cnd = abs(self.Pin_cnd)
+            print('Ошибка!!! при температуре', self.water_streams.at['AIR','T'])
+        
         self.Hin_cnd = self.Hotb1
 
         # расчет конденсатора
@@ -285,7 +292,8 @@ class turbine:
         self.Vin_kond = 1 / self.water.p_h(self.Pin_kond, self.Hin_kond)["rho"]
         self.KPD_ots4 = self.off_design_relative_efficiency_CND(
             self.Pin_cnd, self.Hin_cnd, self.Pin_kond, self.Hin_kond, self.Gin_cnd0, self.Vin_cnd0, self.Vin_kond0, self.Gin_cnd, self.Vin_cnd, self.Vin_kond)
-
+        if self.KPD_ots4<0:
+            print(self.Pin_cnd, self.Hin_cnd, self.Pin_kond, self.KPD_ots4)
         ots4_out = self.expansion(
             self.Pin_cnd, self.Hin_cnd, self.Pin_kond, self.KPD_ots4)
         self.Hin_kond = ots4_out["h"]
@@ -414,6 +422,9 @@ class turbine:
             Max_error = max(Errors)
             if abs(Max_error) < calctolerance and i > 1:
                 # print("Максимальная погрешность определения давления в отборах", Max_error)
+                if min(H_out)<0:
+                    print(Eff_out)
+                    print(H_out)
                 break
             if i == maxiterations-1:
                 print('Достигнуто максимальное количество итераций')

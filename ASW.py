@@ -82,18 +82,19 @@ class Accum():
 
             # тут уточнить
         
-            if self.ASWatm = False:
+            if self.ASWatm == False:
                 self._P_accum = self.water_streams.at[self._stream_pryamoi_setevoi_vody, 'P']
             else:
                 self._P_accum = 0.1
-                self._T_accum = 95
-                
+                if self.water_streams.at[self._stream_pryamoi_setevoi_vody, 'T'] < 95:
+                    self._T_accum = self.water_streams.at[self._stream_pryamoi_setevoi_vody, 'T']
+                else:
+                    self._T_accum = 95
             self._h_accum = self._water.p_t(self._P_accum, self._T_accum)['h']
             self.water_streams.at[self._stream11, 'T'] = self._T_accum
             self.water_streams.at[self._stream11, 'H'] = self._h_accum
             self.water_streams.at[self._stream11, 'P'] = self._P_accum
-            self._G = self._kolichestvo*self._V * \
-                self._water.p_t(self._P_accum, self._T_accum)['rho']/(tau*3600)
+            self._G = self._kolichestvo*self._V*self._water.p_t(self._P_accum, self._T_accum)['rho']/(tau*3600)
             self.water_streams.at[self._stream11, 'G'] = self._G
             self._Mass = self._kolichestvo*self._V * \
                 self._water.p_t(self._P_accum, self._T_accum)['rho']

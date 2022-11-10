@@ -180,11 +180,21 @@ def ParallelCompute(args):
 
     calculate_all.calculate_CCGT(args)
     # steamVD_to_turbine = 0
-    GTU_input = pd.read_excel("input.xlsx", sheet_name="GTU_input", index_col=0)
-    GTU_input.at["n", 1] = nagr
-    GTU_input.at["tair", 1] = t_air_list
+#     GTU_input = pd.read_excel("input.xlsx", sheet_name="GTU_input", index_col=0)
+#     GTU_input.at["n", 1] = nagr
+#     GTU_input.at["tair", 1] = t_air_list
 
     Max_iterations_minimum = 10
+    if Teplo == 1:
+        n_GTU = GTU_input.at["n", 1]
+        Delt_Gcnd = (water_streams.at["INKOND", "G"] - 4.44) / 4.44
+        Delt_Nturb = (electric.at["Turbine", "Ni"] - 17.6) / 17.6
+        Delt_Gvd = (water_streams.at["PEVD-DROSVD", "G"] / water_streams0.at["PEVD-DROSVD", "G"]- 0.25)/ 0.25
+        Delt_Gnd = (water_streams.at["PPND-DROSND", "G"] / water_streams0.at["PPND-DROSND", "G"]- 0.5) / 0.5
+        Delta_min = min(Delt_Gcnd, Delt_Nturb, Delt_Gvd, Delt_Gnd)
+        print(Delta_min,'check')
+        if n_GTU == 1 and Delta_min < 0:
+            print("Мощность ГТУ 100% и расход пара все еще слишком мал")
 
     if Сalculate_minimum == True:
         n_GTU = GTU_input.at["n", 1]
@@ -286,7 +296,7 @@ def ParallelCompute(args):
 
     result = {
     "T_air":round(t_air_list,2),
-    "n_GTU":round(nagr,2),
+    "n_GTU":round(GTU_input.at["n", 1],2),
     "GTU": round(electric.at["GTU", "N"], 4),
     "GTU_KPD": round(electric.at["GTU", "KPD"], 4),
     "Turbine": round(electric.at["Turbine", "Ni"], 4),
@@ -295,6 +305,10 @@ def ParallelCompute(args):
     "PEN": round(electric.at["PEN", "Ni"], 4),
     "Turbine_Qt":round(heaters.at["SP2", "Qw"]+heaters.at["SP1", "Qw"]+heaters.at["OD", "Qw"], 4),
     "ASW_Qt":round(accumulation.at["ASW", "Qw"]/(vremya*3600), 4),
+    "ASW_bull":ASWbul,
+    "Delta_P_Diafragma":round(water_streams.at["INCND", "P"]-water_streams.at["DOOTB1", "P"],4),
+    "INKOND": round(water_streams.at["INKOND", "G"],4),
+    
 #     "Delta_P_Diafragma":round(Delta_P_Diafragma, 4)
     }
     return result
