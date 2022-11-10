@@ -11,7 +11,7 @@ from scipy.optimize import root
 
 
 
-def calculate_CCGT(Iterations_KU_TU, Iterations_cotel, Iterations_turbine,
+def calculate_CCGT_PKM(Iterations_KU_TU, Iterations_cotel, Iterations_turbine,
                     gas_streams0,water_streams0,
                     GTU_ISO,GTU_input,
                     gas_streams,water_streams,
@@ -20,7 +20,7 @@ def calculate_CCGT(Iterations_KU_TU, Iterations_cotel, Iterations_turbine,
                     water,PKM_zaryad,PKM_razryad,
                     syngas_streams,Calcmethod,
                     Calctolerance,KPD_PN,KPD_KN,KPD_to,KPD_SP,
-                    steamVD_fraction_to_turbine,Teplo,accumulation,time_ac):
+                    steamVD_fraction_to_turbine,accumulation,time_ac):
     
     gasmix = "Nitrogen*Oxygen*CO2*Water*Argon"
     RP = prop.init_REFPROP(r"C:\Program Files (x86)\REFPROP")
@@ -50,11 +50,17 @@ def calculate_CCGT(Iterations_KU_TU, Iterations_cotel, Iterations_turbine,
     if PKM_zaryad:
         Accumulator = accum.zaryad(time_ac,accumulation,gas_streams,syngas_streams,water_streams,water_streams0,heaters,electric)
         steamVD_to_turbine = Accumulator['steamVD_to_turbine']
-        #Мощность осн ГТУ????
+        Teplo = Accumulator['Teplo']
+        
     elif PKM_razryad:
         Accumulator = accum.razryad(time_ac,accumulation,gas_streams,syngas_streams,water_streams,water_streams0,heaters,electric)
-        #......
+        Teplo = Accumulator['Teplo']
         steamVD_to_turbine = Accumulator['steamVD_to_turbine']
+    else:
+        gas_streams.loc["GTU-PEVD", "T":"Ar"] = gas_streams.loc["GTU-KU", "T":"Ar"]
+        water_streams.loc["ST-GPK", "T":"G"] = [0,0,0,0]
+        steamVD_to_turbine=water_streams.at["PEVD-DROSVD", "G"]
+        Teplo = True
     ##################################################
 
     # Состав газов при частичной нагрузке
@@ -100,7 +106,7 @@ def calculate_CCGT(Iterations_KU_TU, Iterations_cotel, Iterations_turbine,
     )
     start_time = time.time()
 
-
+    print('Teplo',Teplo)
     # Расчет КУ и ТУ
     KU_and_TU.calculate(
         Teplo,
