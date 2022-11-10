@@ -393,7 +393,7 @@ class PKM_all:
             
             steamVD_to_turbine = water_streams.loc["DROSVD-TURBVD", "G"]
             Qref_all = heaters.loc["Ref_HTS", "Qw"] + heaters.loc["Ref_cooler", "Qw"] + heaters.loc["Strans_cool", "Qw"]+heaters.loc["HTS_cooler", "Qw"] 
-            print(heaters.loc["Ref_HTS", "Qw"], heaters.loc["Ref_cooler", "Qw"], heaters.loc["Strans_cool", "Qw"],heaters.loc["HTS_cooler", "Qw"] )
+            # print(heaters.loc["Ref_HTS", "Qw"], heaters.loc["Ref_cooler", "Qw"], heaters.loc["Strans_cool", "Qw"],heaters.loc["HTS_cooler", "Qw"] )
         else:
             water_streams.loc["DROSVD-TURBVD", "G"] = water_streams.loc["PEVD-DROSVD", "G"]
             gas_streams.loc["GTU-PEVD", "T":"Ar"] = gas_streams.loc["GTU-KU", "T":"Ar"]
@@ -492,17 +492,14 @@ class accum:
         steamVD_to_turbine = PKM['steamVD_to_turbine']
         syngas_streams.loc["SGaccum-GTU", "G"] = 0
         
-        
-        
         Qteplofic = water_streams.loc['SWIN','G']*(water_streams.loc['SWOUT','H']-water_streams.loc['SWIN','H'])
         Qref = heaters.loc["Ref_all", "Qw"]
         if Qref<Qteplofic:
             print('-ТЕПЛА ОТ ПКМ НЕ ХВАТАЕТ НА ТЕПЛОФИКАЦИЮ',Qref,'/',Qteplofic)
-            
-            
             Gw_pkm = Qref/(water_streams.loc['SWOUT','H']-water_streams.loc['SWIN','H'])
             water_streams.loc['SWIN-TURB','G'] = water_streams.loc['SWIN','G']-Gw_pkm
             Teplo = 1
+            
         else:
             print('+ТЕПЛА ОТ ПКМ ХВАТАЕТ НА ТЕПЛОФИКАЦИЮ',Qref,'/',Qteplofic)
             Teplo = 0

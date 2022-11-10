@@ -285,7 +285,6 @@ class turbine:
         self.Vin_kond = 1 / self.water.p_h(self.Pin_kond, self.Hin_kond)["rho"]
         self.KPD_ots4 = self.off_design_relative_efficiency_CND(
             self.Pin_cnd, self.Hin_cnd, self.Pin_kond, self.Hin_kond, self.Gin_cnd0, self.Vin_cnd0, self.Vin_kond0, self.Gin_cnd, self.Vin_cnd, self.Vin_kond)
-
         ots4_out = self.expansion(
             self.Pin_cnd, self.Hin_cnd, self.Pin_kond, self.KPD_ots4)
         self.Hin_kond = ots4_out["h"]

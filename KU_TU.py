@@ -74,6 +74,7 @@ class ku_tu:
         Calctolerance_new = 10**-1
         Teplo_overflow = 0
         Maxiterations_cotel_new = 5
+        # print('Teplo',Teplo)
 
         for i in range(Maxiterations_KU_TU):
 
@@ -104,11 +105,15 @@ class ku_tu:
                                       'H'] = self.water_streams.at[self.streamKU_ND, 'H']
 
                 # В первм приближении для упрощения считаем конденсационный режим
-                if i > 0 and Teplo == 1:
+                if i>0 and Teplo == 1:
                     teplofikacia = 1
                 else:
                     teplofikacia = 0
-
+                    
+                   
+                # print('Teplo',Teplo)
+                # print('teplofikacia',teplofikacia)
+                
                 # Расчет турбины
                 TU_res = self.TU.calculate(
                     teplofikacia, calcmethod="hybr", calctolerance=Calctolerance_new, maxiterations=Maxiterations_turbine

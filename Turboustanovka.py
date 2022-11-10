@@ -108,6 +108,7 @@ class turboustanovka:
                 print(
                     "Достигнуто максимальное количество итераций давления верхнего отбора"
                 )
+                # print("Diafragma_it",Diafragma_it)
                 if Diafragma == 0:
                     print(
                         'Невозможно получить необходимое давление, диафрагма полностью открыта')
@@ -170,6 +171,13 @@ class turboustanovka:
             Turb_res=self.Turb.calculate(
                 diafragma, maxiterations, calctolerance)
             Result={"Turb_res":  {"Efficiencies":Turb_res, "Power":self.Turb.calculate_power()}}
+            self.heaters.at["SP2", "Qw"]=0
+            self.heaters.at["SP1", "Qw"]=0
+            self.heaters.at["OD", "Qw"]=0
+            self.heaters.at["SP2", "KPD"]=0
+            self.heaters.at["SP1", "KPD"]=0
+            self.heaters.at["OD", "KPD"]=0
+
 
         # запись данных в таблицу блоков
 

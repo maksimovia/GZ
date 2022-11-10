@@ -10,18 +10,9 @@ import SP
 from scipy.optimize import root
 
 
+def calculate_CCGT_PKM(arguments_all):
+    Iterations_KU_TU, Iterations_cotel, Iterations_turbine, gas_streams0, water_streams0, GTU_ISO, GTU_input, gas_streams, water_streams, heaters, electric, Gas_turbine, gas0,    water, PKM_zaryad, PKM_razryad,    syngas_streams, Calcmethod,    Calctolerance, KPD_PN, KPD_KN, KPD_to, KPD_SP,    steamVD_fraction_to_turbine, accumulation, time_ac = arguments_all
 
-def calculate_CCGT_PKM(Iterations_KU_TU, Iterations_cotel, Iterations_turbine,
-                    gas_streams0,water_streams0,
-                    GTU_ISO,GTU_input,
-                    gas_streams,water_streams,
-                    heaters,electric,
-                    Gas_turbine,gas0,
-                    water,PKM_zaryad,PKM_razryad,
-                    syngas_streams,Calcmethod,
-                    Calctolerance,KPD_PN,KPD_KN,KPD_to,KPD_SP,
-                    steamVD_fraction_to_turbine,accumulation,time_ac):
-    
     gasmix = "Nitrogen*Oxygen*CO2*Water*Argon"
     RP = prop.init_REFPROP(r"C:\Program Files (x86)\REFPROP")
 
@@ -48,19 +39,24 @@ def calculate_CCGT_PKM(Iterations_KU_TU, Iterations_cotel, Iterations_turbine,
     #####################Максимов#####################
     from PKM import accum
     if PKM_zaryad:
-        Accumulator = accum.zaryad(time_ac,accumulation,gas_streams,syngas_streams,water_streams,water_streams0,heaters,electric)
+        Accumulator = accum.zaryad(time_ac, accumulation, gas_streams,
+                                   syngas_streams, water_streams, water_streams0, heaters, electric)
         steamVD_to_turbine = Accumulator['steamVD_to_turbine']
         Teplo = Accumulator['Teplo']
-        
+        # print("Zaryad")
+
     elif PKM_razryad:
-        Accumulator = accum.razryad(time_ac,accumulation,gas_streams,syngas_streams,water_streams,water_streams0,heaters,electric)
+        Accumulator = accum.razryad(time_ac, accumulation, gas_streams,
+                                    syngas_streams, water_streams, water_streams0, heaters, electric)
         Teplo = Accumulator['Teplo']
         steamVD_to_turbine = Accumulator['steamVD_to_turbine']
+
     else:
-        gas_streams.loc["GTU-PEVD", "T":"Ar"] = gas_streams.loc["GTU-KU", "T":"Ar"]
-        water_streams.loc["ST-GPK", "T":"G"] = [0,0,0,0]
-        steamVD_to_turbine=water_streams.at["PEVD-DROSVD", "G"]
-        Teplo = True
+        gas_streams.loc["GTU-PEVD",
+                        "T":"Ar"] = gas_streams.loc["GTU-KU", "T":"Ar"]
+        water_streams.loc["ST-GPK", "T":"G"] = [0, 0, 0, 0]
+        steamVD_to_turbine = water_streams.at["PEVD-DROSVD", "G"]
+        Teplo = 1
     ##################################################
 
     # Состав газов при частичной нагрузке
@@ -79,7 +75,7 @@ def calculate_CCGT_PKM(Iterations_KU_TU, Iterations_cotel, Iterations_turbine,
         prop.REFPROP_s_q,
         RP=RP,
     )
-    
+
     # Инициализаця KU+TU, она здесь потому что нужно менять состав газа на входе в КУ
 
     KU_and_TU = KU_TU.ku_tu(
@@ -106,7 +102,7 @@ def calculate_CCGT_PKM(Iterations_KU_TU, Iterations_cotel, Iterations_turbine,
     )
     start_time = time.time()
 
-    print('Teplo',Teplo)
+    # print('Teplo',Teplo)
     # Расчет КУ и ТУ
     KU_and_TU.calculate(
         Teplo,
@@ -118,3 +114,50 @@ def calculate_CCGT_PKM(Iterations_KU_TU, Iterations_cotel, Iterations_turbine,
 #     print(gas_streams)
     print(f"fin КУ и ТУ:--- {round((time.time() - start_time), 1)} сек. ---")
     return gas_streams
+
+def Calculate_CCGT_PKM_iter(arguments_all_it):
+    Maxiterations_KU_TU,
+    Maxiterations_cotel = arguments_all_it[0], arguments_all_it[1]
+    for i in range(Iter_pkm):
+        if i < 6:
+            Maxiterations_KU_TU_new = int(2)
+            Maxiterations_cotel_new = int(2)
+            # print(Maxiterations_KU_TU_new,Maxiterations_cotel_new)
+
+        else:
+            Maxiterations_KU_TU_new = Maxiterations_KU_TU
+            Maxiterations_cotel_new = Maxiterations_cotel
+
+        # from calculate_CCGT_PKM import calculate_CCGT_PKM
+
+        arguments_all = arguments_all_it.copy()
+        arguments_all[0], arguments_all[1] = [
+            Maxiterations_KU_TU_new,
+            Maxiterations_cotel_new,
+        ]
+
+        gas_streams = calculate_CCGT_PKM(arguments_all)
+        ####################################
+        print(
+            f"Время {i+1} итерации расчета КУ+ТУ с ПКМ:--- %s сек. --- {round((time.time() - start_time), 1)}"
+        )
+        Gst.append(round(water_streams.at["PEVD-DROSVD", "G"], 2))
+        Ggpk.append(round(water_streams.at["SMESH-GPK", "G"], 2))
+
+        print("Gst", Gst)
+        print("Ggpk", Ggpk)
+
+        Err1 = abs((Gst[i] - Gst[i - 1]) / (Gst[i]) * 100)
+        Err3 = abs((Ggpk[i] - Ggpk[i - 1]) / (Ggpk[i]) * 100)
+
+        if i == Iter_pkm - 1:
+            print("Достигнуто максимальнео количество итераций КУ+ПТУ+ПКМ")
+
+        if Err1 < pkm_pgu_tol and Err3 < pkm_pgu_tol:
+
+            print(
+                f"Расчет КУ+ПТУ+ПКМ закончен:--- %s сек. ---{round((time.time() - start_time), 1)}"
+            )
+            print(Err1, Err3)
+
+            break
