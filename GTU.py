@@ -265,7 +265,7 @@ class gtu:
     def calc(self,GTU_input):
         T = GTU_input.at["tair", 1]
         n = GTU_input.at['n', 1]
-        print(f"Относительная мощность ГТУ в ГТУ {n}")
+#         print(f"Относительная мощность ГТУ в ГТУ {n}")
         Pin = GTU_input.at['Pin', 1]
         Pout = GTU_input.at['Pout', 1]
         GTU_res = gtu_raschet(self.ISO, n, T, Pin , Pout)

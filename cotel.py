@@ -450,7 +450,7 @@ class cotel_all:
             if k>it-it/2:
                 calctolerance_new=calctolerance/10
                 # print( self.water_streams)
-                print('Повышена точность расчета котла для увеличения сходимости')
+#                 print('Повышена точность расчета котла для увеличения сходимости')
 
             else:
                 calctolerance_new=calctolerance
@@ -498,8 +498,8 @@ class cotel_all:
                 Qwat1VD = self.water_streams.at['PEVD-DROSVD', 'G']*(
                     self.water_streams.at['PEVD-DROSVD', 'H']-self.water_streams.at['EVD-IVD', 'H'])
                 ErrorVD = (Qgas1VD-Qwat1VD)/Qgas1VD*100
-                if k > it/2:
-                    print('dQ/Q ПЕВД+ИВД+ЭВД', ErrorVD)
+#                 if k > it/2:
+#                     print('dQ/Q ПЕВД+ИВД+ЭВД', ErrorVD)
                 if abs(ErrorVD) < calctolerance:
                     break
                 if j == it - 1:
@@ -622,8 +622,8 @@ class cotel_all:
                      self.water_streams.at['GPK-IND', 'H'])
                 ErrorND = (Qgas1ND-Qwat1ND)/Qgas1ND*100
                 ErrorND2 = (Qgas1ND-Qwat2ND)/Qgas1ND*100
-                if k > it/2:
-                    print('dQ/Q ППНД+ИНД+ГПК', ErrorND)
+#                 if k > it/2:
+#                     print('dQ/Q ППНД+ИНД+ГПК', ErrorND)
                 if abs(ErrorND) < calctolerance and abs(ErrorND2) < calctolerance:
                     break
                 if j == it - 1:
@@ -639,9 +639,9 @@ class cotel_all:
             ErrorALL = (Qgasall-Qwatall)/Qgasall*100
             # print('dQ/Qsumm', ErrorALL)
             if abs((Qgasall-Qwatall)/Qgasall*100) < calctolerance:
-                print("Fin котел-утилизатора:--- %s сек. ---" %
-                      round((time.time() - start_time), 2))
-                print('dQ/Qsumm', ErrorALL)
+#                 print("Fin котел-утилизатора:--- %s сек. ---" %
+#                       round((time.time() - start_time), 2))
+#                 print('dQ/Qsumm', ErrorALL)
                 # print('dQ/Qvd', ErrorVD)
                 # print('dQ/Qnd', ErrorND)
                 break

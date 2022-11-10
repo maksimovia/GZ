@@ -287,6 +287,9 @@ class teplofik_systema:
             # Расчет ОД
             OD_res = self.OD.calc()
             Qw_od=OD_res['Qw']
+            
+            # print('Gsv_in',Gsv_in)
+            # print('Qw_od',Qw_od)
 
             # Смешение
             t_wod = self.water_streams.at["OD-SP1", "T"]
