@@ -120,14 +120,15 @@ def Calculate_CCGT_PKM_iter(arguments_all_it,Iter_pkm,pkm_pgu_tol):
     start_time = time.time()
     water_streams0=arguments_all_it[4]
     water_streams=arguments_all_it[8]
+    print('Gst',water_streams.at["PEVD-DROSVD", "G"],'Gst',round(water_streams.at["SMESH-GPK", "G"]))
 
-    Gst = [water_streams0.at["DROSVD-ST", "G"]]
-    Ggpk = [water_streams0.at["SMESH-GPK", "G"]]
+    Gst = [max([water_streams0.at["DROSVD-ST", "G"]],round(water_streams.at["PEVD-DROSVD", "G"], 2))]
+    Ggpk = [max([water_streams0.at["SMESH-GPK", "G"]],round(water_streams.at["SMESH-GPK", "G"], 2))]
 
     for i in range(Iter_pkm):
         if i < 6:
-            Maxiterations_KU_TU_new = int(2)
-            Maxiterations_cotel_new = int(2)
+            Maxiterations_KU_TU_new = 2
+            Maxiterations_cotel_new = 2
             # print(Maxiterations_KU_TU_new,Maxiterations_cotel_new)
 
         else:
@@ -145,26 +146,29 @@ def Calculate_CCGT_PKM_iter(arguments_all_it,Iter_pkm,pkm_pgu_tol):
         gas_streams = calculate_CCGT_PKM(arguments_all)
         ####################################
         print(
-            f"Время {i+1} итерации расчета КУ+ТУ с ПКМ:--- %s сек. --- {round((time.time() - start_time), 1)}"
+            f"Время {i+1} итерации расчета КУ+ТУ с ПКМ: --- {round((time.time() - start_time), 1)} сек. ---"
         )
         Gst.append(round(water_streams.at["PEVD-DROSVD", "G"], 2))
         Ggpk.append(round(water_streams.at["SMESH-GPK", "G"], 2))
 
-        print("Gst", Gst)
-        print("Ggpk", Ggpk)
+
 
         Err1 = abs((Gst[i] - Gst[i - 1]) / (Gst[i]) * 100)
         Err3 = abs((Ggpk[i] - Ggpk[i - 1]) / (Ggpk[i]) * 100)
 
         if i == Iter_pkm - 1:
-            print("Достигнуто максимальнео количество итераций КУ+ПТУ+ПКМ")
+            print("Достигнуто максимальное количество итераций КУ+ПТУ+ПКМ")
+            print("Gst", Gst)
+            print("Ggpk", Ggpk)
 
         if Err1 < pkm_pgu_tol and Err3 < pkm_pgu_tol:
 
             print(
                 f"Расчет КУ+ПТУ+ПКМ закончен:--- %s сек. ---{round((time.time() - start_time), 1)}"
             )
-            print(Err1, Err3)
+            print("Gst", Gst)
+            print("Ggpk", Ggpk)
+            # print(Err1, Err3)
 
             break
     return gas_streams

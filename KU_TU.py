@@ -71,9 +71,9 @@ class ku_tu:
         Max_error = 2
         Error_nd_P = 2
         Error_vd_P = 2
-        Calctolerance_new = 10**-1
+        Calctolerance_new = max(10**-1, Calctolerance)
         Teplo_overflow = 0
-        Maxiterations_cotel_new = 5
+        Maxiterations_cotel_new = min(5,Maxiterations_cotel)
         # print('Teplo',Teplo)
 
         for i in range(Maxiterations_KU_TU):
@@ -161,7 +161,7 @@ class ku_tu:
                 Max_error = max(Error_water_G, Error_nd_G,
                                 Error_vd_G, Error_nd_P, Error_vd_P)
 
-                if Error_water_G > 20:
+                if Error_water_G > 20 and j != Maxiterations_cotel - 1:
                     Teplo_overflow = 1
                     print(f"Расход из турбины G: {G_turb}")
                     print(f"Расход в ГПК G: {G_ku}")
@@ -174,9 +174,9 @@ class ku_tu:
                     #                         "Максимальная погрешность определения расхода в КУ+ПТУ", Max_error_G)
                     # break
                 if j == Maxiterations_cotel - 1:
-                    print("Достигнуто максимальное количество итераций расхода КУ+ПТУ")
-                    print(
-                        f"Error_water_G: {Error_water_G}, Error_nd_G: {Error_nd_G}, Error_vd_G: {Error_vd_G}")
+                    print(f"Достигнуто максимальное количество итераций расхода КУ+ПТУ: {Maxiterations_cotel}")
+                    # print(
+                        # f"Error_water_G: {Error_water_G}, Error_nd_G: {Error_nd_G}, Error_vd_G: {Error_vd_G}")
 
             # Переписываю давления
             P_turb_vd = self.water_streams.at[self.streamST_VD, 'P']
@@ -220,12 +220,12 @@ class ku_tu:
                     'Для правильного расчета необходимо повысить мощность ГТУ или уменьшить мощность теплофикации.')
             if abs(Max_error) < Calctolerance and Calctolerance_new == Calctolerance:
                 print('Расчет КУ+ПТУ окончен.')
-                # print("Максимальная погрешность определения расходов при расчете КУ+ПТУ", Error_water_G)
+                print("Максимальная погрешность определения расходов при расчете КУ+ПТУ", Error_water_G)
                 print('Pnd_it', Pnd_it)
                 print('Pvd_it', Pvd_it)
                 break
 
             if i == Maxiterations_KU_TU - 1:
-                print("Достигнуто максимальное количество итераций давления КУ+ПТУ", i+1)
+                print("Достигнуто максимальное количество итераций давления КУ+ПТУ:", i+1)
                 print('Pnd_it', Pnd_it)
                 print('Pvd_it', Pvd_it)
