@@ -39,8 +39,8 @@ def calculate_CCGT_PKM(arguments_all):
     #####################Максимов#####################
     from PKM import accum
     if PKM_zaryad:
-        Accumulator = accum.zaryad(time_ac, accumulation, gas_streams,
-                                   syngas_streams, water_streams, water_streams0, heaters, electric)
+        print(len([time_ac, accumulation, gas_streams,syngas_streams, water_streams, water_streams0, heaters, electric]))
+        Accumulator = accum.zaryad(time_ac, accumulation, gas_streams,syngas_streams, water_streams, water_streams0, heaters, electric)
         steamVD_to_turbine = Accumulator['steamVD_to_turbine']
         Teplo = Accumulator['Teplo']
         # print("Zaryad")

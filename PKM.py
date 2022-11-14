@@ -551,7 +551,31 @@ class syngas_GTU:
         electric.loc['SGgtu_turb','Ni'] = Nturb
         
         
-class accum:#&
+class accum:
+    
+     def __init__(self, water, water_streams, accumulation, ASWatm, **kwargs):
+
+        self._V = 1
+        self._D = 1
+        self._F = 1
+        self._H = 1
+        self._P_accum = 1e-1
+        self._T_accum = 95
+        self._D = 1
+        self._kolichestvo = 1
+        self._V = n.pi*self._D**3/4
+        self._F = 1.5*n.pi*self._D**2
+        self._khi = 1
+        self._lambda_min_vata = 0.045
+        self.delta_min_vata = 0.01
+
+        self._water = water
+        self.water_streams = water_streams
+        self.accumulation = accumulation
+        self.ASWatm=ASWatm
+
+        self._T_nar_vozd = self.water_streams.at['AIR', 'T']
+    
     def set_construct(self, **kwargs):
 
         if 'D' in kwargs.keys():
@@ -572,13 +596,11 @@ class accum:#&
         self._F = n.pi*self._D*self._H + n.pi*self._D**2/2
         pass
     
-    def zaryad(self,t,accumulation,gas_streams,syngas_streams,water_streams,water_streams0,heaters,electric):
-        
+    def zaryad(self, t,accumulation,gas_streams,syngas_streams,water_streams,water_streams0,heaters,electric):
+          
         PKM = PKM_all.calc(True,gas_streams,syngas_streams,water_streams,water_streams0,heaters)
         steamVD_to_turbine = PKM['steamVD_to_turbine']
         syngas_streams.loc["SGaccum-GTU", "G"] = 0
-        
-        
         
         Qteplofic = water_streams.loc['SWIN','G']*(water_streams.loc['SWOUT','H']-water_streams.loc['SWIN','H'])
         Qref = heaters.loc["Ref_all", "Qw"]
