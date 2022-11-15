@@ -552,7 +552,6 @@ class syngas_GTU:
         
         
 class accum:
-    
      def __init__(self, water, water_streams, accumulation, ASWatm, **kwargs):
 
         self._V = 1
@@ -606,8 +605,6 @@ class accum:
         Qref = heaters.loc["Ref_all", "Qw"]
         if Qref<Qteplofic:
             print('-ТЕПЛА ОТ ПКМ НЕ ХВАТАЕТ НА ТЕПЛОФИКАЦИЮ',Qref,'/',Qteplofic)
-            
-            
             Gw_pkm = Qref/(water_streams.loc['SWOUT','H']-water_streams.loc['SWIN','H'])
             water_streams.loc['SWIN-TURB','G'] = water_streams.loc['SWIN','G']-Gw_pkm
             Teplo = 1
