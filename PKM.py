@@ -1,6 +1,7 @@
 import mat_properties as prop
 import numpy as n
 import pandas as pd
+from scipy.optimize import root
 
 RP = prop.init_REFPROP(r"C:\Program Files (x86)\REFPROP")
 
@@ -109,8 +110,7 @@ class steam_transformer:
 
         Qtrans = G1*(H11-H16)
         
-        
-        T17 = 80
+        T17 = self.water_streams.loc['SWIN','T']+10
         P17 = P16
         H17 = self.water.p_t(P17, T17)['h']
         
@@ -280,6 +280,7 @@ class HTS_cooler:
         heaters.loc['HTS_cooler','Qw'] = Q
         syngas_streams.loc[stream2,'N2':'CO'] = list(SGfrac)
         return Q
+    
 class separator:
     def calc(stream1, stream2, syngas_streams, heaters):
         Hin = syngas_streams.loc[stream1,'H']
@@ -313,7 +314,7 @@ class separator:
                        "N2": 0.280134,
                        "O2": 0.015999}
         
-        Sr_mol_mass = sum(map(lambda x1, x2: molar_mases[x1] * x2,  list(syngas_streams.columns)[4:], SGfrac))
+        Sr_mol_mass = sum(map(lambda x1, x2: molar_mases[x1] * x2, list(syngas_streams.columns)[4:], SGfrac))
         Mole_flow = G/Sr_mol_mass
         Mole_flow_CO2 = Mole_flow*SGfrac["CO2"]
         Mole_flow_H2O = Mole_flow*SGfrac["H2O"]
@@ -324,9 +325,9 @@ class separator:
         Mole_flow_N2 = Mole_flow*SGfrac["N2"]
         Mole_flow_O2 = Mole_flow*SGfrac["O2"]
         Mole_sep = Gliq/molar_mases['H2O']
-        Mole_flow_out = Mole_flow_CO2+Mole_flow_Ar+(Mole_flow_H2O-Mole_sep)+Mole_flow_CH4+Mole_flow_H2+Mole_flow_CO+Mole_flow_N2+Mole_flow_O2
-        SGfrac_new = [Mole_flow_N2/Mole_flow_out ,Mole_flow_O2/Mole_flow_out ,Mole_flow_CO2/Mole_flow_out ,Mole_flow_Ar/Mole_flow_out, (Mole_flow_H2O-Mole_sep)/Mole_flow_out,Mole_flow_CH4/Mole_flow_out,Mole_flow_H2/Mole_flow_out ,Mole_flow_CO/Mole_flow_out]
-        
+        Mole_flow_H2O=max(Mole_flow_H2O-Mole_sep,0)
+        Mole_flow_out = Mole_flow_CO2+Mole_flow_Ar+(Mole_flow_H2O)+Mole_flow_CH4+Mole_flow_H2+Mole_flow_CO+Mole_flow_N2+Mole_flow_O2
+        SGfrac_new = [Mole_flow_N2/Mole_flow_out ,Mole_flow_O2/Mole_flow_out ,Mole_flow_CO2/Mole_flow_out ,Mole_flow_Ar/Mole_flow_out, (Mole_flow_H2O)/Mole_flow_out,Mole_flow_CH4/Mole_flow_out,Mole_flow_H2/Mole_flow_out ,Mole_flow_CO/Mole_flow_out]
         Sr_mol_mass_out = sum(map(lambda x1, x2: molar_mases[x1] * x2,  list(syngas_streams.columns)[4:], SGfrac_new))
         Mass_flow_out = Mole_flow_out*Sr_mol_mass_out
         SGnew = prop.Materials_prop(SGsost,
@@ -343,8 +344,6 @@ class separator:
         Hout = SGnew.p_t(Pin, Tin)['h']
         syngas_streams.loc[stream2,'N2':'CO'] = SGfrac_new
         syngas_streams.loc[stream2,'T':'G'] = [Tin, Pin, Hout, Mass_flow_out]
-        
-        
         
     
 class PKM_all:
@@ -396,10 +395,7 @@ class PKM_all:
                                          prop.REFPROP_s_q,
                                          RP=RP)
         if PKM_zaryad == True:
-            #Пар в паротрансформатор и ЦВД
-            water_streams.loc["DROSVD-TURBVD", "G"] = 0.25*water_streams0.at["PEVD-DROSVD", "G"]
-            water_streams.loc["DROSVD-ST", "T":"H"] = water_streams.loc["PEVD-DROSVD", "T":"H"]
-            water_streams.loc["DROSVD-ST", "G"] = water_streams.at["PEVD-DROSVD", "G"] - water_streams.loc["DROSVD-TURBVD", "G"]
+            water_streams.loc["DROSVD-TURBVD", "G"] = water_streams.loc["PEVD-DROSVD", "G"]-water_streams.loc["DROSVD-ST", "G"]
 
             # паротрансформатор
             ST = steam_transformer(stream11="DROSVD-ST",
@@ -414,9 +410,6 @@ class PKM_all:
             water_streams.loc["ST-PKM", "T":"G"] = [steam_trans["T24"],steam_trans["P2"],steam_trans["H24"],steam_trans["G2"]]
             
             
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            water_streams.loc["ST-PKM", "T":'G'] = [629.797064053617,2,3757.9,9]
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             # реформер
             from PKM import reformer
 
@@ -458,26 +451,23 @@ class PKM_all:
             from PKM import separator
             sep = separator.calc('HTSCOOL-Separ', 'Separ-SGaccum',syngas_streams, heaters)            
             
-            steamVD_to_turbine = water_streams.loc["DROSVD-TURBVD", "G"]
             Qref_all = heaters.loc["Ref_HTS", "Qw"] + heaters.loc["Ref_cooler", "Qw"] + heaters.loc["Strans_cool", "Qw"]+heaters.loc["HTS_cooler", "Qw"] 
-            print(heaters.loc["Ref_HTS", "Qw"], heaters.loc["Ref_cooler", "Qw"], heaters.loc["Strans_cool", "Qw"],heaters.loc["HTS_cooler", "Qw"] )
         else:
             water_streams.loc["DROSVD-TURBVD", "G"] = water_streams.loc["PEVD-DROSVD", "G"]
             gas_streams.loc["GTU-PEVD", "T":"Ar"] = gas_streams.loc["GTU-KU", "T":"Ar"]
             water_streams.loc["ST-GPK", "T":"G"] = [80,2,336.57,0]
             heaters.loc["Strans":"Ref_HTS", "Qw"] = 0
             Qref_all = 0
-        steamVD_to_turbine = water_streams.loc["DROSVD-TURBVD", "G"]
         heaters.loc["Ref_all", "Qw"] = Qref_all
-        return {'steamVD_to_turbine':steamVD_to_turbine, 'Qref_all':Qref_all}
+        return {'Qref_all':Qref_all}
         
         
 class syngas_GTU:
     def calc(syngas_streams, P2,KPDcomp,KPDturb,heaters,electric):
-        Tsg = syngas_streams.loc["SGaccum-COMB", "T"]
-        Psg = syngas_streams.loc["SGaccum-COMB", "P"]
-        Hsg = syngas_streams.loc["SGaccum-COMB", "H"]
-        Gsg = syngas_streams.loc["SGaccum-COMB", "G"]
+        Tsg = syngas_streams.loc["Sepout-COMB", "T"]
+        Psg = syngas_streams.loc["Sepout-COMB", "P"]
+        Hsg = syngas_streams.loc["Sepout-COMB", "H"]
+        Gsg = syngas_streams.loc["Sepout-COMB", "G"]
         
         RP = prop.init_REFPROP(r"C:\Program Files (x86)\REFPROP")
         air = prop.Materials_prop("Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO",
@@ -495,12 +485,12 @@ class syngas_GTU:
         Hair1 = air.p_t(0.1,15)['h']
         Sair1 = air.p_t(0.1,15)['s']
         Hair2t = air.p_s(P2,Sair1)['h']
-        Hair2 = Hair1 + (Hair2t-Hair1)/KPDcomp#+44
+        Hair2 = Hair1 + (Hair2t-Hair1)/KPDcomp
         Tair2 = air.p_h(P2,Hair2)['T']
         
         #кам сгор
         combsost = "Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO"
-        combfrac = (0.749339662191397,0.1670532120516,0.0269473196408155,0,0.056659806116187,0,0,0)
+        combfrac = list(syngas_streams.loc['Sepout-COMB','N2':'CO'])
         COMB = prop.Materials_prop(combsost,
                                  combfrac,
                                  prop.REFPROP_h_s,
@@ -515,8 +505,11 @@ class syngas_GTU:
         Tcomb = 750
         Hcomb = COMB.p_t(P2,Tcomb)['h']
         Scomb = COMB.p_t(P2,Tcomb)['s']
-        Qnr=23375.32317  #??????
         
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        Qnr=23375.32317
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
         Gair = -Gsg*((Hsg-Hcomb+Qnr)/(Hair2-Hcomb))
         Gcomb = Gair+Gsg
         
@@ -527,12 +520,10 @@ class syngas_GTU:
         Tex = 70
         Hex = COMB.p_t(0.1,Tex)['h']
         
-        
         Ncomp = Gair*(Hair2-Hair1)
         Nturb = Gcomb*(Hcomb - Hcombex)
         Ngtu = Nturb-Ncomp
         Qgtu_ex = Gcomb*(Hcombex-Hex)
-        Gcomb = Gair + Gsg
 
         syngas_streams.loc['AIR-COMP', 'T':'G'] = [15,0.1,Hair1,Gair]
         syngas_streams.loc['COMP-COMB', 'T':'G'] = [Tair2,P2,Hair2,Gair]
@@ -544,22 +535,18 @@ class syngas_GTU:
         syngas_streams.loc['TURB-COOL', 'N2':'CO'] = combfrac
         syngas_streams.loc['COOL-EX', 'N2':'CO'] = combfrac
         
-        
-
         heaters.loc['SGgtu_Qsw','Qw'] = Qgtu_ex
         electric.loc['SGgtu_comp','Ni'] = Ncomp
         electric.loc['SGgtu_turb','Ni'] = Nturb
         
         
 class accum:
-     def __init__(self, water, water_streams, accumulation, ASWatm, **kwargs):
 
+    def __init__(self, water_streams, accumulation):
         self._V = 1
         self._D = 1
         self._F = 1
         self._H = 1
-        self._P_accum = 1e-1
-        self._T_accum = 95
         self._D = 1
         self._kolichestvo = 1
         self._V = n.pi*self._D**3/4
@@ -567,59 +554,29 @@ class accum:
         self._khi = 1
         self._lambda_min_vata = 0.045
         self.delta_min_vata = 0.01
-
-        self._water = water
         self.water_streams = water_streams
         self.accumulation = accumulation
-        self.ASWatm=ASWatm
-
         self._T_nar_vozd = self.water_streams.at['AIR', 'T']
-    
-    def set_construct(self, **kwargs):
+        self._f = 0
+        self._T_accum = 0
+        self._h_accum = 0
+        self._P_accum = 0
+        self._Mass = 0
+        self._Q = 0
 
-        if 'D' in kwargs.keys():
-            self._D = kwargs['D']
-        if 'd' in kwargs.keys():
-            self._D = kwargs['d']
-        if 'Diametr' in kwargs.keys():
-            self._D = kwargs['Diametr']
-        if 'kolichestvo' in kwargs.keys():
-            self._kolichestvo = kwargs['kolichestvo']
-        if 'Visota' in kwargs.keys():
-            self._H = kwargs['Visota']
-        if 'lambda_min_vata' in kwargs.keys():
-            self._lambda_min_vata = kwargs['lambda_min_vata']
-        if 'delta_min_vata' in kwargs.keys():
-            self._delta_min_vata = kwargs['delta_min_vata']
+    def set_construct(self, constr):
+        
+        self._D = constr['Diametr']
+        self._kolichestvo = constr['kolichestvo']
+        self._H = constr['Visota']
+        self._lambda_min_vata = constr['lambda_min_vata']
+        self._delta_min_vata = constr['delta_min_vata']
         self._V = n.pi*self._D**2/4 * self._H
         self._F = n.pi*self._D*self._H + n.pi*self._D**2/2
+
         pass
     
     def zaryad(self, t,accumulation,gas_streams,syngas_streams,water_streams,water_streams0,heaters,electric):
-          
-        PKM = PKM_all.calc(True,gas_streams,syngas_streams,water_streams,water_streams0,heaters)
-        steamVD_to_turbine = PKM['steamVD_to_turbine']
-        syngas_streams.loc["SGaccum-GTU", "G"] = 0
-        
-        Qteplofic = water_streams.loc['SWIN','G']*(water_streams.loc['SWOUT','H']-water_streams.loc['SWIN','H'])
-        Qref = heaters.loc["Ref_all", "Qw"]
-        if Qref<Qteplofic:
-            print('-ТЕПЛА ОТ ПКМ НЕ ХВАТАЕТ НА ТЕПЛОФИКАЦИЮ',Qref,'/',Qteplofic)
-            Gw_pkm = Qref/(water_streams.loc['SWOUT','H']-water_streams.loc['SWIN','H'])
-            water_streams.loc['SWIN-TURB','G'] = water_streams.loc['SWIN','G']-Gw_pkm
-            Teplo = 1
-        else:
-            print('+ТЕПЛА ОТ ПКМ ХВАТАЕТ НА ТЕПЛОФИКАЦИЮ',Qref,'/',Qteplofic)
-            Teplo = 0
-        
-        return {'steamVD_to_turbine':steamVD_to_turbine, 'Teplo':Teplo}
-        
-    def razryad(self,t,accumulation,gas_streams,syngas_streams,water_streams,water_streams0,heaters,electric):
-        
-        
-        PKM = PKM_all.calc(False,gas_streams,syngas_streams,water_streams,water_streams0,heaters)
-        steamVD_to_turbine = PKM['steamVD_to_turbine']
-        
         SGsost = "Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO"
         SGfrac = (0,0,0.168738364456343,0,0.0503573198627571,0.0975081144748292,0.681387369772999,0.00200883143307171)
         SG = prop.Materials_prop(SGsost,SGfrac,
@@ -636,26 +593,138 @@ class accum:
         Tsg = accumulation.loc['PKM','T']
         Psg = 2
         rosg = SG.p_t(Psg,Tsg)['rho']
+        Gsg = V*self._kolichestvo*rosg/(t*3600)
+        def sved_Gst(Gst):
+            water_streams.loc['DROSVD-ST','G'] = Gst
+            PKM = PKM_all.calc(True,gas_streams,syngas_streams,water_streams,water_streams0,heaters)
+            Gsgnew = syngas_streams.loc["Separ-SGaccum", "G"]
+            return ((Gsg-Gsgnew)/Gsg)*100
+        Gst = float(root(sved_Gst, water_streams.loc['DROSVD-ST','G'],method="hybr", tol=10**-2).x)
+        if Gst > water_streams.loc['PEVD-DROSVD','G']:
+            print('!Расчетный расход пара в ПКМ больше расхода пара в КУ:', Gst, water_streams.loc['PEVD-DROSVD','G'])
+            Gst = water_streams.loc['PEVD-DROSVD','G']
+        water_streams.loc['DROSVD-ST','G'] = Gst
+        water_streams.loc['DROSVD-ST','T':'H'] = water_streams.loc['PEVD-DROSVD','T':'H']
+        PKM = PKM_all.calc(True,gas_streams,syngas_streams,water_streams,water_streams0,heaters)
+        steamVD_to_turbine = water_streams.loc['PEVD-DROSVD','G'] - water_streams.loc['DROSVD-ST','G']
+        
+        Qteplofic = water_streams.loc['SWIN','G']*(water_streams.loc['SWOUT','H']-water_streams.loc['SWIN','H'])
+        Qref = heaters.loc["Ref_all", "Qw"]
+        if Qref<Qteplofic:
+            Gw_pkm = Qref/(water_streams.loc['SWOUT','H']-water_streams.loc['SWIN','H'])
+            water_streams.loc['SWIN-TURB','G'] = water_streams.loc['SWIN','G']-Gw_pkm
+            print('-Тепла от ПКМ не хватает на теплофикацию. Расход на СП:',water_streams.loc['SWIN-TURB','G'] )
+            Teplo = 1
+        else:
+            print('+Тепла от ПКМ хватает на теплофикацию')
+            Teplo = 0
+        
+        return {'steamVD_to_turbine':steamVD_to_turbine, 'Teplo':Teplo}
+        
+    def razryad(self,t,accumulation,gas_streams,syngas_streams,water_streams,water_streams0,heaters,electric):
+        
+        
+        PKM = PKM_all.calc(False,gas_streams,syngas_streams,water_streams,water_streams0,heaters)
+        steamVD_to_turbine = water_streams.loc['PEVD-DROSVD','G']
+        SGsost = "Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO"
+        SGmass = syngas_streams.loc['Separacc-Sepout','G'] #масса
+        SGfrac = list(syngas_streams.loc['Separacc-Sepout','N2':'CO'])
+        
+        
+        
+        SG = prop.Materials_prop(SGsost,SGfrac,
+                                 prop.REFPROP_h_s,
+                                 prop.REFPROP_p_t,
+                                 prop.REFPROP_p_h,
+                                 prop.REFPROP_p_s,
+                                 prop.REFPROP_p_q,
+                                 prop.REFPROP_t_q,
+                                 prop.REFPROP_p_rho,
+                                 prop.REFPROP_s_q,
+                                 RP=RP)
+
+        Tsg = syngas_streams.loc['Separacc-Sepout','T'] 
+        Psg = syngas_streams.loc['Separacc-Sepout','P'] 
+        rosg = SG.p_t(Psg,Tsg)['rho']
         Hsg = SG.p_t(Psg,Tsg)['h']
-        Gsg = V*rosg/t
+        Gsg = SGmass/(t*3600)
         Gsg_GTUmain = 9.73*1/9
         Gsg_GTUsg = Gsg - Gsg_GTUmain
-        syngas_streams.loc["SGaccum-COMB", "T":"G"] = [Tsg, Psg, Hsg, Gsg_GTUsg]
-        syngas_streams.loc["SGaccum-GTU", "G"] = Gsg_GTUmain
-        syngas_streams.loc["SGaccum-COMB", "N2":"CO"] = SGfrac
+        syngas_streams.loc["Sepout-COMB", "T":"G"] = [Tsg, Psg, Hsg, Gsg_GTUsg]
+        syngas_streams.loc["Sepout-GTU", "T":"H"] = [Tsg, Psg, Hsg]
+        syngas_streams.loc["Sepout-GTU", "G"] = Gsg_GTUmain
+        syngas_streams.loc["Sepout-GTU", "N2":"CO"] = SGfrac
+        syngas_streams.loc["Sepout-COMB", "N2":"CO"] = SGfrac
         
         Qteplofic = water_streams.loc['SWIN','G']*(water_streams.loc['SWOUT','H']-water_streams.loc['SWIN','H'])
         Qgvto = heaters.loc['SGgtu_Qsw','Qw']
         if Qgvto<Qteplofic:
-            print('-ТЕПЛА В ГВТО НЕ ХВАТАЕТ НА ТЕПЛОФИКАЦИЮ',Qgvto,'/',Qteplofic)
-            
             Gw_pkm = Qgvto/(water_streams.loc['SWOUT','H']-water_streams.loc['SWIN','H'])
             water_streams.loc['SWIN-TURB','G'] = water_streams.loc['SWIN','G']-Gw_pkm
             Teplo = 1
-            
+            print('-Тепла в ГВТО не хватает на теплофикацию. Расход на СП:',water_streams.loc['SWIN-TURB','G'] )
+
         else:
-            print('+ТЕПЛА В ГВТО ХВАТАЕТ НА ТЕПЛОФИКАЦИЮ',Qgvto,'/',Qteplofic)
+            print('+Тепла в ГВТО хватает на теплофикацию')
             Teplo = 0
             
         syngas_GTU.calc(syngas_streams, 1.2,0.88,0.9,heaters,electric)
         return {'steamVD_to_turbine':steamVD_to_turbine,'Teplo':Teplo}
+    
+    def jdat(self, time_jdat,accumulation,gas_streams,syngas_streams,water_streams,heaters,electric):
+        SGsost = "Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO"
+        SGfrac = (0,0,0.168738364456343,0,0.0503573198627571,0.0975081144748292,0.681387369772999,0.00200883143307171)
+        SG = prop.Materials_prop(SGsost,SGfrac,
+                                 prop.REFPROP_h_s,
+                                 prop.REFPROP_p_t,
+                                 prop.REFPROP_p_h,
+                                 prop.REFPROP_p_s,
+                                 prop.REFPROP_p_q,
+                                 prop.REFPROP_t_q,
+                                 prop.REFPROP_p_rho,
+                                 prop.REFPROP_s_q,
+                                 RP=RP)
+        T_nar_vozd = water_streams.loc['AIR','T']
+        T_accum = syngas_streams.loc['Separ-SGaccum','T']
+        Psg = syngas_streams.loc['Separ-SGaccum','P']
+        T_accum = 100   #после сепаратора HTS
+        Psg = 2
+        rosg = SG.p_t(Psg,T_accum)['rho']
+        
+        n_step = 100
+        time_jdat_step = time_jdat/n_step
+        H1 = SG.p_t(Psg, T_accum)['h']
+        H2 = SG.p_t(Psg, T_accum)['h']
+        for i in range(n_step):
+            
+            #заменить на логарифм
+            poteri = self._khi*(self._lambda_min_vata/self.delta_min_vata)*self._F * self._kolichestvo * (T_accum-T_nar_vozd)*(time_jdat_step*3600)/1000
+            H2 = H2 - poteri/(self._V*self._kolichestvo*rosg)
+            T_accum = SG.p_h(Psg, H2)['T']
+#             print('Температура сингаза',T_accum)
+
+        self.accumulation.at["PKM", "Qw"] = (self._V*self._kolichestvo*rosg)*(H2+23375.32317) #хз надо ли
+        self.accumulation.at["PKM", "T"] = T_accum
+        syngas_streams.loc["SGaccum-Separacc", "T"] = T_accum
+        syngas_streams.loc["SGaccum-Separacc", "P"] = Psg
+        syngas_streams.loc["SGaccum-Separacc", "H"] = H2
+        
+        syngas_streams.loc["SGaccum-Separacc", "G"] = (self._V*self._kolichestvo*rosg) #Масса
+        syngas_streams.loc['SGaccum-Separacc','N2':'CO'] = SGfrac
+        from PKM import separator
+        sep = separator.calc('SGaccum-Separacc', 'Separacc-Sepout',syngas_streams, heaters)
+        return {'T_accum': T_accum, 'poteri': poteri}
+
+# REF-COOL
+# COOL-HTS
+# HTS-HTSCOOL
+# HTSCOOL-Separ
+# Separ-SGaccum
+# SGaccum-Separacc
+# Separacc-COMB
+# Separacc-GTU
+# AIR-COMP
+# COMP-COMB
+# COMB-TURB
+# TURB-COOL
+# COOL-EX

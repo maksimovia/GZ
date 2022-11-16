@@ -35,10 +35,11 @@ def REFPROP_h_s(h, s, gas,fraction, RP):
     return res
 
 def REFPROP_p_t(p, t, gas,fraction, RP):
-    if fraction[0]==1 or gas.split("*")[0]!='Nitrogen':   
+    if fraction[0]==1 or fraction[0]==0: #or gas.split("*")[0]!='Nitrogen':   
         RP.PREOSdll(0)
     else:
         RP.PREOSdll(2)
+#         print(p, t, fraction)
     prop = RP.REFPROPdll(gas, 'PT', 'H;S;D;CV;CP;KV;Prandtl;TCX;VIS;Qmass', 21, 0, 0, p, t, fraction)
     res = dict()
     res['h'] = prop.Output[0]/1000
