@@ -131,18 +131,21 @@ class Accum():
             self.water_streams.at[self._stream11, 'G'] = 0
         return {'T_accum': self._T_accum, 'h_accum': self._h_accum, 'P_accum': self._P_accum, 'G': self._G, }
 
-    def jdat(self, tau):
-        self._poteri = self._khi*(self._lambda_min_vata/self.delta_min_vata)*self._F * \
-            self._kolichestvo * \
-            (self._T_accum-self._T_nar_vozd)*tau*3600/1000  # kJ
-        self._Q = self._Q - self._poteri
-        self._h_accum = self._Q/self._Mass + \
-            self._water.p_t(self._P_obr_set_voda, self._T_obr_set_voda)['h']
-        self._T_accum = self._water.p_h(self._P_accum, self._h_accum)['T']
-        self.water_streams.at[self._stream11, 'T'] = 0
-        self.water_streams.at[self._stream11, 'H'] = 0
-        self.water_streams.at[self._stream11, 'P'] = 0
-        self.water_streams.at[self._stream11, 'G'] = 0
-        self.accumulation.at["ASW", "Qw"] = self._Q/1000
-        self.accumulation.at["ASW", "T"] = self._T_accum
+    def jdat(self):
+        self._poteri = 3600/1000*2*3.14*self._H*(self._T_accum-self._T_nar_vozd)/(1/2*self._lambda_min_vata*n.log((self._D+2*self._delta_min_vata)/self._D)+1/(100000*self._D)+1/(10*(self._D+2*self._delta_min_vata))) #kJ
+    
+    
+        self._Q = self._Q - self._poteri   
+        self._h_accum = self._Q/self._Mass + self._water.p_t(self._P_obr_set_voda, self._T_obr_set_voda)['h']
+        self._T_accum = self._water.p_h(self._P_accum, self._h_accum)['T']     
+        self.water_streams.at[self._stream11,'T'] = "None"
+        self.water_streams.at[self._stream11,'H'] = "None"
+        self.water_streams.at[self._stream11,'P'] = "None"
+        self.water_streams.at[self._stream11,'G'] = "None"  
+        self.heaters.at["ASW", "Qw"]=self._Q
         return {'T_accum': self._T_accum, 'poteri': self._poteri, 'Q': self._Q}
+    
+    def jdat_n(self,tau):
+        for i in range(tau):
+            self.jdat()
+        pass

@@ -149,7 +149,7 @@ def calculate_CCGT(args):
                 ## если разрядка
         if ASWbul == 2:
             ASW.zaryadka(vremya)
-            ASW.jdat(vremyaojidaniya)
+            ASW.jdat_n(vremyaojidaniya)
             G_ASW_razryadka = ASW.razryadka(vremya)['G']
             water_streams.at["SWIN-TURB", "G"] = water_streams.at["SWIN", "G"] - G_ASW_razryadka
             water_streams.at["SP2-WOUT", "G"] = water_streams.at["SWIN", "G"] - G_ASW_razryadka
@@ -175,7 +175,7 @@ def calculate_CCGT(args):
                 ## если разрядка
         if ASWbul == 2:
             ASW.zaryadka(vremya)
-            ASW.jdat(vremyaojidaniya)
+            ASW.jdat_n(vremyaojidaniya)
             G_ASW_razryadka = ASW.razryadka(vremya)['G']
             water_streams.at["SWIN-TURB", "G"] = water_streams.at["SWIN", "G"] - G_ASW_razryadka
             water_streams.at["SP2-WOUT", "G"] = water_streams.at["SWIN", "G"] - G_ASW_razryadka
