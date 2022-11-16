@@ -488,9 +488,27 @@ class syngas_GTU:
         Hair2 = Hair1 + (Hair2t-Hair1)/KPDcomp
         Tair2 = air.p_h(P2,Hair2)['T']
         
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        SGsost = "Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO"
+        SGfrac = list(syngas_streams.loc['Sepout-COMB','N2':'CO'])
+        SG = prop.Materials_prop(SGsost,
+                                 SGfrac,
+                                 prop.REFPROP_h_s,
+                                 prop.REFPROP_p_t,
+                                 prop.REFPROP_p_h,
+                                 prop.REFPROP_p_s,
+                                 prop.REFPROP_p_q,
+                                 prop.REFPROP_t_q,
+                                 prop.REFPROP_p_rho,
+                                 prop.REFPROP_s_q,
+                                 RP=RP)
+        #ПЕРЕДЕЛАТЬ СГОРАНИЕ
         #кам сгор
+        
+        #сост ух газов
         combsost = "Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO"
-        combfrac = list(syngas_streams.loc['Sepout-COMB','N2':'CO'])
+        combfrac = (0.709036469739767,0.160575295051754,0.0242497807075509,0,0.106138454500928,0,0,0) #взято из аспена
         COMB = prop.Materials_prop(combsost,
                                  combfrac,
                                  prop.REFPROP_h_s,
@@ -504,9 +522,8 @@ class syngas_GTU:
                                  RP=RP)
         Tcomb = 750
         Hcomb = COMB.p_t(P2,Tcomb)['h']
-        Scomb = COMB.p_t(P2,Tcomb)['s']
+        Scomb = COMB.p_h(P2,Hcomb)['s']
         
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         Qnr=23375.32317
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -517,6 +534,7 @@ class syngas_GTU:
         Hcombext = COMB.p_s(0.1,Scomb)['h']
         Hcombex = Hcomb - (Hcomb-Hcombext)*KPDturb
         Tcombex = COMB.p_h(0.1,Hcombex)['T']
+        
         Tex = 70
         Hex = COMB.p_t(0.1,Tex)['h']
         
