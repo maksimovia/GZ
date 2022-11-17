@@ -512,6 +512,7 @@ class syngas_GTU:
         Psg = syngas_streams.loc["Sepout-COMB", "P"]
         Hsg = syngas_streams.loc["Sepout-COMB", "H"]
         Gsg = syngas_streams.loc["Sepout-COMB", "G"]
+        print(syngas_streams.loc["Sepout-COMB", "T"])
 
         RP = prop.init_REFPROP(r"C:\Program Files (x86)\REFPROP")
         air = prop.Materials_prop("Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO",
@@ -548,6 +549,36 @@ class syngas_GTU:
                                  prop.REFPROP_s_q,
                                  RP=RP)
         # ПЕРЕДЕЛАТЬ СГОРАНИЕ
+        molar_mases = {"CO2": 0.04401,
+                       "H2O": 0.01801528,
+                       "Ar":  0.039948,
+                       "CH4": 0.01604,
+                       "H2":  0.002,
+                       "CO":  0.02801,
+                       "N2": 0.280134,
+                       "O2": 0.015999}
+
+        fractions_syngas = SGfrac
+        components = list(syngas_streams.columns)[4:]
+        print(components)
+        print(fractions_syngas)
+
+        Sr_mol_mass_syngas = sum(
+            map(lambda x1, x2: molar_mases[x1] * x2, components, fractions_syngas))
+        Qnr_molar_elements = {"CO2": 0,
+                              "H2O": 0,
+                              "Ar":  0,
+                              "CH4": 802.34,
+                              "H2":  244,
+                              "CO":  283.24,
+                              "N2": 0,
+                              "O2": 0}
+        Qnr_molar=sum (map(lambda x1, x2: Qnr_molar_elements[x1]*x2, components, fractions_syngas))*1000
+        Qnr_mass=Qnr_molar*Sr_mol_mass_syngas
+        print(Tsg,Hsg,Psg,fractions_syngas )
+        print("Sr_mol_mass_syngas",Sr_mol_mass_syngas)
+        print("Qnr_molar",Qnr_molar)
+        print("Qnr_mass",Qnr_mass)
         # кам сгор
 
         # сост ух газов
@@ -753,8 +784,12 @@ class accum:
 
     def jdat(self, time_jdat, accumulation, gas_streams, syngas_streams, water_streams, heaters, electric):
         SGsost = "Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO"
-        SGfrac = (0, 0, 0.168738364456343, 0, 0.0503573198627571,
+        ##########НАДО СЧИТАТЬ С ТАБЛИЦЫ##########
+        SGfrac=list(syngas_streams.loc['Separ-SGaccum', 'N2':])
+        if isinstance(SGfrac[-2],float):
+            SGfrac = (0, 0, 0.168738364456343, 0, 0.0503573198627571,
                   0.0975081144748292, 0.681387369772999, 0.00200883143307171)
+        
         SG = prop.Materials_prop(SGsost, SGfrac,
                                  prop.REFPROP_h_s,
                                  prop.REFPROP_p_t,
@@ -768,8 +803,14 @@ class accum:
         T_nar_vozd = water_streams.loc['AIR', 'T']
         T_accum = syngas_streams.loc['Separ-SGaccum', 'T']
         Psg = syngas_streams.loc['Separ-SGaccum', 'P']
-        T_accum = 100  # после сепаратора HTS
-        Psg = 2
+        ##########НАДО СЧИТАТЬ С ТАБЛИЦЫ№№№№№№№№№№№№№№
+        if  isinstance(T_accum,float):
+            T_accum = 100  # после сепаратора HTS
+        if isinstance(Psg,float):
+            Psg = 2
+        
+        # print(T_accum,Psg,SGfrac)
+        
         rosg = SG.p_t(Psg, T_accum)['rho']
 
         n_step = 100
@@ -799,6 +840,8 @@ class accum:
         from PKM import separator
         sep = separator.calc('SGaccum-Separacc',
                              'Separacc-Sepout', syngas_streams, heaters)
+        
+        syngas_streams.loc["Sepout-COMB","T":"CO"]=syngas_streams.loc["Separacc-Sepout","T":"CO"]
         return {'T_accum': T_accum, 'poteri': poteri}
 
 # REF-COOL

@@ -48,6 +48,7 @@ def calculate_CCGT_PKM(arguments_all):
     elif PKM_razryad:
         Accum.jdat(time_jdat, accumulation, gas_streams,
                    syngas_streams, water_streams, heaters, electric)
+        # print(syngas_streams)
         Accumulator = Accum.razryad(time_ac, accumulation, gas_streams,
                                     syngas_streams, water_streams, water_streams0, heaters, electric)
         Teplo = Accumulator['Teplo']
