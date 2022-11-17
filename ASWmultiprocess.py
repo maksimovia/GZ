@@ -33,9 +33,9 @@ def ParallelCompute(args):
     gas_streams.loc["AIR", "T":"P"] = [GTU_input.loc["tair", 1], 0.1]
     water_streams.loc["AIR", "T":"P"] = [GTU_input.loc["tair", 1], 0.1]
     Tnv = gas_streams.at["AIR", "T"]
-    water_streams.at["SWINB", "T"] = SP.Tset(Tnv)[1]
+    water_streams.at["SWIN", "T"] = SP.Tset(Tnv)[1]
     water_streams.at["SWOUT", "T"] = SP.Tset(Tnv)[0]
-    water_streams.at["SWIN-TURB", "T"] = water_streams.at["SWINB", "T"]
+    water_streams.at["SWIN-TURB", "T"] = water_streams.at["SWIN", "T"]
     water_streams.at["SP2-WOUT", "T"] = water_streams.at["SWOUT", "T"]
     ############################################################
     # Состав газов в номинале в ГТУ
@@ -306,8 +306,11 @@ def ParallelCompute(args):
     "Turbine_Qt":round(heaters.at["SP2", "Qw"]+heaters.at["SP1", "Qw"]+heaters.at["OD", "Qw"], 4),
     "ASW_Qt":round(accumulation.at["ASW", "Qw"]/(vremya*3600), 4),
     "ASW_bull":ASWbul,
-    "Delta_P_Diafragma":round(water_streams.at["INCND", "P"]-water_streams.at["DOOTB1", "P"],4),
+    "Delta_P_Diafragma":round(water_streams.at["DOOTB1", "P"]-water_streams.at["INCND", "P"],4),
     "INKOND": round(water_streams.at["INKOND", "G"],4),
+    "ASWatm": ASWatm,
+    "Calculate_minimum": Сalculate_minimum,
+     
     
 #     "Delta_P_Diafragma":round(Delta_P_Diafragma, 4)
     }

@@ -212,7 +212,6 @@ def calculate_CCGT(args):
         steamVD_to_turbine,
     )
     start_time = time.time()
-
     # Расчет КУ и ТУ
     KU_and_TU.calculate(
         Teplo,
