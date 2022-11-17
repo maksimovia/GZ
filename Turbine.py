@@ -136,7 +136,8 @@ class turbine:
         Q = self.Gin_kond * \
             (self.Hin_kond-self.water.p_q(self.Pin_kond, 0)['h'])*(10**-3)
         q = Q/self.Q_kond0
-        Pin_kond = max(0.001, ((-0.0174000000+0.0169740000*q+0.0036920000*T1v-0.0001400000*(T1v**2)+0.0000022900*(T1v**3))/(1-0.5925300000*q+0.1835860000*(q**2)-0.0173900000*T1v+0.0002330000*(T1v**2)))*0.09806650124809235)
+        Pin_kond = max(0.001, ((-0.0174000000+0.0169740000*q+0.0036920000*T1v-0.0001400000*(T1v**2)+0.0000022900*(
+            T1v**3))/(1-0.5925300000*q+0.1835860000*(q**2)-0.0173900000*T1v+0.0002330000*(T1v**2)))*0.09806650124809235)
         return Pin_kond
 
     def off_design_relative_efficiency(self, G0, Vin0, Vout0, G1, Vin1, Vout1):
@@ -181,7 +182,7 @@ class turbine:
         K_vl = 1-0.4*(1-betta_vl)*(y0-yz)/100*H_vl/H0
         Hvs = 40*(Vout1*G1/G0/Vout0)**2
         KPD0i = 0.87*(1+(H0-400)/10000)*K_vl-Hvs/H0
-        
+
         # Vave0 = (Vin0+Vout0)/2
         # Q0 = G0*Vave0
         # Vave1 = (Vin1+Vout1)/2
@@ -189,15 +190,15 @@ class turbine:
         # q = Q1/Q0
         # Delta_eff = -1.0702*q**2+1.7951*q-0.6597
         # Efficiency_out = KPD0i-Delta_eff
-        
+
         q = G1/G0
-        Eff_massflow=2.2965*q**3-5.9155*q**2+4.8421*q-0.2163
-        if q>1:
-            Eff_massflow=1
-        Efficiency_out=KPD0i*Eff_massflow
+        Eff_massflow = 2.2965*q**3-5.9155*q**2+4.8421*q-0.2163
+        if q > 1:
+            Eff_massflow = 1
+        Efficiency_out = KPD0i*Eff_massflow
 #         print(Efficiency_out,'check')
-        Efficiency_out=max(Efficiency_out,0)
-        Efficiency_out=min(Efficiency_out,1) # Опарин внес
+        Efficiency_out = max(Efficiency_out, 0)
+        Efficiency_out = min(Efficiency_out, 1)  # Опарин внес
 
         return Efficiency_out
 
@@ -278,10 +279,11 @@ class turbine:
 
         # диафрагма
         self.Pin_cnd = self.Potb1 - self.diafragma
-        if self.Pin_cnd<0:
+        if self.Pin_cnd < 0:
             self.Pin_cnd = abs(self.Pin_cnd)
-            print('Давление на входе в ЦНД меньше нуля при температуре воздуха:', self.water_streams.at['AIR','T'])
-        
+            print('Давление на входе в ЦНД меньше нуля при температуре воздуха:',
+                  self.water_streams.at['AIR', 'T'])
+
         self.Hin_cnd = self.Hotb1
 
         # расчет конденсатора
@@ -292,7 +294,7 @@ class turbine:
         self.Vin_kond = 1 / self.water.p_h(self.Pin_kond, self.Hin_kond)["rho"]
         self.KPD_ots4 = self.off_design_relative_efficiency_CND(
             self.Pin_cnd, self.Hin_cnd, self.Pin_kond, self.Hin_kond, self.Gin_cnd0, self.Vin_cnd0, self.Vin_kond0, self.Gin_cnd, self.Vin_cnd, self.Vin_kond)
-        if self.KPD_ots4<0:
+        if self.KPD_ots4 < 0:
             print(self.Pin_cnd, self.Hin_cnd, self.Pin_kond, self.KPD_ots4)
         ots4_out = self.expansion(
             self.Pin_cnd, self.Hin_cnd, self.Pin_kond, self.KPD_ots4)
@@ -422,7 +424,7 @@ class turbine:
             Max_error = max(Errors)
             if abs(Max_error) < calctolerance and i > 1:
                 # print("Максимальная погрешность определения давления в отборах", Max_error)
-                if min(H_out)<0:
+                if min(H_out) < 0:
                     print(Eff_out)
                     print(H_out)
                 break
@@ -450,7 +452,7 @@ class turbine:
         self.water_streams.loc[self.stream1:self.stream8, "T"] = Temperatures
         self.water_streams.loc[self.stream1:self.stream8, "S"] = Entropies
         self.water_streams.loc[self.stream1:self.stream8, "X"] = Humidities
-        
+
         return Eff_out
 
     def calculate_power(self):

@@ -29,28 +29,33 @@ def calculate_CCGT_PKM(arguments_all):
     gas_streams.at["GTU-KU", "T"] = Gas_turbine_res["T"]
     gas_streams.at["GTU-KU", "G"] = Gas_turbine_res["G"]
     gas_streams.at["GTU-KU", "P"] = 0.1
-    gas_streams.at["GTU-KU", "H"] = gas0.p_t(gas_streams.at["GTU-KU", "P"], gas_streams.at["GTU-KU", "T"])["h"]
-    Gas_turbine_composition = pd.read_excel("input.xlsx", sheet_name="Gas_composition0", index_col=0)
+    gas_streams.at["GTU-KU", "H"] = gas0.p_t(
+        gas_streams.at["GTU-KU", "P"], gas_streams.at["GTU-KU", "T"])["h"]
+    Gas_turbine_composition = pd.read_excel(
+        "input.xlsx", sheet_name="Gas_composition0", index_col=0)
 
     #####################Максимов#####################
     from PKM import accum
-    Accum=accum(water_streams, accumulation)
+    Accum = accum(water_streams, accumulation)
     Accum.set_construct(constr)
-        
+
     if PKM_zaryad:
-        Accumulator = Accum.zaryad(time_ac, accumulation, gas_streams,syngas_streams, water_streams, water_streams0, heaters, electric)
+        Accumulator = Accum.zaryad(time_ac, accumulation, gas_streams,
+                                   syngas_streams, water_streams, water_streams0, heaters, electric)
         steamVD_to_turbine = Accumulator['steamVD_to_turbine']
         Teplo = Accumulator['Teplo']
 
     elif PKM_razryad:
-        Accum.jdat(time_jdat,accumulation,gas_streams,syngas_streams,water_streams,heaters,electric)
+        Accum.jdat(time_jdat, accumulation, gas_streams,
+                   syngas_streams, water_streams, heaters, electric)
         Accumulator = Accum.razryad(time_ac, accumulation, gas_streams,
                                     syngas_streams, water_streams, water_streams0, heaters, electric)
         Teplo = Accumulator['Teplo']
         steamVD_to_turbine = Accumulator['steamVD_to_turbine']
 
     else:
-        gas_streams.loc["GTU-PEVD","T":"Ar"] = gas_streams.loc["GTU-KU", "T":"Ar"]
+        gas_streams.loc["GTU-PEVD",
+                        "T":"Ar"] = gas_streams.loc["GTU-KU", "T":"Ar"]
         water_streams.loc["ST-GPK", "T":"G"] = [0, 0, 0, 0]
         steamVD_to_turbine = water_streams.at["PEVD-DROSVD", "G"]
         Teplo = 1
@@ -102,7 +107,6 @@ def calculate_CCGT_PKM(arguments_all):
 
     # Расчет КУ и ТУ
     # print(water_streams)
-    
 
     KU_and_TU.calculate(
         Teplo,
@@ -114,16 +118,19 @@ def calculate_CCGT_PKM(arguments_all):
     print(f"fin КУ и ТУ:--- {round((time.time() - start_time), 1)} сек. ---")
     return gas_streams
 
-def Calculate_CCGT_PKM_iter(arguments_all_it,Iter_pkm,pkm_pgu_tol):
+
+def Calculate_CCGT_PKM_iter(arguments_all_it, Iter_pkm, pkm_pgu_tol):
     Maxiterations_KU_TU,    Maxiterations_cotel = arguments_all_it[0], arguments_all_it[1]
     start_time = time.time()
-    water_streams0=arguments_all_it[4]
-    water_streams=arguments_all_it[8]
-    gas_streams=arguments_all_it[7]
+    water_streams0 = arguments_all_it[4]
+    water_streams = arguments_all_it[8]
+    gas_streams = arguments_all_it[7]
 #     print('Gst',water_streams.at["PEVD-DROSVD", "G"],'Gst',round(water_streams.at["SMESH-GPK", "G"]))
 
-    Gst = [max([water_streams0.at["DROSVD-ST", "G"]],round(water_streams.at["PEVD-DROSVD", "G"], 2))]
-    Ggpk = [max([water_streams0.at["SMESH-GPK", "G"]],round(water_streams.at["SMESH-GPK", "G"], 2))]
+    Gst = [max([water_streams0.at["DROSVD-ST", "G"]],
+               round(water_streams.at["PEVD-DROSVD", "G"], 2))]
+    Ggpk = [max([water_streams0.at["SMESH-GPK", "G"]],
+                round(water_streams.at["SMESH-GPK", "G"], 2))]
 
     for i in range(Iter_pkm):
         if i < 6:
@@ -150,8 +157,6 @@ def Calculate_CCGT_PKM_iter(arguments_all_it,Iter_pkm,pkm_pgu_tol):
         )
         Gst.append(round(water_streams.at["PEVD-DROSVD", "G"], 2))
         Ggpk.append(round(water_streams.at["SMESH-GPK", "G"], 2))
-
-
 
         Err1 = abs((Gst[i] - Gst[i - 1]) / (Gst[i]) * 100)
         Err3 = abs((Ggpk[i] - Ggpk[i - 1]) / (Ggpk[i]) * 100)
