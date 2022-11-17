@@ -60,8 +60,8 @@ class ku_tu:
         if self.water_streams0.at[self.streamKU_ND, 'P'] == self.water_streams.at[self.streamKU_ND, 'P']:
             G_gas1 = self.gas_streams.at["GTU-PEVD", "G"]
             G_gas0 = self.gas_streams0.at["GTU-PEVD", "G"]
-            if isinstance(G_gas1, float):
-                print(self.gas_streams)
+            # if isinstance(G_gas1, float):
+            #     print(self.gas_streams)
                 # print(G_gas1)
                 # G_gas1=G_gas0
             g_gas = G_gas1/G_gas0
@@ -137,7 +137,7 @@ class ku_tu:
                 if i > 2:
                     Calctolerance_new = Calctolerance
                     Maxiterations_cotel_new = Maxiterations_cotel
-                if i>7:
+                if i>5:
                     Maxiterations_cotel_tu_rashod_new= Maxiterations_KU_TU
 #                     if i == 3 and j == 0:
 #                         print('Переход к оригинальной точности расчета',
@@ -185,10 +185,9 @@ class ku_tu:
 #                     print("Погрешность определения расхода выше допустимой")
 #                     print(f"Расход из турбины: {G_turb}")
 #                     print(f"Расход в ГПК: {G_ku}")
-                # if abs(Max_error_G) < Calctolerance_new:
-                    #                     print(
-                    #                         "Максимальная погрешность определения расхода в КУ+ПТУ", Max_error_G)
-                    # break
+                if abs(Max_error_G) < Calctolerance_new:
+                    # print("Максимальная погрешность определения расхода в КУ+ПТУ", Max_error_G)
+                    break
                 if j == Maxiterations_cotel_tu_rashod - 1:
                     print(f"Достигнуто максимальное количество итераций расхода КУ+ПТУ: {Maxiterations_cotel_tu_rashod}")
                     print(f"Error_water_G: {Error_water_G}, Error_nd_G: {Error_nd_G}, Error_vd_G: {Error_vd_G}")
