@@ -32,13 +32,14 @@ class turboustanovka:
         self.heaters = heaters
         self.electric = electric
         self.water = water
-        self.Diafragma = 0.05
+        self.Diafragma = max(
+            self.water_streams.at["DOOTB1", "P"] - self.water_streams.at["INCND", "P"], 0.05)
         self.KN = nasos.nasos('KOND-KN', 'KN-GPK', water,
                               KPDnasos, water_streams, water_streams0)
 
     def Find_Potb2_it(self, maxiterations, calctolerance):
         Diafragma = self.Diafragma
-        Diafragma_it = [0]
+        Diafragma_it = [Diafragma]
         for i in range(maxiterations):
             G_sp2_it = 1
             G_sp1_it = 1
@@ -95,7 +96,7 @@ class turboustanovka:
                     print('Расход в СП2', G_sp2)
 
             Error_p = (Potb2_turb - Potb2_teplof) / Potb2_teplof * 100
-            Diafragma = max(0, Diafragma - Error_p / 5000)
+            Diafragma = max(0, Diafragma - Error_p / 1000)
             Diafragma_it.append(Diafragma)
             if abs(Error_p) < calctolerance:
                 # print("Максимальная погрешность определения давления в верхнем отборе",Error_p,)
@@ -107,7 +108,7 @@ class turboustanovka:
                 print(
                     "Достигнуто максимальное количество итераций давления верхнего отбора"
                 )
-                # print("Diafragma_it",Diafragma_it)
+                print("Diafragma_it", Diafragma_it)
                 if Diafragma == 0:
                     print(
                         'Невозможно получить необходимое давление, диафрагма полностью открыта')
@@ -116,6 +117,7 @@ class turboustanovka:
                 else:
                     print(
                         'Погрешность давления в верхнем сетевом отборе в %: ', Error_p)
+                    
                     # print(self.water_streams['SP1-OD':'KN-GPK','T':'G'])
                     # print(Potb2_turb - Potb2_teplof)
 

@@ -156,8 +156,11 @@ def Calculate_CCGT_PKM_iter(arguments_all_it, Iter_pkm, pkm_pgu_tol):
             f"Время {i+1} итерации расчета КУ+ТУ с ПКМ: --- {round((time.time() - start_time), 1)} сек. ---"
         )
         Gst.append(round(water_streams.at["PEVD-DROSVD", "G"], 2))
-        Ggpk.append(round(water_streams.at["SMESH-GPK", "G"], 2))
+        try:
+            Ggpk.append(round(water_streams.at["SMESH-GPK", "G"], 2))
 
+        except:
+            Ggpk.append(0)
         Err1 = abs((Gst[i] - Gst[i - 1]) / (Gst[i]) * 100)
         Err3 = abs((Ggpk[i] - Ggpk[i - 1]) / (Ggpk[i]) * 100)
 
