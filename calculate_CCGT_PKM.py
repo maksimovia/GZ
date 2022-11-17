@@ -74,6 +74,7 @@ def calculate_CCGT_PKM(arguments_all):
     )
 
     # Инициализаця KU+TU, она здесь потому что нужно менять состав газа на входе в КУ
+    # print(gas_streams)
 
     KU_and_TU = KU_TU.ku_tu(
         gas0,
@@ -100,6 +101,9 @@ def calculate_CCGT_PKM(arguments_all):
     start_time = time.time()
 
     # Расчет КУ и ТУ
+    # print(water_streams)
+    
+
     KU_and_TU.calculate(
         Teplo,
         Calctolerance,
@@ -115,6 +119,7 @@ def Calculate_CCGT_PKM_iter(arguments_all_it,Iter_pkm,pkm_pgu_tol):
     start_time = time.time()
     water_streams0=arguments_all_it[4]
     water_streams=arguments_all_it[8]
+    gas_streams=arguments_all_it[7]
 #     print('Gst',water_streams.at["PEVD-DROSVD", "G"],'Gst',round(water_streams.at["SMESH-GPK", "G"]))
 
     Gst = [max([water_streams0.at["DROSVD-ST", "G"]],round(water_streams.at["PEVD-DROSVD", "G"], 2))]

@@ -30,7 +30,8 @@ def ParallelCompute(args):
     Tnv = gas_streams.at["AIR", "T"]
     water_streams.at["SWINB", "T"] = SP.Tset(Tnv)[1]
     water_streams.at["SWOUT", "T"] = SP.Tset(Tnv)[0]
-    water_streams.at["SWIN-TURB", "T"] = water_streams.at["SWINB", "T"]
+    water_streams.at["SWIN-TURB", "T"] = water_streams.at["SWIN", "T"]
+    water_streams.at["SWIN-TURB", "G"] = water_streams.at["SWIN", "G"]
     water_streams.at["SP2-WOUT", "T"] = water_streams.at["SWOUT", "T"]
     ############################################################
 

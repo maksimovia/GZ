@@ -68,6 +68,7 @@ class steam_transformer:
         
         H12 = self.water.p_q(P12, Q12)['h']
         T12 = self.water.p_q(P12, Q12)['T']
+        # print("P12",P12)
 
         P13 = self.Pdr1
         H13 = H12
@@ -396,6 +397,7 @@ class PKM_all:
                                          RP=RP)
         if PKM_zaryad == True:
             water_streams.loc["DROSVD-TURBVD", "G"] = water_streams.loc["PEVD-DROSVD", "G"]-water_streams.loc["DROSVD-ST", "G"]
+            water_streams.loc['DROSVD-ST','P'] = water_streams.loc['PEVD-DROSVD','P']
 
             # паротрансформатор
             ST = steam_transformer(stream11="DROSVD-ST",
@@ -411,7 +413,7 @@ class PKM_all:
             
             
             # реформер
-            from PKM import reformer
+            # from PKM import reformer
 
             ref = reformer(stream11="ST-PKM",
                            water=water,
@@ -446,9 +448,9 @@ class PKM_all:
             hts = HTS('COOL-HTS', 'HTS-HTSCOOL', syngas_streams,heaters,275).calc()
             
             #+HTS_cooler
-            from PKM import HTS_cooler
+            # from PKM import HTS_cooler
             cool = HTS_cooler.calc('HTS-HTSCOOL','HTSCOOL-Separ',syngas_streams,heaters,100)
-            from PKM import separator
+            # from PKM import separator
             sep = separator.calc('HTSCOOL-Separ', 'Separ-SGaccum',syngas_streams, heaters)            
             
             Qref_all = heaters.loc["Ref_HTS", "Qw"] + heaters.loc["Ref_cooler", "Qw"] + heaters.loc["Strans_cool", "Qw"]+heaters.loc["HTS_cooler", "Qw"] 
@@ -631,10 +633,10 @@ class accum:
         if Qref<Qteplofic:
             Gw_pkm = Qref/(water_streams.loc['SWOUT','H']-water_streams.loc['SWIN','H'])
             water_streams.loc['SWIN-TURB','G'] = water_streams.loc['SWIN','G']-Gw_pkm
-            print('-Тепла от ПКМ не хватает на теплофикацию. Расход на СП:',water_streams.loc['SWIN-TURB','G'] )
+            print('Тепла от ПКМ не хватает на теплофикацию. Расход на СП:',water_streams.loc['SWIN-TURB','G'] )
             Teplo = 1
         else:
-            print('+Тепла от ПКМ хватает на теплофикацию')
+            print('Тепла от ПКМ хватает на теплофикацию')
             Teplo = 0
         
         return {'steamVD_to_turbine':steamVD_to_turbine, 'Teplo':Teplo}
@@ -680,10 +682,10 @@ class accum:
             Gw_pkm = Qgvto/(water_streams.loc['SWOUT','H']-water_streams.loc['SWIN','H'])
             water_streams.loc['SWIN-TURB','G'] = water_streams.loc['SWIN','G']-Gw_pkm
             Teplo = 1
-            print('-Тепла в ГВТО не хватает на теплофикацию. Расход на СП:',water_streams.loc['SWIN-TURB','G'] )
+            print('Тепла в ГВТО не хватает на теплофикацию. Расход на СП:',water_streams.loc['SWIN-TURB','G'] )
 
         else:
-            print('+Тепла в ГВТО хватает на теплофикацию')
+            print('Тепла в ГВТО хватает на теплофикацию')
             Teplo = 0
             
         syngas_GTU.calc(syngas_streams, 1.2,0.88,0.9,heaters,electric)

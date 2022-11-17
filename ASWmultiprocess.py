@@ -36,6 +36,7 @@ def ParallelCompute(args):
     water_streams.at["SWIN", "T"] = SP.Tset(Tnv)[1]
     water_streams.at["SWOUT", "T"] = SP.Tset(Tnv)[0]
     water_streams.at["SWIN-TURB", "T"] = water_streams.at["SWIN", "T"]
+    water_streams.at["SWIN-TURB", "G"] = water_streams.at["SWIN", "G"]
     water_streams.at["SP2-WOUT", "T"] = water_streams.at["SWOUT", "T"]
     ############################################################
     # Состав газов в номинале в ГТУ

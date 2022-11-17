@@ -51,16 +51,25 @@ class ku_tu:
         self.gas0 = gas0
         self.gas1 = gas1
         self.water = water
+        
 
+        # print(self.water_streams)
         # Первое приближение по давлению
+        
+
         if self.water_streams0.at[self.streamKU_ND, 'P'] == self.water_streams.at[self.streamKU_ND, 'P']:
             G_gas1 = self.gas_streams.at["GTU-PEVD", "G"]
             G_gas0 = self.gas_streams0.at["GTU-PEVD", "G"]
+            if isinstance(G_gas1, float):
+                print(self.gas_streams)
+                # print(G_gas1)
+                # G_gas1=G_gas0
             g_gas = G_gas1/G_gas0
             Pvd_1 = 0.4538+7.7601*g_gas
             Pnd_1 = -0.0189+0.6885*g_gas
             self.water_streams.at[self.streamKU_ND, 'P'] = Pnd_1
             self.water_streams.at[self.streamKU_VD, 'P'] = Pvd_1
+        # print(self.water_streams)
 
     def calculate(self, Teplo, Calctolerance, Maxiterations_KU_TU, Maxiterations_cotel, Maxiterations_turbine):
         Pnd_it = []
@@ -73,14 +82,18 @@ class ku_tu:
         Error_vd_P = 2
         Calctolerance_new = max(10**-1, Calctolerance)
         Teplo_overflow = 0
-        Maxiterations_cotel_new = min(5,Maxiterations_cotel)
+        Maxiterations_cotel_new = min(3,Maxiterations_cotel)
+        Maxiterations_cotel_tu_rashod_new=min(3,Maxiterations_KU_TU)
         # print('Teplo',Teplo)
 
         for i in range(Maxiterations_KU_TU):
+            Maxiterations_cotel_tu_rashod=Maxiterations_KU_TU
+            
 
-            for j in range(Maxiterations_cotel_new):
+            for j in range(Maxiterations_cotel_tu_rashod_new):
 
                 # Расчет котла
+
                 Cotel_result = self.Whole_cotel.calc(
                     Calctolerance_new, Maxiterations_cotel_new)
                 
@@ -118,11 +131,14 @@ class ku_tu:
                 TU_res = self.TU.calculate(
                     teplofikacia, calcmethod="hybr", calctolerance=Calctolerance_new, maxiterations=Maxiterations_turbine
                 )
+                
 
-                Calctolerance_new = Calctolerance
+                # Calctolerance_new = Calctolerance
                 if i > 2:
                     Calctolerance_new = Calctolerance
                     Maxiterations_cotel_new = Maxiterations_cotel
+                if i>7:
+                    Maxiterations_cotel_tu_rashod_new= Maxiterations_KU_TU
 #                     if i == 3 and j == 0:
 #                         print('Переход к оригинальной точности расчета',
 #                               Calctolerance)
@@ -161,7 +177,7 @@ class ku_tu:
                 Max_error = max(Error_water_G, Error_nd_G,
                                 Error_vd_G, Error_nd_P, Error_vd_P)
 
-                if Error_water_G > 20 and j != Maxiterations_cotel - 1:
+                if Error_water_G > 20 and j != Maxiterations_cotel_tu_rashod - 1:
                     Teplo_overflow = 1
                     print(f"Расход из турбины G: {G_turb}")
                     print(f"Расход в ГПК G: {G_ku}")
@@ -173,10 +189,9 @@ class ku_tu:
                     #                     print(
                     #                         "Максимальная погрешность определения расхода в КУ+ПТУ", Max_error_G)
                     # break
-                if j == Maxiterations_cotel - 1:
-                    print(f"Достигнуто максимальное количество итераций расхода КУ+ПТУ: {Maxiterations_cotel}")
-                    # print(
-                        # f"Error_water_G: {Error_water_G}, Error_nd_G: {Error_nd_G}, Error_vd_G: {Error_vd_G}")
+                if j == Maxiterations_cotel_tu_rashod - 1:
+                    print(f"Достигнуто максимальное количество итераций расхода КУ+ПТУ: {Maxiterations_cotel_tu_rashod}")
+                    print(f"Error_water_G: {Error_water_G}, Error_nd_G: {Error_nd_G}, Error_vd_G: {Error_vd_G}")
 
             # Переписываю давления
             P_turb_vd = self.water_streams.at[self.streamST_VD, 'P']

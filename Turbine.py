@@ -280,7 +280,7 @@ class turbine:
         self.Pin_cnd = self.Potb1 - self.diafragma
         if self.Pin_cnd<0:
             self.Pin_cnd = abs(self.Pin_cnd)
-            print('Давление на входе в ЦНД меньше нуля', self.water_streams.at['AIR','T'])
+            print('Давление на входе в ЦНД меньше нуля при температуре воздуха:', self.water_streams.at['AIR','T'])
         
         self.Hin_cnd = self.Hotb1
 
