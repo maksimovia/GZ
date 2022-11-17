@@ -311,6 +311,7 @@ def ParallelCompute(args):
     "INKOND": round(water_streams.at["INKOND", "G"],4),
     "ASWatm": ASWatm,
     "Calculate_minimum": Сalculate_minimum,
+    "G_ASW": water_streams.at["SP2-ASW", 'G'],
      
     
 #     "Delta_P_Diafragma":round(Delta_P_Diafragma, 4)
