@@ -190,7 +190,7 @@ class ku_tu:
                     break
                 if j == Maxiterations_cotel_tu_rashod - 1:
                     print(f"Достигнуто максимальное количество итераций расхода КУ+ПТУ: {Maxiterations_cotel_tu_rashod}")
-                    print(f"Error_water_G: {Error_water_G}, Error_nd_G: {Error_nd_G}, Error_vd_G: {Error_vd_G}")
+                    # print(f"Error_water_G: {Error_water_G}, Error_nd_G: {Error_nd_G}, Error_vd_G: {Error_vd_G}")
 
             # Переписываю давления
             P_turb_vd = self.water_streams.at[self.streamST_VD, 'P']
