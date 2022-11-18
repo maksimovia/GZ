@@ -392,7 +392,8 @@ def ParallelCompute(args):
                 New_iterations_KU_TU, New_iterations_cotel, New_iterations_turbine
             )
             print(f"Отклонение от ограничения минимальное равно {Delta_min}")
-            if abs(Delta_min) < Calctolerance:
+            Delta_n_GTU = abs((n_GTU_it[-1] - n_GTU_it[-2]) / n_GTU_it[-1] * 100)
+            if abs(Delta_min) < Calctolerance and Delta_n_GTU < Calctolerance:
                 calculate_CCGT(
                 New_iterations_KU_TU, New_iterations_cotel, New_iterations_turbine
             )
