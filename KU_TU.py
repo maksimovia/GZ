@@ -57,7 +57,7 @@ class ku_tu:
         # Первое приближение по давлению
         
 
-        if self.water_streams.at[self.streamKU_ND, 'P'] == self.water_streams0.at[self.streamKU_ND, 'P']:
+        if self.water_streams.at[self.streamKU_ND, 'P'] == self.water_streams0.at[self.streamKU_ND, 'P'] and self.water_streams.at[self.streamKU_VD, 'P'] == self.water_streams0.at[self.streamKU_VD, 'P']:
             G_gas1 = self.gas_streams.at["GTU-PEVD", "G"]
             G_gas0 = self.gas_streams0.at["GTU-PEVD", "G"]
             g_gas = G_gas1/G_gas0
@@ -69,8 +69,8 @@ class ku_tu:
         # print(self.water_streams)
 
     def calculate(self, Teplo, Calctolerance, Maxiterations_KU_TU, Maxiterations_cotel, Maxiterations_turbine):
-        Pnd_it = []
-        Pvd_it = []
+        Pnd_it = [round(self.water_streams.loc[self.streamKU_ND, 'P'], 5)]
+        Pvd_it = [round(self.water_streams.loc[self.streamKU_VD, 'P'], 5)]
         start_time = time.time()
         Max_error_P = 2
         Max_error_G = 2

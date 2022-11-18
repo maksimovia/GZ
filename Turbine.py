@@ -123,10 +123,12 @@ class turbine:
         return res
 
     def stodola_flugel(self, D0, D1, pn0, pv0, Vv0, pn1, pv1, Vv1):
-        pv1 = n.sqrt(
-            pn1**2 + ((D1 / D0) ** 2) * (pv0**2 - pn0**2) *
-            (pv1 * Vv1 / (pv0 * Vv0))
-        )
+        under_square=pn1**2 + ((D1 / D0) ** 2) * (pv0**2 - pn0**2) *(pv1 * Vv1 / (pv0 * Vv0))
+        if under_square<0:
+            pv1=pv0
+            print("При расчете Стодола-флюгеля давление в верхнем отборе оказалось меньше 0, а именно корень из:",under_square)
+        else:
+            pv1 = n.sqrt(pn1**2 + ((D1 / D0) ** 2) * (pv0**2 - pn0**2) *(pv1 * Vv1 / (pv0 * Vv0)))
         return pv1
 
     def calculate_cond(self, tair, G):

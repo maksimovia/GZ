@@ -137,7 +137,7 @@ def Calculate_CCGT_PKM_iter(arguments_all_it, Iter_pkm, pkm_pgu_tol):
 
         for i in range(Iter_pkm):
             if i < 6:
-                Maxiterations_KU_TU_new = 2
+                Maxiterations_KU_TU_new = 4
                 Maxiterations_cotel_new = 2
                 # print(Maxiterations_KU_TU_new,Maxiterations_cotel_new)
 
