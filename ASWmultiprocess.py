@@ -281,10 +281,12 @@ def ParallelCompute(args):
                 print("Мощность ГТУ 100% и расход пара все еще слишком мал")
             n_GTU = n_GTU - Delta_min / 10
             GTU_input.at["n", 1] = n_GTU
+            Delta_n_GTU = abs((n_GTU_it[-1] - n_GTU_it[-2]) / n_GTU_it[-1] * 100)
+
 
             calculate_all.calculate_CCGT(args)
             print(f"Отклонение от ограничения минимальное равно {Delta_min}")
-            if abs(Delta_min) < Calctolerance:
+            if abs(Delta_min) < Calctolerance and Delta_n_GTU < Calctolerance:
                 calculate_all.calculate_CCGT(args)
                 print(f"Отклонение от ограничения минимальное равно {Delta_min}")
                 print(f"Относительная мощность ГТУ равна {n_GTU}")
