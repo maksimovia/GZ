@@ -200,7 +200,9 @@ def ParallelCompute(args):
     if Сalculate_minimum == True:
         n_GTU = GTU_input.at["n", 1]
         start_time = time.time()
+        n_GTU_it = [0]
         for i in range(Max_iterations_minimum):
+            print("n_GTU:", n_GTU_it)
             print(f"Началась {i+1} итерация расчета ПГУ")
             if i < round(Max_iterations_minimum/2,1):
                 New_iterations_KU_TU, New_iterations_cotel, New_iterations_turbine = (
@@ -280,6 +282,7 @@ def ParallelCompute(args):
             if n_GTU == 1 and Delta_min < 0:
                 print("Мощность ГТУ 100% и расход пара все еще слишком мал")
             n_GTU = n_GTU - Delta_min / 10
+            n_GTU_it.append(round(n_GTU, 5))
             GTU_input.at["n", 1] = n_GTU
             Delta_n_GTU = abs((n_GTU_it[-1] - n_GTU_it[-2]) / n_GTU_it[-1] * 100)
 
