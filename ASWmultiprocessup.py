@@ -372,20 +372,20 @@ def ParallelCompute(args):
             Delt_Gcnd = 100
             Delt_Nturb = 100
             if Teplo == 1:
-                Delt_Gcnd = (water_streams.at["INKOND", "G"] - 4.44) / 4.44
-                Delt_Nturb = (electric.at["Turbine", "Ni"] - 17.6) / 17.6
-            Delt_Gvd = (
+                Delt_Gcnd = abs((water_streams.at["INKOND", "G"] - 4.44) / 4.44*100)
+                Delt_Nturb = abs((electric.at["Turbine", "Ni"] - 17.6) / 17.6*100)
+            Delt_Gvd = abs((
                 water_streams.at["PEVD-DROSVD", "G"] / water_streams0.at["PEVD-DROSVD", "G"]
                 - 0.25
-            ) / 0.25
-            Delt_Gnd = (
+            ) / 0.25*100)
+            Delt_Gnd = abs((
                 water_streams.at["PPND-DROSND", "G"] / water_streams0.at["PPND-DROSND", "G"]
                 - 0.5
-            ) / 0.5
+            ) / 0.5*100)
             Delta_min = min(Delt_Gcnd, Delt_Nturb, Delt_Gvd, Delt_Gnd)
             if n_GTU == 1 and Delta_min < 0:
                 print("Мощность ГТУ 100% и расход пара все еще слишком мал")
-            n_GTU = n_GTU - Delta_min / 10
+            n_GTU = n_GTU - Delta_min / 500
             GTU_input.at["n", 1] = n_GTU
 
             calculate_CCGT(
