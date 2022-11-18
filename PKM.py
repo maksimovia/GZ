@@ -11,11 +11,14 @@ def mixing_gases_molar(stream1, stream2, stream3, working_table):
     fractions2 = working_table.loc[stream2, "N2":]
     [gas1_T, gas1_P, gas1_H, gas1_G] = working_table.loc[stream1, "T":"G"]
     [gas2_T, gas2_P, gas2_H, gas2_G] = working_table.loc[stream2, "T":"G"]
-    molar_mases = {"N2": 0.0280134,
-                   "O2": 0.03199806,
-                   "CO2": 0.0440095,
-                   "H2O": 0.01801528,
-                   "Ar": 0.039948}
+    molar_mases = {"CO2": 0.04401,
+                       "H2O": 0.01801528,
+                       "Ar":  0.039948,
+                       "CH4": 0.01604,
+                       "H2":  0.002,
+                       "CO":  0.02801,
+                       "N2": 0.0280134,
+                       "O2": 0.015999*2}
     components = list(working_table.columns)[4:]
     Sr_mol_mass1 = sum(
         map(lambda x1, x2: molar_mases[x1] * x2, components, fractions1))
@@ -328,8 +331,8 @@ class separator:
                        "CH4": 0.01604,
                        "H2":  0.002,
                        "CO":  0.02801,
-                       "N2": 0.280134,
-                       "O2": 0.015999}
+                       "N2": 0.0280134,
+                       "O2": 0.015999*2}
 
         Sr_mol_mass = sum(map(
             lambda x1, x2: molar_mases[x1] * x2, list(syngas_streams.columns)[4:], SGfrac))
@@ -512,7 +515,7 @@ class syngas_GTU:
         Psg = syngas_streams.loc["Sepout-COMB", "P"]
         Hsg = syngas_streams.loc["Sepout-COMB", "H"]
         Gsg = syngas_streams.loc["Sepout-COMB", "G"]
-        print(syngas_streams.loc["Sepout-COMB", "T"])
+        # print(syngas_streams.loc["Sepout-COMB", "T"])
 
         RP = prop.init_REFPROP(r"C:\Program Files (x86)\REFPROP")
         air = prop.Materials_prop("Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO",
@@ -555,13 +558,13 @@ class syngas_GTU:
                        "CH4": 0.01604,
                        "H2":  0.002,
                        "CO":  0.02801,
-                       "N2": 0.280134,
-                       "O2": 0.015999}
+                       "N2": 0.0280134,
+                       "O2": 0.015999*2}
 
         fractions_syngas = SGfrac
         components = list(syngas_streams.columns)[4:]
-        print(components)
-        print(fractions_syngas)
+        # print(components)
+        # print(fractions_syngas)
 
         Sr_mol_mass_syngas = sum(
             map(lambda x1, x2: molar_mases[x1] * x2, components, fractions_syngas))
@@ -573,40 +576,136 @@ class syngas_GTU:
                               "CO":  283.24,
                               "N2": 0,
                               "O2": 0}
-        Qnr_molar=sum (map(lambda x1, x2: Qnr_molar_elements[x1]*x2, components, fractions_syngas))*1000
-        Qnr_mass=Qnr_molar*Sr_mol_mass_syngas
-        print(Tsg,Hsg,Psg,fractions_syngas )
-        print("Sr_mol_mass_syngas",Sr_mol_mass_syngas)
-        print("Qnr_molar",Qnr_molar)
-        print("Qnr_mass",Qnr_mass)
+        Qnr_molar = sum(
+            map(lambda x1, x2: Qnr_molar_elements[x1]*x2, components, fractions_syngas))
+        Qnr_mass = Qnr_molar/Sr_mol_mass_syngas
+        Molar_flow_syngas = Gsg/Sr_mol_mass_syngas
+        Molar_components_flows_syngas = list(
+            map(lambda x: x*Molar_flow_syngas, fractions_syngas))
+        # print(Molar_components_flows_syngas)
+
+        # print(Tsg,Hsg,Psg,fractions_syngas )
+        # print("Sr_mol_mass_syngas",Sr_mol_mass_syngas)
+        # print("Qnr_molar",Qnr_molar)
+        # print("Qnr_mass",Qnr_mass)
         # кам сгор
 
         # сост ух газов
+        air_composition = ["N2", "O2", "Ar"]
+        air_fraction_composition = [0.78, 0.21, 0.01]
         combsost = "Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO"
-        combfrac = (0.709036469739767, 0.160575295051754, 0.0242497807075509,
-                    0, 0.106138454500928, 0, 0, 0)  # взято из аспена
-        COMB = prop.Materials_prop(combsost,
-                                   combfrac,
-                                   prop.REFPROP_h_s,
-                                   prop.REFPROP_p_t,
-                                   prop.REFPROP_p_h,
-                                   prop.REFPROP_p_s,
-                                   prop.REFPROP_p_q,
-                                   prop.REFPROP_t_q,
-                                   prop.REFPROP_p_rho,
-                                   prop.REFPROP_s_q,
-                                   RP=RP)
-        Tcomb = 750
-        Hcomb = COMB.p_t(P2, Tcomb)['h']
-        Scomb = COMB.p_h(P2, Hcomb)['s']
+        
+        
+        combfrac=syngas_streams.loc['COMB-TURB', 'N2':'CO'] 
+        if combfrac[0]==0:
+            combfrac = (0.5, 0.2,0.2,
+                    0, 0.1, 0, 0, 0)  #первое приближение
+            
 
-        Qnr = 23375.32317
+        max_iterations_gas_turbine = 20
+        Gair_tol = 10**-4
+        Tcomb = 750
+        Gair_it = [0]
+        Sr_mol_mass_air = sum(map(lambda x1, x2: x1*molar_mases[x2], air_fraction_composition, air_composition))
+
+        # print(Sr_mol_mass_air)
+        Molar_composition_exhaust=combfrac
+        # print(Molar_composition_exhaust)
+
+        for i in range(max_iterations_gas_turbine):
+            
+            COMB = prop.Materials_prop(combsost,
+                                       Molar_composition_exhaust,
+                                       prop.REFPROP_h_s,
+                                       prop.REFPROP_p_t,
+                                       prop.REFPROP_p_h,
+                                       prop.REFPROP_p_s,
+                                       prop.REFPROP_p_q,
+                                       prop.REFPROP_t_q,
+                                       prop.REFPROP_p_rho,
+                                       prop.REFPROP_s_q,
+                                       RP=RP)
+            Hcomb = COMB.p_t(P2, Tcomb)['h']
+            Gair = -Gsg*((Hsg-Hcomb+Qnr_mass)/(Hair2-Hcomb))
+            Gcomb = Gair+Gsg
+            Molar_flow_air = Gair/Sr_mol_mass_air
+            Molar_components_flows_air = list(
+                map(lambda x: x*Molar_flow_air, air_fraction_composition))
+            
+            # Hydrogen combustion
+            Molar_flow_H2O_H2 = Molar_components_flows_syngas[components.index(
+                "H2")]
+            Molar_flow_O2used_H2 = Molar_components_flows_syngas[components.index(
+                "H2")]/2
+
+            # Methane combustion
+            Molar_flow_H2O_CH4 = Molar_components_flows_syngas[components.index(
+                "CH4")]*2
+            Molar_flow_CO2_CH4 = Molar_components_flows_syngas[components.index(
+                "CH4")]
+            Molar_flow_O2used_CH4 = Molar_components_flows_syngas[components.index(
+                "CH4")]*2
+
+            # CO combustion
+            Molar_flow_CO2_CO = Molar_components_flows_syngas[components.index(
+                "CO")]
+            Molar_flow_O2used_CO = Molar_components_flows_syngas[components.index("CO")]/2
+
+            Molar_flow_components_exhaust = Molar_components_flows_syngas.copy()
+
+            Molar_flow_components_exhaust[components.index("H2")] = 0
+            Molar_flow_components_exhaust[components.index("CH4")] = 0
+            Molar_flow_components_exhaust[components.index("CO")] = 0
+            Molar_flow_components_exhaust[components.index(
+                "H2O")] += Molar_flow_H2O_H2 + Molar_flow_H2O_CH4
+            
+            Molar_flow_components_exhaust[components.index(
+                "CO2")] += Molar_flow_CO2_CO + Molar_flow_CO2_CH4
+            
+            Molar_flow_components_exhaust[components.index("O2")] +=Molar_components_flows_air[air_composition.index("O2")]-Molar_flow_O2used_H2-Molar_flow_O2used_CH4-Molar_flow_O2used_CO
+            Molar_flow_components_exhaust[components.index("O2")]=max(0,Molar_flow_components_exhaust[components.index("O2")])
+            
+            Molar_flow_components_exhaust[components.index("N2")] +=Molar_components_flows_air[air_composition.index("N2")]
+            Molar_flow_components_exhaust[components.index("Ar")] +=Molar_components_flows_air[air_composition.index("Ar")]
+            
+            Molar_composition_exhaust=list(map(lambda x: x/sum(Molar_flow_components_exhaust),Molar_flow_components_exhaust))
+            
+            Sr_molar_mass_exhaust=sum(map(lambda x1, x2: x1*molar_mases[x2], Molar_composition_exhaust, components))
+            G_exhaust_calculated=Sr_molar_mass_exhaust*sum(Molar_flow_components_exhaust)
+            Error_G=abs((G_exhaust_calculated-Gcomb)/Gcomb*100)
+            
+            Error_composition=abs((Molar_composition_exhaust[0]-combfrac[0])/combfrac[0]*100)
+            
+            Gair=Gair-Error_composition
+            Gair_it.append(Gair)
+            Error_Gair = abs((Gair_it[-1]-Gair_it[-2])/Gair_it[-1]*100)
+            
+            combfrac=Molar_composition_exhaust
+            
+            if Error_G > 0.1:
+                print("Не сходится баланс камеры сгорания",G_exhaust_calculated,Gcomb, G_exhaust_calculated- Gcomb)
+                # print(dict(zip(components,Molar_components_flows_syngas)))
+                # print(dict(zip(components,Molar_flow_components_exhaust)))
+                # print(dict(zip(air_composition,Molar_components_flows_air)))
+                # print(sum(Molar_components_flows_syngas),sum(Molar_components_flows_air),sum(Molar_flow_components_exhaust))
+                # print(dict(zip(components,list(map(lambda x1, x2: x1*molar_mases[x2],Molar_components_flows_syngas,components)))))
+                # print(dict(zip(components,list(map(lambda x1, x2: x1*molar_mases[x2],Molar_components_flows_air,air_composition)))))
+                # print(dict(zip(components,list(map(lambda x1, x2: x1*molar_mases[x2],Molar_flow_components_exhaust,components)))))                                     
+            if i == max_iterations_gas_turbine-1:
+                print("Достигнуто максимальное количество итераций расхода воздуха в пиковую ГТУ: ",
+                      max_iterations_gas_turbine)
+                print("Gair_it ", Gair_it)
+            if Error_Gair < Gair_tol and Error_composition < Gair_tol:
+                print("Рассчитана пиковая ГТУ, расход воздуха:",Gair_it[-1])
+                # print("Gair_it ", Gair_it)
+                break
+
+        # Qnr = 23375.32317
+
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        Gair = -Gsg*((Hsg-Hcomb+Qnr)/(Hair2-Hcomb))
-        Gcomb = Gair+Gsg
-
         # турб
+        Scomb = COMB.p_h(P2, Hcomb)['s']
         Hcombext = COMB.p_s(0.1, Scomb)['h']
         Hcombex = Hcomb - (Hcomb-Hcombext)*KPDturb
         Tcombex = COMB.p_h(0.1, Hcombex)['T']
@@ -785,11 +884,11 @@ class accum:
     def jdat(self, time_jdat, accumulation, gas_streams, syngas_streams, water_streams, heaters, electric):
         SGsost = "Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO"
         ##########НАДО СЧИТАТЬ С ТАБЛИЦЫ##########
-        SGfrac=list(syngas_streams.loc['Separ-SGaccum', 'N2':])
-        if isinstance(SGfrac[-2],float):
+        SGfrac = list(syngas_streams.loc['Separ-SGaccum', 'N2':])
+        if isinstance(SGfrac[-2], float):
             SGfrac = (0, 0, 0.168738364456343, 0, 0.0503573198627571,
-                  0.0975081144748292, 0.681387369772999, 0.00200883143307171)
-        
+                      0.0975081144748292, 0.681387369772999, 0.00200883143307171)
+
         SG = prop.Materials_prop(SGsost, SGfrac,
                                  prop.REFPROP_h_s,
                                  prop.REFPROP_p_t,
@@ -803,14 +902,14 @@ class accum:
         T_nar_vozd = water_streams.loc['AIR', 'T']
         T_accum = syngas_streams.loc['Separ-SGaccum', 'T']
         Psg = syngas_streams.loc['Separ-SGaccum', 'P']
-        ##########НАДО СЧИТАТЬ С ТАБЛИЦЫ№№№№№№№№№№№№№№
-        if  isinstance(T_accum,float):
+        # НАДО СЧИТАТЬ С ТАБЛИЦЫ№№№№№№№№№№№№№№
+        if isinstance(T_accum, float):
             T_accum = 100  # после сепаратора HTS
-        if isinstance(Psg,float):
+        if isinstance(Psg, float):
             Psg = 2
-        
+
         # print(T_accum,Psg,SGfrac)
-        
+
         rosg = SG.p_t(Psg, T_accum)['rho']
 
         n_step = 100
@@ -840,8 +939,9 @@ class accum:
         from PKM import separator
         sep = separator.calc('SGaccum-Separacc',
                              'Separacc-Sepout', syngas_streams, heaters)
-        
-        syngas_streams.loc["Sepout-COMB","T":"CO"]=syngas_streams.loc["Separacc-Sepout","T":"CO"]
+
+        syngas_streams.loc["Sepout-COMB",
+                           "T":"CO"] = syngas_streams.loc["Separacc-Sepout", "T":"CO"]
         return {'T_accum': T_accum, 'poteri': poteri}
 
 # REF-COOL
