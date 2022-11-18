@@ -385,7 +385,7 @@ def ParallelCompute(args):
             Delta_min = min(Delt_Gcnd, Delt_Nturb, Delt_Gvd, Delt_Gnd)
             if n_GTU == 1 and Delta_min < 0:
                 print("Мощность ГТУ 100% и расход пара все еще слишком мал")
-            n_GTU = n_GTU - Delta_min / 500
+            n_GTU = n_GTU - Delta_min / 5
             GTU_input.at["n", 1] = n_GTU
 
             calculate_CCGT(
