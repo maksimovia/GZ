@@ -96,7 +96,7 @@ class turboustanovka:
                     print('Расход в СП2', G_sp2)
 
             Error_p = (Potb2_turb - Potb2_teplof) / Potb2_teplof * 100
-            Diafragma = max(0, Diafragma - Error_p / 1200)
+            Diafragma = max(0, Diafragma - Error_p / 1500)
             Diafragma_it.append(Diafragma)
             if abs(Error_p) < calctolerance:
                 # print("Максимальная погрешность определения давления в верхнем отборе",Error_p,)
