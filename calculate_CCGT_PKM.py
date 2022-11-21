@@ -122,7 +122,6 @@ def calculate_CCGT_PKM(arguments_all):
 
 def Calculate_CCGT_PKM_iter(arguments_all_it, Iter_pkm, pkm_pgu_tol):
     Maxiterations_KU_TU,    Maxiterations_cotel = arguments_all_it[0], arguments_all_it[1]
-    PKM_zaryad,PKM_razryad=arguments_all_it[14],arguments_all_it[15]
     start_time = time.time()
     water_streams0 = arguments_all_it[4]
     water_streams = arguments_all_it[8]
@@ -133,59 +132,52 @@ def Calculate_CCGT_PKM_iter(arguments_all_it, Iter_pkm, pkm_pgu_tol):
                round(water_streams.at["PEVD-DROSVD", "G"], 2))]
     Ggpk = [max([water_streams0.at["SMESH-GPK", "G"]],
                 round(water_streams.at["SMESH-GPK", "G"], 2))]
-    if PKM_zaryad:
 
-        for i in range(Iter_pkm):
-            if i < 6:
-                Maxiterations_KU_TU_new = 2
-                Maxiterations_cotel_new = 2
-                # print(Maxiterations_KU_TU_new,Maxiterations_cotel_new)
+    for i in range(Iter_pkm):
+        if i < 6:
+            Maxiterations_KU_TU_new = 2
+            Maxiterations_cotel_new = 2
+            # print(Maxiterations_KU_TU_new,Maxiterations_cotel_new)
 
-            else:
-                Maxiterations_KU_TU_new = Maxiterations_KU_TU
-                Maxiterations_cotel_new = Maxiterations_cotel
+        else:
+            Maxiterations_KU_TU_new = Maxiterations_KU_TU
+            Maxiterations_cotel_new = Maxiterations_cotel
 
-            # from calculate_CCGT_PKM import calculate_CCGT_PKM
+        # from calculate_CCGT_PKM import calculate_CCGT_PKM
 
-            arguments_all = arguments_all_it.copy()
-            arguments_all[0], arguments_all[1] = [
-                Maxiterations_KU_TU_new,
-                Maxiterations_cotel_new,
-            ]
+        arguments_all = arguments_all_it.copy()
+        arguments_all[0], arguments_all[1] = [
+            Maxiterations_KU_TU_new,
+            Maxiterations_cotel_new,
+        ]
 
-            gas_streams = calculate_CCGT_PKM(arguments_all)
-            ####################################
+        gas_streams = calculate_CCGT_PKM(arguments_all)
+        ####################################
+        print(
+            f"Время {i+1} итерации расчета КУ+ТУ с ПКМ: --- {round((time.time() - start_time), 1)} сек. ---"
+        )
+        Gst.append(round(water_streams.at["PEVD-DROSVD", "G"], 2))
+        try:
+            Ggpk.append(round(water_streams.at["SMESH-GPK", "G"], 2))
+
+        except:
+            Ggpk.append(0)
+        Err1 = abs((Gst[i] - Gst[i - 1]) / (Gst[i]) * 100)
+        Err3 = abs((Ggpk[i] - Ggpk[i - 1]) / (Ggpk[i]) * 100)
+
+        if i == Iter_pkm - 1:
+            print("Достигнуто максимальное количество итераций КУ+ПТУ+ПКМ")
+            print("Gst", Gst)
+            print("Ggpk", Ggpk)
+
+        if Err1 < pkm_pgu_tol and Err3 < pkm_pgu_tol:
+
             print(
-                f"Время {i+1} итерации расчета КУ+ТУ с ПКМ: --- {round((time.time() - start_time), 1)} сек. ---"
+                f"Расчет КУ+ПТУ+ПКМ закончен:--- %s сек. ---{round((time.time() - start_time), 1)}"
             )
-            Gst.append(round(water_streams.at["PEVD-DROSVD", "G"], 2))
-            try:
-                Ggpk.append(round(water_streams.at["SMESH-GPK", "G"], 2))
+            print("Gst", Gst)
+            print("Ggpk", Ggpk)
+            # print(Err1, Err3)
 
-            except:
-                Ggpk.append(0)
-            Err1 = abs((Gst[i] - Gst[i - 1]) / (Gst[i]) * 100)
-            Err3 = abs((Ggpk[i] - Ggpk[i - 1]) / (Ggpk[i]) * 100)
-
-            if i == Iter_pkm - 1:
-                print("Достигнуто максимальное количество итераций КУ+ПТУ+ПКМ")
-                print("Gst", Gst)
-                print("Ggpk", Ggpk)
-
-            if Err1 < pkm_pgu_tol and Err3 < pkm_pgu_tol:
-
-                print(
-                    f"Расчет КУ+ПТУ+ПКМ закончен:--- %s сек. ---{round((time.time() - start_time), 1)}"
-                )
-                print("Gst", Gst)
-                print("Ggpk", Ggpk)
-                # print(Err1, Err3)
-
-                break
-        return gas_streams
-    
-    if PKM_razryad:
-        gas_streams = calculate_CCGT_PKM(arguments_all_it)
-        return gas_streams
-        
-        
+            break
+    return gas_streams
