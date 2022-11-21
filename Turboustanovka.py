@@ -32,8 +32,11 @@ class turboustanovka:
         self.heaters = heaters
         self.electric = electric
         self.water = water
-        self.Diafragma = max(
-            self.water_streams.at["DOOTB1", "P"] - self.water_streams.at["INCND", "P"], 0.05)
+        if self.water_streams.at["DOOTB1", "P"] == self.water_streams.at["INCND", "P"]:
+            self.Diafragma=0.05
+        else:
+            
+            self.Diafragma = self.water_streams.at["DOOTB1", "P"] - self.water_streams.at["INCND", "P"]
         self.KN = nasos.nasos('KOND-KN', 'KN-GPK', water,
                               KPDnasos, water_streams, water_streams0)
 
@@ -96,7 +99,7 @@ class turboustanovka:
                     print('Расход в СП2', G_sp2)
 
             Error_p = (Potb2_turb - Potb2_teplof) / Potb2_teplof * 100
-            Diafragma = max(0, Diafragma - Error_p / 1493)
+            Diafragma = max(0, Diafragma - Error_p / 2000)
             Diafragma_it.append(Diafragma)
             if abs(Error_p) < calctolerance:
                 # print("Максимальная погрешность определения давления в верхнем отборе",Error_p,)
