@@ -185,7 +185,7 @@ def ParallelCompute(args):
 #     GTU_input.at["n", 1] = nagr
 #     GTU_input.at["tair", 1] = t_air_list
 
-    Max_iterations_minimum = 10
+    Max_iterations_minimum = 20
     if Teplo == 1:
         n_GTU = GTU_input.at["n", 1]
         Delt_Gcnd = (water_streams.at["INKOND", "G"] - 4.44) / 4.44
@@ -281,7 +281,7 @@ def ParallelCompute(args):
             Delta_min = min(Delt_Gcnd, Delt_Nturb, Delt_Gvd, Delt_Gnd)
             if n_GTU == 1 and Delta_min < 0:
                 print("Мощность ГТУ 100% и расход пара все еще слишком мал")
-            n_GTU = n_GTU - Delta_min / 10
+            n_GTU = n_GTU - Delta_min / 15
             n_GTU_it.append(round(n_GTU, 5))
             GTU_input.at["n", 1] = n_GTU
             Delta_n_GTU = abs((n_GTU_it[-1] - n_GTU_it[-2]) / n_GTU_it[-1] * 100)
@@ -302,7 +302,7 @@ def ParallelCompute(args):
 
     result = {
     "T_air":round(t_air_list,2),
-    "n_GTU":round(GTU_input.at["n", 1],2),
+    "n_GTU":round(GTU_input.at["n", 1],5),
     "GTU": round(electric.at["GTU", "N"], 4),
     "GTU_KPD": round(electric.at["GTU", "KPD"], 4),
     "Turbine": round(electric.at["Turbine", "Ni"], 4),
