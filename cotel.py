@@ -206,7 +206,7 @@ class heatexPEND:
             Tfirst = T12
         except:
             Tfirst = T11*0.9
-        sol = root(T12sved, T11*0.99,
+        sol = root(T12sved, T11-0.5,
                    method=self.calcmethod, tol=calctolerance)
         T12 = float(sol.x)
         H12 = self.gas.p_t(P1, T12)['h']
