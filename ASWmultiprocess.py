@@ -281,7 +281,7 @@ def ParallelCompute(args):
             Delta_min = min(Delt_Gcnd, Delt_Nturb, Delt_Gvd, Delt_Gnd)
             if n_GTU == 1 and Delta_min < 0:
                 print("Мощность ГТУ 100% и расход пара все еще слишком мал")
-            n_GTU = n_GTU - Delta_min / 15
+            n_GTU = n_GTU - Delta_min / 20
             n_GTU_it.append(round(n_GTU, 5))
             GTU_input.at["n", 1] = n_GTU
             Delta_n_GTU = abs((n_GTU_it[-1] - n_GTU_it[-2]) / n_GTU_it[-1] * 100)
@@ -299,6 +299,9 @@ def ParallelCompute(args):
                 break
             if i == Max_iterations_minimum - 1:
                 print("Достигнуто максимальное количество итераций минимального расхода в ПГУ", i+1)
+                print("Температура воздуха:", t_air_list)
+                print("ASW_bull:", ASW_bull)
+                print("ASWatm:", ASWatm)
 
     result = {
     "T_air":round(t_air_list,2),
