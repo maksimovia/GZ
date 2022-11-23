@@ -111,7 +111,7 @@ class turboustanovka:
                 print(
                     "Достигнуто максимальное количество итераций давления верхнего отбора"
                 )
-                print("Diafragma_it", Diafragma_it)
+                print("Diafragma_it", Diafragma_it[-4:])
                 if Diafragma == 0:
                     print(
                         'Невозможно получить необходимое давление, диафрагма полностью открыта')
