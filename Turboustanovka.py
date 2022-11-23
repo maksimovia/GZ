@@ -91,9 +91,9 @@ class turboustanovka:
                 if abs(Max_error) < calctolerance:
                     # print("Выход из цикла сведения турбины и теплофикации",Max_error,)
                     break
-                if j == maxiterations - 1:
-                    print(
-                        "Достигнуто максимальное количество итераций расхода и давления в турбине при работе с теплофикацией")
+                # if j == maxiterations - 1:
+                    # print(
+                    #     "Достигнуто максимальное количество итераций расхода и давления в турбине при работе с теплофикацией")
                     # print('Расход в конденсатор', G_CND)
                     # print('Расход в СП1', G_sp1)
                     # print('Расход в СП2', G_sp2)
@@ -119,7 +119,7 @@ class turboustanovka:
                     print('Расход в конденсатор равен нулю')
                 else:
                     print(
-                        'Погрешность давления в верхнем сетевом отборе в %: ', Error_p)
+                        'Погрешность давления в верхнем сетевом отборе в %: ', round(Error_p,3))
                     
                     # print(self.water_streams['SP1-OD':'KN-GPK','T':'G'])
                     # print(Potb2_turb - Potb2_teplof)
