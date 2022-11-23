@@ -243,5 +243,6 @@ class ku_tu:
                 print("Достигнуто максимальное количество итераций давления КУ+ПТУ:", i+1)
                 print('Pnd_it', Pnd_it)
                 print('Pvd_it', Pvd_it)
-                print('Max_error', Max_error)
+                print('Max_error_P', Max_error_P)
+                print('Max_error_G', Max_error_G)
                 

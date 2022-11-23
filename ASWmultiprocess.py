@@ -221,13 +221,13 @@ def ParallelCompute(args):
                 f"Началась {i+1} итерация расчета ПГУ: --- {round((time.time() - start_time), 1)} сек. ---")
             print("n_GTU: ", n_GTU_it)
             print("Delta_n_GTU: ", Delta_n_GTU)
-            if i < 4:
+            if i < 6:
                 # print("Число итераций меньше:", 3)
                 New_iterations_KU_TU, New_iterations_cotel, New_iterations_turbine, New_coeficient_PGU = (
                     2,
                     2,
                     15,
-                    10
+                    15
                 )
 
             else:
@@ -331,7 +331,7 @@ def ParallelCompute(args):
                     f"fin минимальная мощность ПГУ:--- {round((time.time() - start_time), 1)} сек. ---"
                 )
                 print("n_GTU:", n_GTU_it)
-                calculate_all.calculate_CCGT(args)
+                # calculate_all.calculate_CCGT(args)
                 break
             if i == Max_iterations_minimum - 1:
                 print(

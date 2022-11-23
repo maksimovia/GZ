@@ -926,15 +926,11 @@ class accum:
             # T_accum = SG.p_h(Psg, H2)['T']
             
             
-        def jdat_i_iter(self,time):
-            poteri = time*3600/1000*3.14*self._H*(self._T_accum-self._T_nar_vozd)/(1/2*self._lambda_min_vata*n.log((self._D+2*self._delta_min_vata)/self._D)+1/(100000*self._D)+1/(20*(self._D+2*self._delta_min_vata)))+ time*3600/1000*2*3.14*self._D**2/4*(self._T_accum-self._T_nar_vozd)/(1/20+1/100000+self._delta_min_vata/self._lambda_min_vata) #kJ
-            H2 = H2 - poteri/(self._V*self._kolichestvo*rosg)
-            T_accum = SG.p_h(Psg, H2)['T']   
-            return {'T_accum': T_accum, 'poteri': self._poteri, 'H2': H2}
-#             print('Температура сингаза',T_accum)
         
         for i in range(n_step):
-            jdat_i_iter(time_jdat_step)
+            poteri = time_jdat_step*3600/1000*3.14*self._H*(self._T_accum-self._T_nar_vozd)/(1/2*self._lambda_min_vata*n.log((self._D+2*self._delta_min_vata)/self._D)+1/(100000*self._D)+1/(20*(self._D+2*self._delta_min_vata)))+ time_jdat_step*3600/1000*2*3.14*self._D**2/4*(self._T_accum-self._T_nar_vozd)/(1/20+1/100000+self._delta_min_vata/self._lambda_min_vata) #kJ
+            H2 = H2 - poteri/(self._V*self._kolichestvo*rosg)
+            T_accum = SG.p_h(Psg, H2)['T']
 
         self.accumulation.at["PKM", "Qw"] = (
             self._V*self._kolichestvo*rosg)*(H2)  # хз надо ли
