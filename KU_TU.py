@@ -81,7 +81,7 @@ class ku_tu:
         Teplo_overflow = 0
         Maxiterations_cotel_new = min(3,Maxiterations_cotel)
         Maxiterations_cotel_tu_rashod_new=min(3,Maxiterations_KU_TU)
-        Maxiterations_KU_TU=min(3,Maxiterations_KU_TU)
+        # Maxiterations_KU_TU=min(3,Maxiterations_KU_TU)
         # print('Teplo',Teplo)
 
         for i in range(Maxiterations_KU_TU):
@@ -243,3 +243,5 @@ class ku_tu:
                 print("Достигнуто максимальное количество итераций давления КУ+ПТУ:", i+1)
                 print('Pnd_it', Pnd_it)
                 print('Pvd_it', Pvd_it)
+                print('Max_error', Max_error)
+                

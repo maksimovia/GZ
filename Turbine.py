@@ -268,6 +268,15 @@ class turbine:
         self.Gsmesh = self.Gnd + self.Gvd
         self.Hsmesh = (self.Hnd * self.Gnd +
                        self.Hvd_out * self.Gvd) / self.Gsmesh
+        if self.Hsmesh<0:
+            print("self.Hsmesh<0 ")
+            print("self.Hsmesh",self.Hsmesh)
+            print("self.Hvd_out",self.Hvd_out)
+            print("self.Hnd",self.Hnd)
+            print("self.Gvd",self.Gvd)
+            print("self.Gnd",self.Gnd)
+            self.Hsmesh=max(self.Hvd_out,self.Hnd)
+        
 
         # отсек 2
         self.Gotb2 = self.Gsmesh

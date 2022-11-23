@@ -91,6 +91,13 @@ class heatex:
                 Pr1av = self.gas.p_t(P1, T1av)['Prandtl']
                 nu1av = self.gas.p_t(P1, T1av)['nu']
                 ro1av = self.gas.p_t(P1, T1av)['rho']
+                
+                if isinstance(ro1av, float)==False:
+                    print("ro1av is not float")
+                if isinstance(nu1av, float)==False:
+                    print("nu1av is not float")  
+                    
+                
                 kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
                     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
                 Qq = self.Q0 / (kk*dt)
