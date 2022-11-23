@@ -213,6 +213,7 @@ def calculate_CCGT(args):
     )
     start_time = time.time()
     # Расчет КУ и ТУ
+    print(water_streams)
     KU_and_TU.calculate(
         Teplo,
         Calctolerance,

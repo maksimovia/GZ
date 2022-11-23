@@ -94,6 +94,7 @@ class ku_tu:
                 Cotel_result = self.Whole_cotel.calc(
                     Calctolerance_new, Maxiterations_cotel_new)
                 
+                
                 Gnd1 = self.water_streams.at[self.streamKU_ND, "G"]
                 Gnd2 = self.water_streams.at[self.streamST_ND, "G"]
                 Gvd1 = self.water_streams.at[self.streamKU_VD, "G"]
@@ -225,6 +226,7 @@ class ku_tu:
             # print('Max_error', Max_error)
             print(
                 f"Время {i+1} итерации расчета КУ+ТУ:---  {round((time.time() - start_time), 1)} сек. ---")
+            # print(self.water_streams)
             if Teplo_overflow == 1:
                 print('Слишком большая теплофикационная мощность, расчет окончен.')
                 print(

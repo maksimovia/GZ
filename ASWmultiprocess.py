@@ -179,7 +179,12 @@ def ParallelCompute(args):
            ASWatm,
            ]
 
-    calculate_all.calculate_CCGT(args)
+    
+    if Сalculate_minimum == False:
+        print("Сalculate_minimum",Сalculate_minimum)
+        print("ASW_bull:", ASWbul)
+        print("ASWatm:", ASWatm)
+        calculate_all.calculate_CCGT(args)
     # steamVD_to_turbine = 0
 #     GTU_input = pd.read_excel("input.xlsx", sheet_name="GTU_input", index_col=0)
 #     GTU_input.at["n", 1] = nagr
@@ -197,6 +202,7 @@ def ParallelCompute(args):
         if n_GTU == 1 and Delta_min < 0:
             print("Мощность ГТУ 100% и расход пара все еще слишком мал")
 
+    
     if Сalculate_minimum == True:
         n_GTU = GTU_input.at["n", 1]
         start_time = time.time()

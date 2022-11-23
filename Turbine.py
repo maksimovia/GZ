@@ -129,6 +129,11 @@ class turbine:
             print("При расчете Стодола-флюгеля давление в верхнем отборе оказалось меньше 0, а именно корень из:",under_square)
         else:
             pv1 = n.sqrt(pn1**2 + ((D1 / D0) ** 2) * (pv0**2 - pn0**2) *(pv1 * Vv1 / (pv0 * Vv0)))
+        if pv1<=pn1:
+            print(f"Давление по Стодола-Флюгеля не правильно рассчитано:pv1={pv1}< pn1={pn1}")
+            delta=0.001
+            print(f"Принимаем давление в верхнем отборе на delta={delta} больше чем в нижнем")
+            pv1=pn1+delta
         return pv1
 
     def calculate_cond(self, tair, G):
@@ -150,6 +155,10 @@ class turbine:
         eff_0 = 0.962
         q = Q1/Q0
         eff_1 = (-0.2366*q**2+0.475*q+0.7236)/eff_0
+        if eff_1<0:
+            # print("Удельная эффективность в отсеке меньше нуля ",eff_1)
+            eff_1=0
+    
         return eff_1
 
     def off_design_relative_efficiency_CND(self, pin, Hin, pout, Hout, G0, Vin0, Vout0, G1, Vin1, Vout1):
@@ -199,7 +208,7 @@ class turbine:
             Eff_massflow = 1
         Efficiency_out = KPD0i*Eff_massflow
 #         print(Efficiency_out,'check')
-        Efficiency_out = max(Efficiency_out, 0)
+        Efficiency_out = max(Efficiency_out, -0.2)
         Efficiency_out = min(Efficiency_out, 1)  # Опарин внес
 
         return Efficiency_out
@@ -249,8 +258,8 @@ class turbine:
         self.Gvd_out = self.Gvd
         self.Vvd = 1 / self.water.p_h(self.Pvd, self.Hvd)["rho"]
         self.Vvd_out = 1 / self.water.p_h(self.Pvd_out, self.Hvd_out)["rho"]
-        self.KPD_ots1 = self.effiency0_ots1*self.off_design_relative_efficiency(
-            self.Gvd0, self.Vvd0, self.Vvd_out0, self.Gvd_out, self.Vvd, self.Vvd_out)
+        self.KPD_ots1 = min(1,self.effiency0_ots1*self.off_design_relative_efficiency(
+            self.Gvd0, self.Vvd0, self.Vvd_out0, self.Gvd_out, self.Vvd, self.Vvd_out))
         ots1_out = self.expansion(
             self.Pvd, self.Hvd, self.Pvd_out, self.KPD_ots1)
         self.Hvd_out = ots1_out["h"]
@@ -264,8 +273,8 @@ class turbine:
         self.Gotb2 = self.Gsmesh
         self.Vsmesh = 1 / self.water.p_h(self.Psmesh, self.Hsmesh)["rho"]
         self.Votb2 = 1 / self.water.p_h(self.Potb2, self.Hotb2)["rho"]
-        self.KPD_ots2 = self.effiency0_ots2*self.off_design_relative_efficiency(
-            self.Gsmesh0, self.Vsmesh0, self.Votb20, self.Gsmesh, self.Vsmesh, self.Votb2)
+        self.KPD_ots2 = min(1,self.effiency0_ots2*self.off_design_relative_efficiency(
+            self.Gsmesh0, self.Vsmesh0, self.Votb20, self.Gsmesh, self.Vsmesh, self.Votb2))
         ots2_out = self.expansion(
             self.Psmesh, self.Hsmesh, self.Potb2, self.KPD_ots2)
         self.Hotb2 = ots2_out["h"]
@@ -273,8 +282,11 @@ class turbine:
         # отсек 3
         self.Votb2 = 1 / self.water.p_h(self.Potb2, self.Hotb2)["rho"]
         self.Votb1 = 1 / self.water.p_h(self.Potb1, self.Hotb1)["rho"]
-        self.KPD_ots3 = self.effiency0_ots3*self.off_design_relative_efficiency(
-            self.Gotb10, self.Votb20, self.Votb10, self.Gotb1, self.Votb2, self.Votb1)
+        self.KPD_ots3 = min(1,self.effiency0_ots3*self.off_design_relative_efficiency(
+            self.Gotb10, self.Votb20, self.Votb10, self.Gotb1, self.Votb2, self.Votb1))
+        if self.KPD_ots3<0:
+            print("Эффективность 3 отсека меньше нуля ",0)
+            self.KPD_ots3=0
         ots3_out = self.expansion(
             self.Potb2, self.Hotb2, self.Potb1, self.KPD_ots3)
         self.Hotb1 = ots3_out["h"]
@@ -296,8 +308,8 @@ class turbine:
         self.Vin_kond = 1 / self.water.p_h(self.Pin_kond, self.Hin_kond)["rho"]
         self.KPD_ots4 = self.off_design_relative_efficiency_CND(
             self.Pin_cnd, self.Hin_cnd, self.Pin_kond, self.Hin_kond, self.Gin_cnd0, self.Vin_cnd0, self.Vin_kond0, self.Gin_cnd, self.Vin_cnd, self.Vin_kond)
-        if self.KPD_ots4 < 0:
-            print(self.Pin_cnd, self.Hin_cnd, self.Pin_kond, self.KPD_ots4)
+        # if self.KPD_ots4 < 0:
+        #     print("Pin_cnd",self.Pin_cnd, "Hin_cnd",self.Hin_cnd, "Pin_kond",self.Pin_kond, "KPD_ots4",self.KPD_ots4)
         ots4_out = self.expansion(
             self.Pin_cnd, self.Hin_cnd, self.Pin_kond, self.KPD_ots4)
         self.Hin_kond = ots4_out["h"]
@@ -411,7 +423,13 @@ class turbine:
                 self.KPD_ots2,
                 self.KPD_ots3,
                 self.KPD_ots4]
+            # print("P_out_exp",P_out)
+            # print("H_out",H_out)
+            # print("Eff_out",Eff_out)
+            # print("Eff_0",Eff_0)
             self.calculate_turbine_stodol_flugel()
+            
+
             P_out = [
                 self.Pvd,
                 self.Pvd_out,
@@ -421,17 +439,21 @@ class turbine:
                 self.Potb1,
                 self.Pin_cnd,
                 self.Pin_kond]
+            # print("P_out_stodol",P_out)
+            
             P_out2 = P_out.copy()
-            Errors = list(map(lambda x, y: (x - y) / x * 100, P_out1, P_out2))
+            Errors = list(map(lambda x, y: abs((x - y) / x * 100), P_out1, P_out2))
+            
             Max_error = max(Errors)
             if abs(Max_error) < calctolerance and i > 1:
-                # print("Максимальная погрешность определения давления в отборах", Max_error)
+                print("Максимальная погрешность определения давления в отборах", Max_error)
                 if min(H_out) < 0:
                     print(Eff_out)
                     print(H_out)
                 break
-            if i == maxiterations-1:
-                print('Достигнуто максимальное количество итераций')
+            # if i == maxiterations-1:
+                # print('Достигнуто максимальное количество итераций турбины')
+                # print("P_out2",P_out2)
         G_out = [self.Gvd,
                  self.Gvd_out,
                  self.Gnd,

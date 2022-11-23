@@ -94,9 +94,9 @@ class turboustanovka:
                 if j == maxiterations - 1:
                     print(
                         "Достигнуто максимальное количество итераций расхода и давления в турбине при работе с теплофикацией")
-                    print('Расход в конденсатор', G_CND)
-                    print('Расход в СП1', G_sp1)
-                    print('Расход в СП2', G_sp2)
+                    # print('Расход в конденсатор', G_CND)
+                    # print('Расход в СП1', G_sp1)
+                    # print('Расход в СП2', G_sp2)
 
             Error_p = (Potb2_turb - Potb2_teplof) / Potb2_teplof * 100
             Diafragma = max(0, Diafragma - Error_p / 2500)
@@ -229,7 +229,7 @@ class turboustanovka:
         self.water_streams.at["SMESHOD-REC", "T"] = t_smeshod
         self.water_streams.at["SMESHOD-REC", "H"] = h_smeshod
         self.water_streams.at["SMESHOD-REC", "G"] = G_smeshod
-#         print("Fin турбоустановка:--- %s сек. ---" %
-#               round((time.time() - start_time), 2))
+        # print("Fin турбоустановка:--- %s сек. ---" %
+        #       round((time.time() - start_time), 2))
 
         return Result

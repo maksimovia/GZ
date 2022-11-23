@@ -95,12 +95,12 @@ class heatex:
                     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
                 Qq = self.Q0 / (kk*dt)
                 return ((Q-Qq)/Q)*100
-        Tfirst = T11
-        try:
-            Tfirst = T12
-        except:
-            Tfirst = T11*0.9
-        sol = root(T12sved, max(Tfirst, T21+5),
+        # Tfirst = T11
+        # try:
+        #     Tfirst = T12
+        # except:
+        #     Tfirst = T11*0.9
+        sol = root(T12sved, T11*0.9,
                    method=self.calcmethod, tol=calctolerance)
         T12 = float(sol.x)
         H12 = self.gas.p_t(P1, T12)['h']
@@ -601,8 +601,8 @@ class cotel_all:
                     if abs(Error_gpk) < calctolerance_new:
                         break
                     # if i == it - 1:
-                    #     print(
-                    #         "Достигнуто максимальное количество итераций контура ГПК")
+                        # print(
+                        #     "Достигнуто максимальное количество итераций контура ГПК")
 
                 # Баланс ППНД+ИНД+ГПК
                 Qgas1ND = self.KPD*self.gas_streams.at['EVD-PPND', 'G'] * \
@@ -639,9 +639,9 @@ class cotel_all:
             ErrorALL = (Qgasall-Qwatall)/Qgasall*100
             # print('dQ/Qsumm', ErrorALL)
             if abs((Qgasall-Qwatall)/Qgasall*100) < calctolerance:
-#                 print("Fin котел-утилизатора:--- %s сек. ---" %
-#                       round((time.time() - start_time), 2))
-#                 print('dQ/Qsumm', ErrorALL)
+                # print("Fin котел-утилизатора:--- %s сек. ---" %
+                      # round((time.time() - start_time), 2))
+                # print('dQ/Qsumm', ErrorALL)
                 # print('dQ/Qvd', ErrorVD)
                 # print('dQ/Qnd', ErrorND)
                 break
