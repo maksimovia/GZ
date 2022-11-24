@@ -315,6 +315,9 @@ def ParallelCompute(args):
             if n_GTU == 1 and Delta_min < 0:
                 print("Мощность ГТУ 100% и расход пара все еще слишком мал")
             n_GTU = n_GTU - Delta_min / New_coeficient_PGU
+            if n_GTU>1:
+                print("Мощность больше 1 у ГТУ")
+                n_GTU=min(n_GTU,1.1)
             n_GTU_it.append(round(n_GTU, 5))
             GTU_input.at["n", 1] = n_GTU
             Delta_n_GTU = abs(

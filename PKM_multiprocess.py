@@ -183,9 +183,9 @@ def ParallelCompute_PKM(air_temperature):
     
     start_time_all = time.time()
 
-    n_GTU_it = [0]
+    n_GTU_it = [0.5]
     Delta_n_GTU = 100
-    coeficient_PGU = 5
+    coeficient_PGU = 7
     if Сalculate_minimum == True:
         gas_streams.loc["GTU-PEVD", "G"] = gas_streams.loc["GTU-KU", "G"]
         n_GTU = GTU_input.at["n", 1]
@@ -202,7 +202,7 @@ def ParallelCompute_PKM(air_temperature):
                     New_iterations_turbine,
                     New_Iter_pkm,
                     New_coeficient_PGU
-                ) = (3, 2, 15, 4, 1)
+                ) = (3, 2, 15, 4, 5)
             else:
                 # print("Delta_n_GTU: ", Delta_n_GTU)
                 (
@@ -245,6 +245,13 @@ def ParallelCompute_PKM(air_temperature):
 
             Delta_min = min(Delt_Gcnd, Delt_Nturb, Delt_Gvd, Delt_Gnd)
             n_GTU = n_GTU - Delta_min / New_coeficient_PGU
+            if n_GTU>1:
+                print("Мощность больше 1 у ГТУ")
+                n_GTU=min(n_GTU,1.1)
+                
+            if n_GTU<0:
+                print("Мощность меньше 0 у ГТУ")
+                n_GTU=0.6
             Delta_n_GTU = abs(
                 (n_GTU_it[-1] - n_GTU_it[-2]) / n_GTU_it[-1] * 100)
             GTU_input.at["n", 1] = n_GTU
