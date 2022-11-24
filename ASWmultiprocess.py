@@ -214,7 +214,7 @@ def ParallelCompute(args):
         start_time = time.time()
         n_GTU_it = [0.5,1]
         Delta_n_GTU = 100
-        coeficient_PGU = 15
+        coeficient_PGU = 10
         print("SWIN-TURB G",water_streams.at["SWIN-TURB", 'G'])
         for i in range(Max_iterations_minimum):
 
@@ -223,7 +223,7 @@ def ParallelCompute(args):
             print("n_GTU: ", n_GTU_it)
             print("Delta_n_GTU: ", Delta_n_GTU)
             print("Delta_min: ", Delta_min)
-            if i<7: #Delta_n_GTU > 1: 
+            if i<3: #Delta_n_GTU > 1: 
                 # print("Число итераций меньше:", 3)
                 New_iterations_KU_TU, New_iterations_cotel, New_iterations_turbine, New_coeficient_PGU = (
                     3,
@@ -329,7 +329,7 @@ def ParallelCompute(args):
 
             calculate_all.calculate_CCGT(args)
             # print(f"Отклонение от ограничения минимальное равно {Delta_min}")
-            if abs(Delta_min) < Calctolerance and Delta_n_GTU < Calctolerance/10:
+            if abs(Delta_min) < Calctolerance and Delta_n_GTU < Calctolerance:
 
                 print(
                     f"Отклонение от ограничения минимальное равно {Delta_min}")
