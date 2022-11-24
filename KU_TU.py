@@ -133,10 +133,10 @@ class ku_tu:
                 
 
                 # Calctolerance_new = Calctolerance
-                if i > 2:
+                if i > 0:
                     Calctolerance_new = Calctolerance
                     Maxiterations_cotel_new = Maxiterations_cotel
-                if i>5:
+                if i>1:
                     Maxiterations_cotel_tu_rashod_new= Maxiterations_KU_TU
 #                     if i == 3 and j == 0:
 #                         print('Переход к оригинальной точности расчета',

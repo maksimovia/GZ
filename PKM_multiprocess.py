@@ -59,7 +59,7 @@ def ParallelCompute_PKM(air_temperature):
 
     # Параметры режима работы ПГУ
     # Расчет для минимума нагрузки
-    Сalculate_minimum = False
+    Сalculate_minimum = True
 
     # Расчет для работы с теплофикацией
     # Teplo = int(False)
@@ -196,7 +196,7 @@ def ParallelCompute_PKM(air_temperature):
             print("n_GTU:", n_GTU_it)
             print("Delta_n_GTU: ", Delta_n_GTU)
             print("Delta_min: ", Delta_min)
-            if i<7 :#Delta_n_GTU > 1 :
+            if i<3 :#Delta_n_GTU > 1 :
                 (
                     New_iterations_KU_TU,
                     New_iterations_cotel,
@@ -266,7 +266,7 @@ def ParallelCompute_PKM(air_temperature):
             if n_GTU == 1 and Delta_min < 0:
                 print("Мощность ГТУ 100% и расход пара все еще слишком мал")
 
-            if abs(Delta_min) < Calctolerance and Delta_n_GTU < Calctolerance/10:
+            if abs(Delta_min) < Calctolerance and Delta_n_GTU < Calctolerance:
                 arguments_all_it[0], arguments_all_it[1], arguments_all_it[2] = (
                     Maxiterations_KU_TU,
                     Maxiterations_cotel,

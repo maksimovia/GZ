@@ -213,7 +213,13 @@ class heatexPEND:
                 Pr1av = self.gas.p_t(P1, T1av)['Prandtl']
                 nu1av = self.gas.p_t(P1, T1av)['nu']
                 ro1av = self.gas.p_t(P1, T1av)['rho']
-                kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
+                znamenatel = (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
+                if isinstance(znamenatel,float)== False:
+                    print("Возникли комплексные числа в ПЕНД")
+                    kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
+                    (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
+                else:
+                    kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
                     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
                 Qq = self.Q0 / (kk*dt)
                 return ((Q-Qq)/Q)*100
