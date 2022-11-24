@@ -377,6 +377,7 @@ def ParallelCompute_PKM(air_temperature):
         "Calculate_minimum": Сalculate_minimum,
         "Delta_P_Diafragma": round(Delta_P_Diafragma, 4),
         "T_accum": round(accumulation.at["PKM", "T"], 4),
+        "time to calc":time_all,
         
         "gas_streams_zaryad": gas_streams_zaryad,
         "water_streams_zaryad": water_streams_zaryad,
