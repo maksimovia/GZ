@@ -107,13 +107,15 @@ class heatex:
         #     Tfirst = T12
         # except:
         #     Tfirst = T11*0.9
-        sol = root(T12sved, T11*0.9,
+        sol = root(T12sved, T11-1,
                    method=self.calcmethod, tol=calctolerance)
         T12 = float(sol.x)
         H12 = self.gas.p_t(P1, T12)['h']
         Q = G1*(H11-H12)*self.KPD
         Qg = G1*(H11-H12)
         H22 = H21 + (Q/G2)
+        if H22<0:
+            print("self.stream22 меньше нуля: ", self.stream22)
         T22 = self.water.p_h(P22, H22)['T']
         return {'Tg': T12, 'Pg': P12, 'Hg': H12, 'Gg': G1, 'Qg': Qg, 'Tw': T22, 'Pw1': P21, 'Pw2': P22, 'Hw': H22, 'Gw': G2, 'Qw': Q, 'KPD': self.KPD}
 
@@ -220,6 +222,8 @@ class heatexPEND:
         Q = G1*(H11-H12)*self.KPD
         Qg = G1*(H11-H12)
         H22 = H21 + (Q/G2)
+        if H22<0:
+            print("self.stream22 меньше нуля: ", self.stream22)
         T22 = self.water.p_h(P22, H22)['T']
         return {'Tg': T12, 'Pg': P12, 'Hg': H12, 'Gg': G1, 'Qg': Qg, 'Tw': T22, 'Pw1': P21, 'Pw2': P22, 'Hw': H22, 'Gw': G2, 'Qw': Q, 'KPD': self.KPD}
 
@@ -300,18 +304,21 @@ class evaporVD:
                     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
                 Qq = self.Q0 / (kk*dt)
                 return ((Q-Qq)/Q)*100
-        Tfirst = T11
-        try:
-            Tfirst = T12
-        except:
-            Tfirst = T11*0.9
-        sol = root(T12sved, max(Tfirst, T21+5),
+        # Tfirst = T11
+        # try:
+        #     Tfirst = T12
+        # except:
+        #     Tfirst = T11*0.9
+        sol = root(T12sved,  T21+0.5,
                    method=self.calcmethod, tol=calctolerance)
         T12 = float(sol.x)
         H12 = self.gas.p_t(P1, T12)['h']
         Q = G1*(H11-H12)*self.KPD
         Qg = G1*(H11-H12)
         H22 = self.water.p_q(P2, 1)['h']
+        if H22<0:
+            print("self.stream22 меньше нуля: ", self.stream22)
+            H22=self.water_streams.at[self.stream22, 'H']
         T22 = self.water.p_h(P2, H22)['T']
         G2 = Q/(H22-H21)
         return {'Tg': T12, 'Pg': P1, 'Hg': H12, 'Gg': G1, 'Qg': Qg, 'Tw': T22, 'Pw': P2, 'Hw': H22, 'Gw': G2, 'Qw': Q, 'KPD': self.KPD}
@@ -405,6 +412,8 @@ class evaporND:
         Q = G1*(H11-H12)*self.KPD
         Qg = G1*(H11-H12)
         H22 = self.water.p_q(P2, 1)['h']
+        if H22<0:
+            print("self.stream22 меньше нуля: ", self.stream22)  
         T22 = self.water.p_h(P2, H22)['T']
         Hvd = self.water.p_q(P2, 0)['h']
         G2 = (Q - Dvd*(Hvd-H21))/(H22-H21)

@@ -212,22 +212,22 @@ def ParallelCompute(args):
     if Сalculate_minimum == True:
         n_GTU = GTU_input.at["n", 1]
         start_time = time.time()
-        n_GTU_it = [0]
+        n_GTU_it = [0,-1]
         Delta_n_GTU = 100
-        coeficient_PGU = 30
+        coeficient_PGU = 15
         for i in range(Max_iterations_minimum):
 
             print(
                 f"Началась {i+1} итерация расчета ПГУ: --- {round((time.time() - start_time), 1)} сек. ---")
             print("n_GTU: ", n_GTU_it)
             print("Delta_n_GTU: ", Delta_n_GTU)
-            if i < 6:
+            if Delta_n_GTU > 1:
                 # print("Число итераций меньше:", 3)
                 New_iterations_KU_TU, New_iterations_cotel, New_iterations_turbine, New_coeficient_PGU = (
                     2,
                     2,
                     15,
-                    15
+                    10
                 )
 
             else:

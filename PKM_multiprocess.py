@@ -180,10 +180,12 @@ def ParallelCompute_PKM(air_temperature):
     ################Расчет минимальной нагрузки ГТУ при остальных нормальных условиях############
 
     Max_iterations_minimum = 20
+    
+    start_time_all = time.time()
 
     n_GTU_it = [0]
     Delta_n_GTU = 100
-    coeficient_PGU = 10
+    coeficient_PGU = 5
     if Сalculate_minimum == True:
         gas_streams.loc["GTU-PEVD", "G"] = gas_streams.loc["GTU-KU", "G"]
         n_GTU = GTU_input.at["n", 1]
@@ -192,16 +194,17 @@ def ParallelCompute_PKM(air_temperature):
         n_GTU_it.append(round(n_GTU, 5))
         for i in range(Max_iterations_minimum):
             print("n_GTU:", n_GTU_it)
-            if i < 6:
+            print("Delta_n_GTU: ", Delta_n_GTU)
+            if Delta_n_GTU > 1:
                 (
                     New_iterations_KU_TU,
                     New_iterations_cotel,
                     New_iterations_turbine,
                     New_Iter_pkm,
                     New_coeficient_PGU
-                ) = (2, 2, 15, 4, 7)
+                ) = (3, 2, 15, 4, 1)
             else:
-                print("Delta_n_GTU: ", Delta_n_GTU)
+                # print("Delta_n_GTU: ", Delta_n_GTU)
                 (
                     New_iterations_KU_TU,
                     New_iterations_cotel,
@@ -347,6 +350,9 @@ def ParallelCompute_PKM(air_temperature):
     Potb2_turb = water_streams.at["DOOTB2", "P"]
     Potb2_teplof = water_streams.at["OTB2-SP2", "P"]
     Delta_P_Diafragma=Potb2_teplof-Potb2_turb
+    
+    time_all=time.time() -start_time_all
+    print(f"Расчет окончен для температуры {air_temperature}:--- {round((time_all), 1)} сек. ---")
 
     result = {
         "T_air": round(air_temperature, 2),
@@ -364,6 +370,7 @@ def ParallelCompute_PKM(air_temperature):
         "Calculate_minimum": Сalculate_minimum,
         "Delta_P_Diafragma": round(Delta_P_Diafragma, 4),
         "T_accum": round(accumulation.at["PKM", "T"], 4),
+        
         "gas_streams_zaryad": gas_streams_zaryad,
         "water_streams_zaryad": water_streams_zaryad,
         "syngas_streams_zaryad": syngas_streams_zaryad,
