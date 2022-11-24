@@ -59,7 +59,7 @@ def ParallelCompute_PKM(air_temperature):
 
     # Параметры режима работы ПГУ
     # Расчет для минимума нагрузки
-    Сalculate_minimum = True
+    Сalculate_minimum = False
 
     # Расчет для работы с теплофикацией
     # Teplo = int(False)
@@ -185,7 +185,7 @@ def ParallelCompute_PKM(air_temperature):
 
     n_GTU_it = [0.5]
     Delta_n_GTU = 100
-    coeficient_PGU = 10
+    coeficient_PGU = 5
     if Сalculate_minimum == True:
         gas_streams.loc["GTU-PEVD", "G"] = gas_streams.loc["GTU-KU", "G"]
         n_GTU = GTU_input.at["n", 1]
@@ -195,14 +195,15 @@ def ParallelCompute_PKM(air_temperature):
         for i in range(Max_iterations_minimum):
             print("n_GTU:", n_GTU_it)
             print("Delta_n_GTU: ", Delta_n_GTU)
-            if Delta_n_GTU > 1:
+            print("Delta_min: ", Delta_min)
+            if i<7 :#Delta_n_GTU > 1 :
                 (
                     New_iterations_KU_TU,
                     New_iterations_cotel,
                     New_iterations_turbine,
                     New_Iter_pkm,
                     New_coeficient_PGU
-                ) = (3, 2, 15, 4, 5)
+                ) = (3, 2, 15, 4, 3)
             else:
                 # print("Delta_n_GTU: ", Delta_n_GTU)
                 (
@@ -371,10 +372,10 @@ def ParallelCompute_PKM(air_temperature):
         "DK": round(electric.at["DK", "N"], 4),
         "PEN": round(electric.at["PEN", "Ni"], 4),
         "Turbine_Qt": round(heaters.at["SP2", "Qw"]+heaters.at["SP1", "Qw"]+heaters.at["OD", "Qw"], 4),
-        "PKM_Qt": round(accumulation.at["ASW", "Qw"]/(vremya*3600), 4),
+        # "PKM_Qt": round(accumulation.at["ASW", "Qw"]/(vremya*3600), 4),
         # "Delta_P_Diafragma":round(water_streams.at["DOOTB1", "P"]-water_streams.at["INCND", "P"],4),
         "INKOND": round(water_streams.at["INKOND", "G"], 4),
-        "Calculate_minimum": Сalculate_minimum,
+        # "Calculate_minimum": Сalculate_minimum,
         "Delta_P_Diafragma": round(Delta_P_Diafragma, 4),
         "T_accum": round(accumulation.at["PKM", "T"], 4),
         "time to calc":time_all,

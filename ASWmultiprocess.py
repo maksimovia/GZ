@@ -212,19 +212,21 @@ def ParallelCompute(args):
     if Сalculate_minimum == True:
         n_GTU = GTU_input.at["n", 1]
         start_time = time.time()
-        n_GTU_it = [0,-1]
+        n_GTU_it = [0.5,1]
         Delta_n_GTU = 100
         coeficient_PGU = 15
+        print("SWIN-TURB G",water_streams.at["SWIN-TURB", 'G'])
         for i in range(Max_iterations_minimum):
 
             print(
                 f"Началась {i+1} итерация расчета ПГУ: --- {round((time.time() - start_time), 1)} сек. ---")
             print("n_GTU: ", n_GTU_it)
             print("Delta_n_GTU: ", Delta_n_GTU)
-            if Delta_n_GTU > 1:
+            print("Delta_min: ", Delta_min)
+            if i<7: #Delta_n_GTU > 1: 
                 # print("Число итераций меньше:", 3)
                 New_iterations_KU_TU, New_iterations_cotel, New_iterations_turbine, New_coeficient_PGU = (
-                    2,
+                    3,
                     2,
                     15,
                     10
@@ -317,7 +319,9 @@ def ParallelCompute(args):
             n_GTU = n_GTU - Delta_min / New_coeficient_PGU
             if n_GTU>1:
                 print("Мощность больше 1 у ГТУ")
-                n_GTU=min(n_GTU,1.1)
+                print(Delt_Gcnd, Delt_Nturb, Delt_Gvd, Delt_Gnd)
+                print(water_streams)
+                # n_GTU=min(n_GTU,1.1)
             n_GTU_it.append(round(n_GTU, 5))
             GTU_input.at["n", 1] = n_GTU
             Delta_n_GTU = abs(
@@ -325,7 +329,7 @@ def ParallelCompute(args):
 
             calculate_all.calculate_CCGT(args)
             # print(f"Отклонение от ограничения минимальное равно {Delta_min}")
-            if abs(Delta_min) < Calctolerance and Delta_n_GTU < Calctolerance:
+            if abs(Delta_min) < Calctolerance and Delta_n_GTU < Calctolerance/10:
 
                 print(
                     f"Отклонение от ограничения минимальное равно {Delta_min}")
