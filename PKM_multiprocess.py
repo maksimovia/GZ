@@ -185,7 +185,7 @@ def ParallelCompute_PKM(air_temperature):
 
     n_GTU_it = [0.5]
     Delta_n_GTU = 100
-    coeficient_PGU = 7
+    coeficient_PGU = 10
     if Сalculate_minimum == True:
         gas_streams.loc["GTU-PEVD", "G"] = gas_streams.loc["GTU-KU", "G"]
         n_GTU = GTU_input.at["n", 1]
@@ -391,4 +391,5 @@ def ParallelCompute_PKM(air_temperature):
         "heaters_razryad":  heaters_razryad,
         "accumulation_razryad":    accumulation_razryad,
     }
+    print(result)
     return result

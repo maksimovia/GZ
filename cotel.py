@@ -78,6 +78,10 @@ class heatex:
                 H12 = self.gas.p_t(P1, T12)['h']
                 Q = G1*(H11-H12)*self.KPD
                 H22 = H21 + (Q/G2)
+                if H22<0:
+                    print("Энтальпия внутри ПЕНД стала меньше 0: ", H22)
+                    t_opa=T11-1
+                    H22=self.water.p_t(P22, t_opa)['h']
                 T22 = self.water.p_h(P22, H22)['T']
                 dTmin = min(T11-T22, T12-T21)
                 dTmax = max(T11-T22, T12-T21)
@@ -96,7 +100,6 @@ class heatex:
                     print("ro1av is not float")
                 if isinstance(nu1av, float)==False:
                     print("nu1av is not float")  
-                    
                 
                 kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
                     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
@@ -107,7 +110,7 @@ class heatex:
         #     Tfirst = T12
         # except:
         #     Tfirst = T11*0.9
-        sol = root(T12sved, T11-1,
+        sol = root(T12sved, max(T11*0.9,T11-0.5),
                    method=self.calcmethod, tol=calctolerance)
         T12 = float(sol.x)
         H12 = self.gas.p_t(P1, T12)['h']
@@ -193,6 +196,10 @@ class heatexPEND:
                 H12 = self.gas.p_t(P1, T12)['h']
                 Q = G1*(H11-H12)*self.KPD
                 H22 = H21 + (Q/G2)
+                if H22<0:
+                    print("Энтальпия внутри ПЕНД стала меньше 0: ", H22)
+                    t_opa=T11-1
+                    H22=self.water.p_t(P22, t_opa)['h']
                 T22 = self.water.p_h(P22, H22)['T']
                 dTmin = min(T11-T22, T12-T21)
                 dTmax = max(T11-T22, T12-T21)
@@ -224,7 +231,10 @@ class heatexPEND:
         H22 = H21 + (Q/G2)
         if H22<0:
             print("self.stream22 меньше нуля: ", self.stream22)
-        T22 = self.water.p_h(P22, H22)['T']
+            T22=T11-0.5
+            H22=self.water.p_t(P22, T22)['h']
+        else:
+            T22 = self.water.p_h(P22, H22)['T']
         return {'Tg': T12, 'Pg': P12, 'Hg': H12, 'Gg': G1, 'Qg': Qg, 'Tw': T22, 'Pw1': P21, 'Pw2': P22, 'Hw': H22, 'Gw': G2, 'Qw': Q, 'KPD': self.KPD}
 
 
