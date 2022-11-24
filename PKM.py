@@ -902,7 +902,7 @@ class accum:
         T_nar_vozd = water_streams.loc['AIR', 'T']
         T_accum = syngas_streams.loc['Separ-SGaccum', 'T']
         Psg = syngas_streams.loc['Separ-SGaccum', 'P']
-        # НАДО СЧИТАТЬ С ТАБЛИЦЫ№№№№№№№№№№№№№№
+        ######НАДО СЧИТАТЬ С ТАБЛИЦЫ######
         if isinstance(T_accum, float):
             T_accum = 100  # после сепаратора HTS
         if isinstance(Psg, float):
@@ -916,18 +916,24 @@ class accum:
         time_jdat_step = time_jdat/n_step
         H1 = SG.p_t(Psg, T_accum)['h']
         H2 = SG.p_t(Psg, T_accum)['h']
-        for i in range(n_step):
+        
 
-            # заменить на логарифм
-            poteri = self._khi*(self._lambda_min_vata/self.delta_min_vata)*self._F * \
-                self._kolichestvo * (T_accum-T_nar_vozd) * \
-                (time_jdat_step*3600)/1000
+            # # заменить на логарифм
+            # poteri = self._khi*(self._lambda_min_vata/self.delta_min_vata)*self._F * \
+            #     self._kolichestvo * (T_accum-T_nar_vozd) * \
+            #     (time_jdat_step*3600)/1000
+            # H2 = H2 - poteri/(self._V*self._kolichestvo*rosg)
+            # T_accum = SG.p_h(Psg, H2)['T']
+            
+            
+        
+        for i in range(n_step):
+            poteri = time_jdat_step*3600/1000*3.14*self._H*(self._T_accum-self._T_nar_vozd)/(1/2*self._lambda_min_vata*n.log((self._D+2*self._delta_min_vata)/self._D)+1/(100000*self._D)+1/(20*(self._D+2*self._delta_min_vata)))+ time_jdat_step*3600/1000*2*3.14*self._D**2/4*(self._T_accum-self._T_nar_vozd)/(1/20+1/100000+self._delta_min_vata/self._lambda_min_vata) #kJ
             H2 = H2 - poteri/(self._V*self._kolichestvo*rosg)
             T_accum = SG.p_h(Psg, H2)['T']
-#             print('Температура сингаза',T_accum)
 
         self.accumulation.at["PKM", "Qw"] = (
-            self._V*self._kolichestvo*rosg)*(H2+23375.32317)  # хз надо ли
+            self._V*self._kolichestvo*rosg)*(H2)  # хз надо ли
         self.accumulation.at["PKM", "T"] = T_accum
         syngas_streams.loc["SGaccum-Separacc", "T"] = T_accum
         syngas_streams.loc["SGaccum-Separacc", "P"] = Psg
