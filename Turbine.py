@@ -196,6 +196,13 @@ class turbine:
         if y0 == 0 and yz == 0:
             H_vl = 0
 
+        if H0<=0:
+            print("Перепад давлений на ЦНД равен: ",pin-pout )
+            if H_vl==0:
+                H0=1
+                H_vl=1
+            else:
+                H0=H_vl
         K_vl = 1-0.4*(1-betta_vl)*(y0-yz)/100*H_vl/H0
         Hvs = 40*(Vout1*G1/G0/Vout0)**2
         KPD0i = 0.87*(1+(H0-400)/10000)*K_vl-Hvs/H0

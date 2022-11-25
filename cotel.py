@@ -101,14 +101,24 @@ class heatex:
 #                 if isinstance(nu1av, float)==False:
 #                     print("nu1av is not float")  
                 # znamenatel = (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
-                if any(n.iscomplex([lambda1av,Pr1av,G1,ro1av,nu1av])):
-                    print("Возникли комплексные числа в ПЕНД")
+                # if any(n.iscomplex([lambda1av,Pr1av,G1,ro1av,nu1av])):
+                #     print("Возникли комплексные числа в ПЕНД")
+                #     print("lambda1av,Pr1av,G1,ro1av,nu1av",lambda1av,Pr1av,G1,ro1av,nu1av)
+                #     kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
+                #     (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
+                # else:
+                #     kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
+                #     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
+                
+                try:
+                    kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
+                    (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
+                    
+                except Exception as e:
+                    print("Возникла проблема: ",e )
                     print("lambda1av,Pr1av,G1,ro1av,nu1av",lambda1av,Pr1av,G1,ro1av,nu1av)
                     kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
                     (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
-                else:
-                    kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
-                    (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
                 
                 # kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
                 #     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
@@ -441,17 +451,25 @@ class evaporND:
                 Pr1av = self.gas.p_t(P1, T1av)['Prandtl']
                 nu1av = self.gas.p_t(P1, T1av)['nu']
                 ro1av = self.gas.p_t(P1, T1av)['rho']
-                znamenatel=(((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
-                
-                
-                if any(n.iscomplex([lambda1av,Pr1av,G1,ro1av,nu1av])):
-                    print("Возникли комплексные числа в ПЕНД")
+#                 znamenatel=(((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
+#                 if any(n.iscomplex([lambda1av,Pr1av,G1,ro1av,nu1av])):
+#                     print("Возникли комплексные числа в ПЕНД")
+#                     print("lambda1av,Pr1av,G1,ro1av,nu1av",lambda1av,Pr1av,G1,ro1av,nu1av)
+#                     kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
+#                     (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
+#                 else:
+#                     kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
+#                     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
+                    
+                try:
+                    kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
+                    (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
+                    
+                except Exception as e:
+                    print("Возникла проблема: ",e )
                     print("lambda1av,Pr1av,G1,ro1av,nu1av",lambda1av,Pr1av,G1,ro1av,nu1av)
                     kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
                     (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
-                else:
-                    kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
-                    (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
                     
                     
                 # if isinstance(znamenatel,float)== False:
@@ -478,12 +496,8 @@ class evaporND:
         Qg = G1*(H11-H12)
         H22 = self.water.p_q(P2, 1)['h']
         if H22<0:
-            print("self.stream22 меньше нуля: ", self.stream22) 
-            print("P2: ", P2) 
-            T22 = T21
-            H22= self.water.t_q(T22, 1)['h']
-        else:
-            T22 = self.water.p_h(P2, H22)['T']
+            print("self.stream22 меньше нуля: ", self.stream22)  
+        T22 = self.water.p_h(P2, H22)['T']
         Hvd = self.water.p_q(P2, 0)['h']
         G2 = (Q - Dvd*(Hvd-H21))/(H22-H21)
         Tvd = self.water.p_q(P2, 0)['T']

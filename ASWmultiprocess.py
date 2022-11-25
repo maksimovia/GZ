@@ -214,7 +214,7 @@ def ParallelCompute(args):
         start_time = time.time()
         n_GTU_it = [0.5,1]
         Delta_n_GTU = 100
-        coeficient_PGU = 10
+        coeficient_PGU = 20
         print("SWIN-TURB G",water_streams.at["SWIN-TURB", 'G'])
         for i in range(Max_iterations_minimum):
 

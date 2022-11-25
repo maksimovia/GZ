@@ -203,7 +203,7 @@ def ParallelCompute_PKM(air_temperature):
                     New_iterations_turbine,
                     New_Iter_pkm,
                     New_coeficient_PGU
-                ) = (3, 2, 15, 4, 5)
+                ) = (2, 2, 15, 4, 5)
             else:
                 # print("Delta_n_GTU: ", Delta_n_GTU)
                 (
@@ -261,7 +261,7 @@ def ParallelCompute_PKM(air_temperature):
             print(
                 f"Время {i+1} итерации расчета мощности ГТУ при ПГУ с ПКМ: --- {round((time.time() - start_time), 1)} сек. ---"
             )
-            print(f"Отклонение от ограничения минимальное равно {Delta_min}")
+            # print(f"Отклонение от ограничения минимальное равно {Delta_min}")
 
             if n_GTU == 1 and Delta_min < 0:
                 print("Мощность ГТУ 100% и расход пара все еще слишком мал")
