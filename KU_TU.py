@@ -78,6 +78,7 @@ class ku_tu:
         Error_nd_P = 2
         Error_vd_P = 2
         Calctolerance_new = max(10**-1, Calctolerance)
+        Calctolerance_new=Calctolerance
         Teplo_overflow = 0
         Maxiterations_cotel_new = min(3,Maxiterations_cotel)
         Maxiterations_cotel_tu_rashod_new=min(3,Maxiterations_KU_TU)
@@ -133,9 +134,9 @@ class ku_tu:
                 
 
                 # Calctolerance_new = Calctolerance
-                # if i > 0:
-                #     Calctolerance_new = Calctolerance
-                #     Maxiterations_cotel_new = Maxiterations_cotel
+                if i > 0:
+                    # Calctolerance_new = Calctolerance
+                    Maxiterations_cotel_new = Maxiterations_cotel
                 if i>1:
                     Maxiterations_cotel_tu_rashod_new= Maxiterations_KU_TU
 #                     if i == 3 and j == 0:
