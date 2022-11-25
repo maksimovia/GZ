@@ -117,7 +117,7 @@ class turbine:
         h2t = self.water.p_s(p2, s1)["h"]
         h2 = h1 - (h1 - h2t) * eff
         if h2<0:
-            print("Энтальпия на выходе меньше 0: ", h2)
+            print(f"Энтальпия на выходе меньше 0: {h2}")
             h=h1-100
         if h1<1000:
             print("Вод на входе в отсек, h1,p1,p2: ",h1,p1,p2)

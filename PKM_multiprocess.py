@@ -203,7 +203,7 @@ def ParallelCompute_PKM(air_temperature):
                     New_iterations_turbine,
                     New_Iter_pkm,
                     New_coeficient_PGU
-                ) = (3, 2, 15, 4, 3)
+                ) = (3, 2, 15, 4, 5)
             else:
                 # print("Delta_n_GTU: ", Delta_n_GTU)
                 (

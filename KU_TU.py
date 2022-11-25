@@ -133,9 +133,9 @@ class ku_tu:
                 
 
                 # Calctolerance_new = Calctolerance
-                if i > 0:
-                    Calctolerance_new = Calctolerance
-                    Maxiterations_cotel_new = Maxiterations_cotel
+                # if i > 0:
+                #     Calctolerance_new = Calctolerance
+                #     Maxiterations_cotel_new = Maxiterations_cotel
                 if i>1:
                     Maxiterations_cotel_tu_rashod_new= Maxiterations_KU_TU
 #                     if i == 3 and j == 0:
