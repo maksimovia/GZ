@@ -61,6 +61,8 @@ class heatex:
                 return 10**9
             else:
                 ro21 = self.water.p_q(P21, 1)['rho']
+                if G2<=0:
+                    print("Расход меньше или равен нуля в потоке :", self.stream21)
                 ddp = (ro21/self.ro021)*((self.G02/G2)**2)
                 P22new = P21 - ((self.P021-self.P022)/ddp)
                 return P22-P22new
@@ -119,7 +121,7 @@ class heatex:
         Qg = G1*(H11-H12)
         H22 = H21 + (Q/G2)
         if H22<0:
-            print("self.stream22 меньше нуля: ", self.stream22)
+            print("H22 меньше нуля: ", self.stream22)
             print("H21: ", H21, "Q: ", Q , "G2: ", G2)
             print("t air: ", self.water_streams.at["AIR","T"])
         T22 = self.water.p_h(P22, H22)['T']
@@ -239,7 +241,7 @@ class heatexPEND:
         Qg = G1*(H11-H12)
         H22 = H21 + (Q/G2)
         if H22<0:
-            print("self.stream22 меньше нуля: ", self.stream22)
+            print("H22 меньше нуля: ", self.stream22)
             T22=T11-0.5
             H22=self.water.p_t(P22, T22)['h']
             print("H21: ", H21, "Q: ", Q , "G2: ", G2)
@@ -343,16 +345,16 @@ class evaporVD:
         Qg = G1*(H11-H12)
         H22 = self.water.p_q(P2, 1)['h']
         if H22<0:
-            print("self.stream22 меньше нуля: ", self.stream22)
+            print("H22 меньше нуля: ", self.stream22)
             print("P2: ", P2, "Q: ", Q , "Qg: ", Qg)
             print("t air: ", self.water_streams.at["AIR","T"])
             H22=self.water_streams.at[self.stream22, 'H']
-        T22 = self.water.p_h(P2, H22)['T']
+        T22 = self.water.p_q(P2, 1)['T']
         G2 = Q/(H22-H21)
-        if G2<0:
+        if G2<=0:
             print("Расход пара высокого давления меньше 0: ", G2)
             print("t air: ", self.water_streams.at["AIR","T"])
-            G2=self.water_streams.at[self.stream22, 'G']
+            G2=1
             print("Новый расход пара высокого давления: ", G2)
         return {'Tg': T12, 'Pg': P1, 'Hg': H12, 'Gg': G1, 'Qg': Qg, 'Tw': T22, 'Pw': P2, 'Hw': H22, 'Gw': G2, 'Qw': Q, 'KPD': self.KPD}
 
@@ -451,17 +453,17 @@ class evaporND:
         Qg = G1*(H11-H12)
         H22 = self.water.p_q(P2, 1)['h']
         if H22<0:
-            print("self.stream22 меньше нуля: ", self.stream22)
+            print("H22 меньше нуля: ", self.stream22)
             print("P2: ", P2, "Q: ", Q , "Qg: ", Qg)
             print("t air: ", self.water_streams.at["AIR","T"])
             H22=self.water_streams.at[self.stream22, 'H'] 
         T22 = self.water.p_h(P2, H22)['T']
         Hvd = self.water.p_q(P2, 0)['h']
         G2 = (Q - Dvd*(Hvd-H21))/(H22-H21)
-        if G2<0:
+        if G2<=0:
             print("Расход пара низкого давления меньше 0: ", G2)
             print("t air: ", self.water_streams.at["AIR","T"])
-            G2= 4 
+            G2= 1 
             print("Новый расход пара низкого давления: ", G2)
         Tvd = self.water.p_q(P2, 0)['T']
         Pvd = P2
