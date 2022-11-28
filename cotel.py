@@ -336,7 +336,7 @@ class evaporVD:
                 H12 = self.gas.p_t(P1, T12)['h']
                 Q = G1*(H11-H12)*self.KPD
                 H22 = self.water.p_q(P2, 1)['h']
-                T22 = self.water.p_h(P2, H22)['T']
+                T22 = self.water.p_q(P2, 1)['T']
                 G2 = Q/(H22-H21)
                 dTmin = min(T11-T22, T12-T21)
                 dTmax = max(T11-T22, T12-T21)
