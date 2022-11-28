@@ -110,15 +110,16 @@ class heatex:
                 #     kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
                 #     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
                 
-                try:
-                    kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
+                # try:
+                kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
                     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
                     
-                except Exception as e:
-                    print("Возникла проблема: ",e )
-                    print("lambda1av,Pr1av,G1,ro1av,nu1av",lambda1av,Pr1av,G1,ro1av,nu1av)
-                    kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
-                    (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
+                # except Exception as e:
+                #     print("Возникла проблема: ",e )
+                #     print("lambda1av,Pr1av,G1,ro1av,nu1av",lambda1av,Pr1av,G1,ro1av,nu1av)
+                #     print("t air: ", self.water_streams.at["AIR","T"])
+                #     kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
+                #     (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
                 
                 # kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
                 #     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
@@ -138,6 +139,8 @@ class heatex:
         H22 = H21 + (Q/G2)
         if H22<0:
             print("self.stream22 меньше нуля: ", self.stream22)
+            print("H21: ", H21, "Q: ", Q , "G2: ", G2)
+            print("t air: ", self.water_streams.at["AIR","T"])
         T22 = self.water.p_h(P22, H22)['T']
         return {'Tg': T12, 'Pg': P12, 'Hg': H12, 'Gg': G1, 'Qg': Qg, 'Tw': T22, 'Pw1': P21, 'Pw2': P22, 'Hw': H22, 'Gw': G2, 'Qw': Q, 'KPD': self.KPD}
 
@@ -235,13 +238,13 @@ class heatexPEND:
                 znamenatel = (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
                 
                 
-                if any(n.iscomplex([lambda1av,Pr1av,G1,ro1av,nu1av])):
-                    print("Возникли комплексные числа в ПЕНД")
-                    print("lambda1av,Pr1av,G1,ro1av,nu1av",lambda1av,Pr1av,G1,ro1av,nu1av)
-                    kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
-                    (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
-                else:
-                    kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
+                # if any(n.iscomplex([lambda1av,Pr1av,G1,ro1av,nu1av])):
+                #     print("Возникли комплексные числа в ПЕНД")
+                #     print("lambda1av,Pr1av,G1,ro1av,nu1av",lambda1av,Pr1av,G1,ro1av,nu1av)
+                #     kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
+                #     (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
+                # else:
+                kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
                     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
                 # if isinstance(znamenatel,float)== False:
                 #     print("Возникли комплексные числа в ПЕНД")
@@ -268,6 +271,8 @@ class heatexPEND:
             print("self.stream22 меньше нуля: ", self.stream22)
             T22=T11-0.5
             H22=self.water.p_t(P22, T22)['h']
+            print("H21: ", H21, "Q: ", Q , "G2: ", G2)
+            print("t air: ", self.water_streams.at["AIR","T"])
         else:
             T22 = self.water.p_h(P22, H22)['T']
         return {'Tg': T12, 'Pg': P12, 'Hg': H12, 'Gg': G1, 'Qg': Qg, 'Tw': T22, 'Pw1': P21, 'Pw2': P22, 'Hw': H22, 'Gw': G2, 'Qw': Q, 'KPD': self.KPD}
@@ -347,13 +352,13 @@ class evaporVD:
                 ro1av = self.gas.p_t(P1, T1av)['rho']
                 
                 
-                if any(n.iscomplex([lambda1av,Pr1av,G1,ro1av,nu1av])):
-                    print("Возникли комплексные числа в ПЕНД")
-                    print("lambda1av,Pr1av,G1,ro1av,nu1av",lambda1av,Pr1av,G1,ro1av,nu1av)
-                    kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
-                    (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
-                else:
-                    kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
+                # if any(n.iscomplex([lambda1av,Pr1av,G1,ro1av,nu1av])):
+                #     print("Возникли комплексные числа в ПЕНД")
+                #     print("lambda1av,Pr1av,G1,ro1av,nu1av",lambda1av,Pr1av,G1,ro1av,nu1av)
+                #     kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
+                #     (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
+                # else:
+                kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
                     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
                 # kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
                 #     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
@@ -373,9 +378,14 @@ class evaporVD:
         H22 = self.water.p_q(P2, 1)['h']
         if H22<0:
             print("self.stream22 меньше нуля: ", self.stream22)
+            print("P2: ", P2, "Q: ", Q , "Qg: ", Qg)
+            print("t air: ", self.water_streams.at["AIR","T"])
             H22=self.water_streams.at[self.stream22, 'H']
         T22 = self.water.p_h(P2, H22)['T']
         G2 = Q/(H22-H21)
+        if G2<0:
+            print("Расход пара высокого давления меньше 0: ", G2)
+            G2=self.water_streams.at[self.stream22, 'G']
         return {'Tg': T12, 'Pg': P1, 'Hg': H12, 'Gg': G1, 'Qg': Qg, 'Tw': T22, 'Pw': P2, 'Hw': H22, 'Gw': G2, 'Qw': Q, 'KPD': self.KPD}
 
 
@@ -461,15 +471,15 @@ class evaporND:
 #                     kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
 #                     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
                     
-                try:
-                    kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
+                # try:
+                kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
                     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
                     
-                except Exception as e:
-                    print("Возникла проблема: ",e )
-                    print("lambda1av,Pr1av,G1,ro1av,nu1av",lambda1av,Pr1av,G1,ro1av,nu1av)
-                    kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
-                    (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
+                # except Exception as e:
+                #     print("Возникла проблема: ",e )
+                #     print("lambda1av,Pr1av,G1,ro1av,nu1av",lambda1av,Pr1av,G1,ro1av,nu1av)
+                #     kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
+                #     (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
                     
                     
                 # if isinstance(znamenatel,float)== False:
@@ -500,6 +510,9 @@ class evaporND:
         T22 = self.water.p_h(P2, H22)['T']
         Hvd = self.water.p_q(P2, 0)['h']
         G2 = (Q - Dvd*(Hvd-H21))/(H22-H21)
+        if G2<0:
+            print("Расход пара низкого давления меньше 0: ", G2)
+            G2=self.water_streams.at[self.stream22, 'G']     
         Tvd = self.water.p_q(P2, 0)['T']
         Pvd = P2
         return {'Tg': T12, 'Pg': P1, 'Hg': H12, 'Gg': G1, 'Qg': Qg, 'Tw': T22, 'Pw': P2, 'Hw': H22, 'Gw': G2, 'Qw': Q, 'KPD': self.KPD, 'Tvd': Tvd, 'Pvd': Pvd, 'Hvd': Hvd, 'Dvd': Dvd}
