@@ -235,7 +235,7 @@ class heatexPEND:
                 Pr1av = self.gas.p_t(P1, T1av)['Prandtl']
                 nu1av = self.gas.p_t(P1, T1av)['nu']
                 ro1av = self.gas.p_t(P1, T1av)['rho']
-                znamenatel = (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
+                # znamenatel = (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
                 
                 
                 # if any(n.iscomplex([lambda1av,Pr1av,G1,ro1av,nu1av])):
@@ -385,7 +385,9 @@ class evaporVD:
         G2 = Q/(H22-H21)
         if G2<0:
             print("Расход пара высокого давления меньше 0: ", G2)
+            print("t air: ", self.water_streams.at["AIR","T"])
             G2=self.water_streams.at[self.stream22, 'G']
+            print("Новый расход пара высокого давления: ", G2)
         return {'Tg': T12, 'Pg': P1, 'Hg': H12, 'Gg': G1, 'Qg': Qg, 'Tw': T22, 'Pw': P2, 'Hw': H22, 'Gw': G2, 'Qw': Q, 'KPD': self.KPD}
 
 
@@ -512,7 +514,9 @@ class evaporND:
         G2 = (Q - Dvd*(Hvd-H21))/(H22-H21)
         if G2<0:
             print("Расход пара низкого давления меньше 0: ", G2)
-            G2=self.water_streams.at[self.stream22, 'G']     
+            print("t air: ", self.water_streams.at["AIR","T"])
+            G2=1 
+            print("Новый расход пара низкого давления: ", G2)
         Tvd = self.water.p_q(P2, 0)['T']
         Pvd = P2
         return {'Tg': T12, 'Pg': P1, 'Hg': H12, 'Gg': G1, 'Qg': Qg, 'Tw': T22, 'Pw': P2, 'Hw': H22, 'Gw': G2, 'Qw': Q, 'KPD': self.KPD, 'Tvd': Tvd, 'Pvd': Pvd, 'Hvd': Hvd, 'Dvd': Dvd}
