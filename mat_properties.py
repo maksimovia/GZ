@@ -48,9 +48,9 @@ def REFPROP_p_t(p, t, gas,fraction, RP):
     res['cv'] = prop.Output[3]
     res['cp'] = prop.Output[4]
     fraction_local=list(fraction)
-    if fraction_local[3]>0.05:
-        fraction_local[2]=fraction_local[2]+fraction_local[3]-0.05
-        fraction_local[3]=0.05
+    if fraction_local[3]>0.04:
+        fraction_local[2]=fraction_local[2]+fraction_local[3]-0.04
+        fraction_local[3]=0.04
     prop1 = RP.REFPROPdll(gas, 'PT', 'H;S;D;CV;CP;KV;Prandtl;TCX;VIS;Qmass', 21, 0, 0, p, t, fraction_local)
     res['nu'] = prop1.Output[5] / 100.
     res['Prandtl'] = prop1.Output[6] 
