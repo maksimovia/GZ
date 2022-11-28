@@ -113,6 +113,7 @@ class heatex:
                 # try:
                 kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
                     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
+                print("lambda1av",lambda1av,"Pr1av",Pr1av,"G1",G1,"nu1av",nu1av,"ro1av",ro1av)
                     
                 # except Exception as e:
                 #     print("Возникла проблема: ",e )
@@ -246,6 +247,7 @@ class heatexPEND:
                 # else:
                 kk = (self.lambda01av/lambda1av)*((self.Pr01av/Pr1av)**0.33) * \
                     (((self.G01/G1)*(ro1av/self.ro01av)*(nu1av/self.nu01av))**0.685)
+                print("lambda1av",lambda1av,"Pr1av",Pr1av,"G1",G1,"nu1av",nu1av,"ro1av",ro1av)
                 # if isinstance(znamenatel,float)== False:
                 #     print("Возникли комплексные числа в ПЕНД")
                 #     kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
