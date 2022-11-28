@@ -391,7 +391,7 @@ def ParallelCompute_PKM(air_temperature):
         "heaters_razryad":  heaters_razryad,
         "accumulation_razryad":    accumulation_razryad,
     }
-    # print(result)
+    print(result)
     
     
     df = pd.DataFrame(result)
