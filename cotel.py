@@ -508,7 +508,10 @@ class evaporND:
         Qg = G1*(H11-H12)
         H22 = self.water.p_q(P2, 1)['h']
         if H22<0:
-            print("self.stream22 меньше нуля: ", self.stream22)  
+            print("self.stream22 меньше нуля: ", self.stream22)
+            print("P2: ", P2, "Q: ", Q , "Qg: ", Qg)
+            print("t air: ", self.water_streams.at["AIR","T"])
+            H22=self.water_streams.at[self.stream22, 'H'] 
         T22 = self.water.p_h(P2, H22)['T']
         Hvd = self.water.p_q(P2, 0)['h']
         G2 = (Q - Dvd*(Hvd-H21))/(H22-H21)
