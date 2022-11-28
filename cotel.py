@@ -100,7 +100,7 @@ class heatex:
                 
                 if lambda1av<0:
                     print("lambda1av",lambda1av,"Pr1av",Pr1av,"G1",G1,"nu1av",nu1av,"ro1av",ro1av,"P1",P1, "T1av",T1av)
-                    print(f"Используем параметры из номинального режима: lambda01av: {lambda1av}, Pr01av: {Pr01av}, ro01av: {ro01av}, nu01av: {nu01av}")
+                    print(f"Используем параметры из номинального режима: lambda01av: {self.lambda01av}, Pr01av: {self.Pr01av}, ro01av: {self.ro01av}, nu01av: {self.nu01av}")
                     kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
                     (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
                 else:
@@ -221,7 +221,7 @@ class heatexPEND:
                 ro1av = self.gas.p_t(P1, T1av)['rho']
                 if lambda1av<0:
                     print("lambda1av",lambda1av,"Pr1av",Pr1av,"G1",G1,"nu1av",nu1av,"ro1av",ro1av,"P1",P1, "T1av",T1av)
-                    print(f"Используем параметры из номинального режима: lambda01av: {lambda1av}, Pr01av: {Pr01av}, ro01av: {ro01av}, nu01av: {nu01av}, G1: {G1}")
+                    print(f"Используем параметры из номинального режима: lambda01av: {self.lambda01av}, Pr01av: {self.Pr01av}, ro01av: {self.ro01av}, nu01av: {self.nu01av}")
                     kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
                     (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
                 else:
@@ -327,7 +327,7 @@ class evaporVD:
                 ro1av = self.gas.p_t(P1, T1av)['rho']
                 if lambda1av<0:
                     print("lambda1av",lambda1av,"Pr1av",Pr1av,"G1",G1,"nu1av",nu1av,"ro1av",ro1av,"P1",P1, "T1av",T1av)
-                    print(f"Используем параметры из номинального режима: lambda01av: {lambda1av}, Pr01av: {Pr01av}, ro01av: {ro01av}, nu01av: {nu01av}, G1: {G1}")
+                    print(f"Используем параметры из номинального режима: lambda01av: {self.lambda01av}, Pr01av: {self.Pr01av}, ro01av: {self.ro01av}, nu01av: {self.nu01av}")
                     kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
                     (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
                 else:
@@ -436,7 +436,7 @@ class evaporND:
                 ro1av = self.gas.p_t(P1, T1av)['rho']
                 if lambda1av<0:
                     print("lambda1av",lambda1av,"Pr1av",Pr1av,"G1",G1,"nu1av",nu1av,"ro1av",ro1av,"P1",P1, "T1av",T1av)
-                    print(f"Используем параметры из номинального режима: lambda01av: {lambda1av}, Pr01av: {Pr01av}, ro01av: {ro01av}, nu01av: {nu01av}, G1: {G1}")
+                    print(f"Используем параметры из номинального режима: lambda01av: {self.lambda01av}, Pr01av: {self.Pr01av}, ro01av: {self.ro01av}, nu01av: {self.nu01av}")
                     kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
                     (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
                 else:
