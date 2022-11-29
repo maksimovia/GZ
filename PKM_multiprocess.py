@@ -395,24 +395,24 @@ def ParallelCompute_PKM(air_temperature):
     print(result)
     
     
-    df = pd.DataFrame(result)
+    # df = pd.DataFrame(result)
     # df = df
     # nametable=[]
     # создаются новые таблицы после каждого расчета
 
     nametable = "resdataTemp"+str(result['T_air'])+".xlsx"
-    dfgas_streams_zaryad=df['gas_streams_zaryad']
-    dfwater_streams_zaryad=df['water_streams_zaryad']
-    dfsyngas_streams_zaryad=df['syngas_streams_zaryad']
-    dfelectric_zaryad=df['electric_zaryad']
-    dfheaters_zaryad=df['heaters_zaryad']
-    dfaccumulation_zaryad=df['accumulation_zaryad']
-    dfgas_streams_razryad=df['gas_streams_razryad']
-    dfwater_streams_razryad=df['water_streams_razryad']
-    dfsyngas_streams_razryad=df['syngas_streams_razryad']
-    dfelectric_razryad=df['electric_razryad']
-    dfheaters_razryad=df['heaters_razryad']
-    dfaccumulation_razryad=df['accumulation_razryad']
+    dfgas_streams_zaryad=result['gas_streams_zaryad']
+    dfwater_streams_zaryad=result['water_streams_zaryad']
+    dfsyngas_streams_zaryad=result['syngas_streams_zaryad']
+    dfelectric_zaryad=result['electric_zaryad']
+    dfheaters_zaryad=result['heaters_zaryad']
+    dfaccumulation_zaryad=result['accumulation_zaryad']
+    dfgas_streams_razryad=result['gas_streams_razryad']
+    dfwater_streams_razryad=result['water_streams_razryad']
+    dfsyngas_streams_razryad=result['syngas_streams_razryad']
+    dfelectric_razryad=result['electric_razryad']
+    dfheaters_razryad=result['heaters_razryad']
+    dfaccumulation_razryad=result['accumulation_razryad']
 
     # dfgas_streams_zaryad = dfgas_streams_zaryad.T #Опционально, если неудобен такой вид таблицы -закоментить
     # dfwater_streams_zaryad = dfwater_streams_zaryad.T #Опционально, если неудобен такой вид таблицы -закоментить
@@ -431,19 +431,19 @@ def ParallelCompute_PKM(air_temperature):
 #         print(dfelectric)
 #         print(dfHeatex)
     with pd.ExcelWriter(nametable) as writer:
-        df.to_excel(writer, sheet_name="all_result", index=False)
-        dfgas_streams_zaryad.to_excel(writer, sheet_name="gas_streams_zaryad", index=False)
-        dfwater_streams_zaryad.to_excel(writer, sheet_name="water_streams_zaryad", index=False)
-        dfsyngas_streams_zaryad.to_excel(writer, sheet_name="syngas_streams_zaryad", index=False)
-        dfelectric_zaryad.to_excel(writer, sheet_name="electric_zaryad", index=False)
-        dfheaters_zaryad.to_excel(writer, sheet_name="heaters_zaryad", index=False)
-        dfaccumulation_zaryad.to_excel(writer, sheet_name="accumulation_zaryad", index=False)
-        dfgas_streams_razryad.to_excel(writer, sheet_name="gas_streams_razryad", index=False)
-        dfwater_streams_razryad.to_excel(writer, sheet_name="water_streams_razryad", index=False)
-        dfsyngas_streams_razryad.to_excel(writer, sheet_name="syngas_streams_razryad", index=False)
-        dfelectric_razryad.to_excel(writer, sheet_name="electric_razryad", index=False)
-        dfheaters_razryad.to_excel(writer, sheet_name="heaters_razryad", index=False)
-        dfaccumulation_razryad.to_excel(writer, sheet_name="accumulation_razryad", index=False)
+        # df.to_excel(writer, sheet_name="all_result", index=False)
+        dfgas_streams_zaryad.to_excel(writer, sheet_name="gas_streams_zaryad")
+        dfwater_streams_zaryad.to_excel(writer, sheet_name="water_streams_zaryad")
+        dfsyngas_streams_zaryad.to_excel(writer, sheet_name="syngas_streams_zaryad")
+        dfelectric_zaryad.to_excel(writer, sheet_name="electric_zaryad")
+        dfheaters_zaryad.to_excel(writer, sheet_name="heaters_zaryad")
+        dfaccumulation_zaryad.to_excel(writer, sheet_name="accumulation_zaryad")
+        dfgas_streams_razryad.to_excel(writer, sheet_name="gas_streams_razryad")
+        dfwater_streams_razryad.to_excel(writer, sheet_name="water_streams_razryad")
+        dfsyngas_streams_razryad.to_excel(writer, sheet_name="syngas_streams_razryad")
+        dfelectric_razryad.to_excel(writer, sheet_name="electric_razryad")
+        dfheaters_razryad.to_excel(writer, sheet_name="heaters_razryad")
+        dfaccumulation_razryad.to_excel(writer, sheet_name="accumulation_razryad")
     
     
     return result
