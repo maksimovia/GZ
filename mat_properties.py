@@ -57,7 +57,11 @@ def REFPROP_p_t(p, t, gas,fraction, RP):
     res['Q'] = prop1.Output[9]
     if res['L']<0 and fraction_local[0]>0.5 and gas.split("*")[0]=='Nitrogen':
         print("Ошибка в расчете по p и t")
-        # print(f"p: {p}, t: {t}, gas: {gas},fraction: {fraction}, RP: {RP}")
+        if fraction[0]==1:
+            res['rho'] = CP.PropsSI('D','P', p,'T',t,gas)
+            res['h'] = CP.PropsSI('H','P', p,'T',t,gas)/1000
+            res['s'] = CP.PropsSI('S','P', p,'T',t,gas)/1000
+        print(f"h: {h}, s: {s}, gas: {gas},fraction: {fraction}, RP: {RP}")
     return res
 
 def REFPROP_p_h(p, h, gas,fraction, RP):
