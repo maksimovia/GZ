@@ -120,6 +120,9 @@ def REFPROP_p_q(p, q, gas,fraction, RP):
     res['rho'] = prop.Output[1]
     res['h'] = prop.Output[2]/1000
     res['s'] = prop.Output[3]/1000
+    if res['h']<0:
+        print("Ошибка в расчете по p и q")
+        print(f"p: {p}, q: {q}, gas: {gas},fraction: {fraction}, RP: {RP}")
     return res
 
 def REFPROP_s_q(s, q, gas,fraction, RP):

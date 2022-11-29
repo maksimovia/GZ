@@ -348,10 +348,14 @@ class evaporVD:
         Qg = G1*(H11-H12)
         H22 = self.water.p_q(P2, 1)['h']
         if H22<0:
-            print("H22 меньше нуля: ", self.stream22)
+            print(f"H22 потока {self.stream22} меньше нуля: {H22}")
             print("P2: ", P2, "Q: ", Q , "Qg: ", Qg)
             print("t air: ", self.water_streams.at["AIR","T"])
+            H22 = self.water.p_q(P2, 1)['h']
+            print(f"Рассчитанное снова значение H22: {H22}")
             H22=self.water_streams.at[self.stream22, 'H']
+            print(f"Новое значение H22: {H22}")
+            
         T22 = self.water.p_q(P2, 1)['T']
         G2 = Q/(H22-H21)
         if G2<=0:
