@@ -408,8 +408,7 @@ def ParallelCompute_PKM(air_temperature):
         "accumulation_razryad":    accumulation_razryad,
         "GTU_input_razryad":GTU_input_razryad
     }
-    print(result)
-    
+  
     
     # df = pd.DataFrame(result)
     # df = df
