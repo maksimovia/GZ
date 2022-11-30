@@ -274,7 +274,6 @@ def ParallelCompute_PKM(air_temperature):
                     Maxiterations_cotel,
                     Maxiterations_turbine,
                 )
-                n_GTU_it.append(round(n_GTU, 5))
                 gas_streams = Calculate_CCGT_PKM_iter(
                     arguments_all_it, New_Iter_pkm, pkm_pgu_tol
                 )
