@@ -115,9 +115,9 @@ def ParallelCompute_PKM(air_temperature):
     time_jdat = 12
     # Конструкция аккумулятора
     constr = {
-        "Diametr": 20,
+        "Diametr": 10,
         "kolichestvo": 8,
-        "Visota": 20,
+        "Visota": 15,
         "lambda_min_vata": 0.045,
         "delta_min_vata": 0.01,
     }
@@ -184,7 +184,7 @@ def ParallelCompute_PKM(air_temperature):
 
     n_GTU_it = [0.5]
     Delta_n_GTU = 100
-    coeficient_PGU = 5
+    coeficient_PGU = 10
     if Сalculate_minimum == True:
         gas_streams.loc["GTU-PEVD", "G"] = gas_streams.loc["GTU-KU", "G"]
         n_GTU = GTU_input.at["n", 1]
@@ -306,6 +306,15 @@ def ParallelCompute_PKM(air_temperature):
     Maxiterations_KU_TU = 20
     Maxiterations_cotel = 5
     Maxiterations_turbine = 20
+    
+    
+    gas_streams0 = pd.read_excel(
+        "streams0.xlsx", sheet_name="gas", index_col=0)
+    gas_streams = pd.read_excel("streams.xlsx", sheet_name="gas", index_col=0)
+    fractiongas0 = list(gas_streams0.loc["GTU-PEVD", "N2":"Ar"])
+    # Задание энтальпий газа в номинальном режиме
+    gas_streams0.loc["GTU-KU":"GPK-out", "H"] = list(
+        map(lambda x: gas0.p_t(Pressure, x)["h"], Temperatures))
 
     n_GTU = 1
     GTU_input.at["n", 1] = n_GTU

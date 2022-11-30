@@ -942,7 +942,7 @@ class accum:
         syngas_streams.loc["SGaccum-Separacc",
                            "G"] = (self._V*self._kolichestvo*rosg)  # Масса
         syngas_streams.loc['SGaccum-Separacc', 'N2':'CO'] = SGfrac
-        from PKM import separator
+        # from PKM import separator
         sep = separator.calc('SGaccum-Separacc',
                              'Separacc-Sepout', syngas_streams, heaters)
 
