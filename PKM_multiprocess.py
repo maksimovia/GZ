@@ -253,10 +253,11 @@ def ParallelCompute_PKM(air_temperature):
             if n_GTU<0:
                 print("Мощность меньше 0 у ГТУ")
                 n_GTU=0.6
-            Delta_n_GTU = abs(
-                (n_GTU_it[-1] - n_GTU_it[-2]) / n_GTU_it[-1] * 100)
+            
             GTU_input.at["n", 1] = n_GTU
             n_GTU_it.append(round(n_GTU, 5))
+            Delta_n_GTU = abs(
+                (n_GTU_it[-1] - n_GTU_it[-2]) / n_GTU_it[-1] * 100)
 
             print(
                 f"Время {i+1} итерации расчета мощности ГТУ при ПГУ с ПКМ: --- {round((time.time() - start_time), 1)} сек. ---"
@@ -309,13 +310,13 @@ def ParallelCompute_PKM(air_temperature):
     Maxiterations_turbine = 20
     
     
-    gas_streams0 = pd.read_excel(
-        "streams0.xlsx", sheet_name="gas", index_col=0)
-    gas_streams = pd.read_excel("streams.xlsx", sheet_name="gas", index_col=0)
-    fractiongas0 = list(gas_streams0.loc["GTU-PEVD", "N2":"Ar"])
-    # Задание энтальпий газа в номинальном режиме
-    gas_streams0.loc["GTU-KU":"GPK-out", "H"] = list(
-        map(lambda x: gas0.p_t(Pressure, x)["h"], Temperatures))
+    # gas_streams0 = pd.read_excel(
+    #     "streams0.xlsx", sheet_name="gas", index_col=0)
+    # gas_streams = pd.read_excel("streams.xlsx", sheet_name="gas", index_col=0)
+    # fractiongas0 = list(gas_streams0.loc["GTU-PEVD", "N2":"Ar"])
+    # # Задание энтальпий газа в номинальном режиме
+    # gas_streams0.loc["GTU-KU":"GPK-out", "H"] = list(
+    #     map(lambda x: gas0.p_t(Pressure, x)["h"], Temperatures))
 
     n_GTU = 1
     GTU_input.at["n", 1] = n_GTU
@@ -374,7 +375,7 @@ def ParallelCompute_PKM(air_temperature):
     time_all=time.time() -start_time_all
     print(f"Расчет окончен для температуры {air_temperature}:--- {round((time_all), 1)} сек. ---")
 
-    result = {
+    result_all={
         "T_air": round(air_temperature, 2),
         "n_GTU": round(GTU_input.at["n", 1], 5),
         "GTU": round(electric.at["GTU", "N"], 4),
@@ -390,7 +391,8 @@ def ParallelCompute_PKM(air_temperature):
         # "Calculate_minimum": Сalculate_minimum,
         "Delta_P_Diafragma": round(Delta_P_Diafragma, 4),
         "T_accum": round(accumulation.at["PKM", "T"], 4),
-        "time to calc":time_all,
+        "time to calc":time_all}
+    result_df = {
         "gas_streams_zaryad": gas_streams_zaryad,
         "water_streams_zaryad": water_streams_zaryad,
         "syngas_streams_zaryad": syngas_streams_zaryad,
@@ -415,49 +417,26 @@ def ParallelCompute_PKM(air_temperature):
     # создаются новые таблицы после каждого расчета
 
     nametable = "resdataTemp"+str(result['T_air'])+".xlsx"
-    dfgas_streams_zaryad=result['gas_streams_zaryad']
-    dfwater_streams_zaryad=result['water_streams_zaryad']
-    dfsyngas_streams_zaryad=result['syngas_streams_zaryad']
-    dfelectric_zaryad=result['electric_zaryad']
-    dfheaters_zaryad=result['heaters_zaryad']
-    dfaccumulation_zaryad=result['accumulation_zaryad']
-    dfgas_streams_razryad=result['gas_streams_razryad']
-    dfwater_streams_razryad=result['water_streams_razryad']
-    dfsyngas_streams_razryad=result['syngas_streams_razryad']
-    dfelectric_razryad=result['electric_razryad']
-    dfheaters_razryad=result['heaters_razryad']
-    dfaccumulation_razryad=result['accumulation_razryad']
 
-    # dfgas_streams_zaryad = dfgas_streams_zaryad.T #Опционально, если неудобен такой вид таблицы -закоментить
-    # dfwater_streams_zaryad = dfwater_streams_zaryad.T #Опционально, если неудобен такой вид таблицы -закоментить
-    # dfsyngas_streams_zaryad = dfsyngas_streams_zaryad.T #Опционально, если неудобен такой вид таблицы -закоментить
-    # dfelectric_zaryad = dfelectric_zaryad.T #Опционально, если неудобен такой вид таблицы -закоментить
-    # dfheaters_zaryad = dfheaters_zaryad.T #Опционально, если неудобен такой вид таблицы -закоментить
-    # dfaccumulation_zaryad = dfaccumulation_zaryad.T #Опционально, если неудобен такой вид таблицы -закоментить
-    # dfgas_streams_razryad = dfgas_streams_razryad.T #Опционально, если неудобен такой вид таблицы -закоментить
-    # dfwater_streams_razryad = dfwater_streams_razryad.T #Опционально, если неудобен такой вид таблицы -закоментить
-    # dfsyngas_streams_razryad = dfsyngas_streams_razryad.T #Опционально, если неудобен такой вид таблицы -закоментить
-    # dfelectric_razryad = dfelectric_razryad.T #Опционально, если неудобен такой вид таблицы -закоментить
-    # dfheaters_razryad = dfheaters_razryad.T #Опционально, если неудобен такой вид таблицы -закоментить
-    # dfaccumulation_razryad = dfaccumulation_razryad.T #Опционально, если неудобен такой вид таблицы -закоментить
-        
-#         print(nametable)
-#         print(dfelectric)
-#         print(dfHeatex)
     with pd.ExcelWriter(nametable) as writer:
+        for name,table in result_df.items():
+            table.to_excel(writer,sheet_name=name)
+        
+        
         # df.to_excel(writer, sheet_name="all_result", index=False)
-        dfgas_streams_zaryad.to_excel(writer, sheet_name="gas_streams_zaryad")
-        dfwater_streams_zaryad.to_excel(writer, sheet_name="water_streams_zaryad")
-        dfsyngas_streams_zaryad.to_excel(writer, sheet_name="syngas_streams_zaryad")
-        dfelectric_zaryad.to_excel(writer, sheet_name="electric_zaryad")
-        dfheaters_zaryad.to_excel(writer, sheet_name="heaters_zaryad")
-        dfaccumulation_zaryad.to_excel(writer, sheet_name="accumulation_zaryad")
-        dfgas_streams_razryad.to_excel(writer, sheet_name="gas_streams_razryad")
-        dfwater_streams_razryad.to_excel(writer, sheet_name="water_streams_razryad")
-        dfsyngas_streams_razryad.to_excel(writer, sheet_name="syngas_streams_razryad")
-        dfelectric_razryad.to_excel(writer, sheet_name="electric_razryad")
-        dfheaters_razryad.to_excel(writer, sheet_name="heaters_razryad")
-        dfaccumulation_razryad.to_excel(writer, sheet_name="accumulation_razryad")
+        # dfgas_streams_zaryad.to_excel(writer, sheet_name="gas_streams_zaryad")
+        # dfwater_streams_zaryad.to_excel(writer, sheet_name="water_streams_zaryad")
+        # dfsyngas_streams_zaryad.to_excel(writer, sheet_name="syngas_streams_zaryad")
+        # dfelectric_zaryad.to_excel(writer, sheet_name="electric_zaryad")
+        # dfheaters_zaryad.to_excel(writer, sheet_name="heaters_zaryad")
+        # dfaccumulation_zaryad.to_excel(writer, sheet_name="accumulation_zaryad")
+        # dfGTU_input_zaryad.to_excel(writer, sheet_name="accumulation_zaryad")
+        # dfgas_streams_razryad.to_excel(writer, sheet_name="gas_streams_razryad")
+        # dfwater_streams_razryad.to_excel(writer, sheet_name="water_streams_razryad")
+        # dfsyngas_streams_razryad.to_excel(writer, sheet_name="syngas_streams_razryad")
+        # dfelectric_razryad.to_excel(writer, sheet_name="electric_razryad")
+        # dfheaters_razryad.to_excel(writer, sheet_name="heaters_razryad")
+        # dfaccumulation_razryad.to_excel(writer, sheet_name="accumulation_razryad")
     
     
-    return result
+    return result_all
