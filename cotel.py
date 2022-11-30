@@ -471,7 +471,7 @@ class evaporND:
         if G2<=0:
             print("Расход пара низкого давления меньше 0: ", G2)
             print("t air: ", self.water_streams.at["AIR","T"])
-            G2= 1 
+            G2= 0.5 
             print("Новый расход пара низкого давления: ", G2)
         Tvd = self.water.p_q(P2, 0)['T']
         Pvd = P2
