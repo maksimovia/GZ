@@ -267,7 +267,7 @@ def ParallelCompute_PKM(air_temperature):
                 print("Мощность ГТУ 100% и расход пара все еще слишком мал")
 
             # if abs(Delta_min) < Calctolerance and Delta_n_GTU < Calctolerance:
-            if abs(Delta_min) < Calctolerance*10:
+            if abs(Delta_min) < Calctolerance and Delta_n_GTU<Calctolerance:
                 arguments_all_it[0], arguments_all_it[1], arguments_all_it[2] = (
                     Maxiterations_KU_TU,
                     Maxiterations_cotel,
