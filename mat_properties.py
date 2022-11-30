@@ -55,13 +55,13 @@ def REFPROP_p_t(p, t, gas,fraction, RP):
     res['Prandtl'] = prop1.Output[6] 
     res['L'] = prop1.Output[7]
     res['Q'] = prop1.Output[9]
-    if res['L']<0 and fraction_local[0]>0.5 and gas.split("*")[0]=='Nitrogen':
-        print("Ошибка в расчете по p и t")
+    if res['h']<0 and fraction_local[0]>0.5 and gas.split("*")[0]=='Nitrogen':
+        # print("Ошибка в расчете по p и t")
         if fraction[0]==1:
             res['rho'] = CP.PropsSI('D','P', p,'T',t,gas)
             res['h'] = CP.PropsSI('H','P', p,'T',t,gas)/1000
             res['s'] = CP.PropsSI('S','P', p,'T',t,gas)/1000
-        print(f"h: {res['h']}, s: {res['s']},t: {res['t']}, p: {res['p']}, gas: {gas},fraction: {fraction}, RP: {RP}")
+        # print(f"h: {res['h']}, s: {res['s']},t: {t}, p: {p}, gas: {gas},fraction: {fraction}, RP: {RP}")
     return res
 
 def REFPROP_p_h(p, h, gas,fraction, RP):
@@ -96,13 +96,13 @@ def REFPROP_p_h(p, h, gas,fraction, RP):
         res['Prandtl'] = prop1.Output[6] 
         res['L'] = prop1.Output[7] 
         res['Q'] = prop1.Output[9]
-    # if res['T']<-999 or res['s']<-1000:
-    #     print("Ошибка в расчете по p и h, переход на расчет по Coolprop")
-    #     # print(f"p: {p}, q: {q}, gas: {gas},fraction: {fraction}, RP: {RP}")
-    #     res['T'] = CP.PropsSI('T','P', p,'H',h,gas)-273.15
-    #     res['rho'] = CP.PropsSI('D','P', p,'H',h,gas)
-    #     res['s'] = CP.PropsSI('H','P', p,'H',s,gas)/1000
-    #     print(f"t: {res['T']}, p: {p},h: {h}, gas: {gas},fraction: {fraction}, RP: {RP}")       
+    if res['T']< -999 or res['s']<-1000:
+        print("Ошибка в расчете по p и h, переход на расчет по Coolprop")
+        # print(f"p: {p}, q: {q}, gas: {gas},fraction: {fraction}, RP: {RP}")
+        res['T'] = CP.PropsSI('T','P', p,'H',h,gas)-273.15
+        res['rho'] = CP.PropsSI('D','P', p,'H',h,gas)
+        res['s'] = CP.PropsSI('H','P', p,'H',s,gas)/1000
+        print(f"t: {res['T']}, p: {p},h: {h}, gas: {gas},fraction: {fraction}, RP: {RP}")       
     return res
 
 def REFPROP_p_s(p, s, gas,fraction, RP):

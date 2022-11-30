@@ -70,6 +70,8 @@ class heatex:
         P21 = float(sol.x)
         ro21 = self.water.p_q(P21, 1)['rho']
         P12 = P1
+        if H21<0:
+            print(f"Энтальпия на входе в теплообменник меньше 0 ({H21}) у потока {self.stream21}")
         T21 = self.water.p_h(P21, H21)['T']
         T11 = self.gas.p_h(P1, H11)['T']
 
@@ -100,7 +102,7 @@ class heatex:
                 
                 if lambda1av<0:
                     print("lambda1av",lambda1av,"Pr1av",Pr1av,"G1",G1,"nu1av",nu1av,"ro1av",ro1av,"P1",P1, "T1av",T1av)
-                    print(f"Используем параметры из номинального режима: lambda01av: {self.lambda01av}, Pr01av: {self.Pr01av}, ro01av: {self.ro01av}, nu01av: {self.nu01av}")
+                    print(f"Используем параметры из номинального режима: lambda01av: {self.lambda01av}, Pr01av: {self.Pr01av}, ro01av: {self.ro01av}, nu01av: {self.nu01av}, gas: {gas}")
                     kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
                     (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
                 else:
@@ -361,7 +363,7 @@ class evaporVD:
         if G2<=0:
             print("Расход пара высокого давления меньше 0: ", G2)
             print("t air: ", self.water_streams.at["AIR","T"])
-            G2=1
+            G2=0.1
             print("Новый расход пара высокого давления: ", G2)
         return {'Tg': T12, 'Pg': P1, 'Hg': H12, 'Gg': G1, 'Qg': Qg, 'Tw': T22, 'Pw': P2, 'Hw': H22, 'Gw': G2, 'Qw': Q, 'KPD': self.KPD}
 
@@ -471,7 +473,7 @@ class evaporND:
         if G2<=0:
             print("Расход пара низкого давления меньше 0: ", G2)
             print("t air: ", self.water_streams.at["AIR","T"])
-            G2= 1 
+            G2= 0.1 
             print("Новый расход пара низкого давления: ", G2)
         Tvd = self.water.p_q(P2, 0)['T']
         Pvd = P2
