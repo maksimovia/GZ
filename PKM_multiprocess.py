@@ -366,7 +366,7 @@ def ParallelCompute_PKM(air_temperature):
     electric_razryad = electric.copy()
     heaters_razryad = heaters.copy()
     accumulation_razryad = accumulation.copy()
-    GTU_input_rzaryad=GTU_input.copy()
+    GTU_input_razryad=GTU_input.copy()
     Potb2_turb = water_streams.at["DOOTB2", "P"]
     Potb2_teplof = water_streams.at["OTB2-SP2", "P"]
     Delta_P_Diafragma=Potb2_teplof-Potb2_turb
@@ -404,7 +404,7 @@ def ParallelCompute_PKM(air_temperature):
         "electric_razryad": electric_razryad,
         "heaters_razryad":  heaters_razryad,
         "accumulation_razryad":    accumulation_razryad,
-        "GTU_input_rzaryad":GTU_input_rzaryad
+        "GTU_input_razryad":GTU_input_razryad
     }
     print(result)
     
