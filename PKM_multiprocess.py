@@ -292,12 +292,13 @@ def ParallelCompute_PKM(air_temperature):
                 )
                 print("n_GTU_it", n_GTU_it)
 
-    gas_streams_zaryad = gas_streams
-    water_streams_zaryad = water_streams
-    syngas_streams_zaryad = syngas_streams
-    electric_zaryad = electric
-    heaters_zaryad = heaters
-    accumulation_zaryad = accumulation
+    gas_streams_zaryad = gas_streams.copy()
+    water_streams_zaryad = water_streams.copy()
+    syngas_streams_zaryad = syngas_streams.copy()
+    electric_zaryad = electric.copy()
+    heaters_zaryad = heaters.copy()
+    accumulation_zaryad = accumulation.copy()
+    GTU_input_zaryad=GTU_input.copy()
 
     #############ПРОЦЕСС РАЗРЯДКИ####################
     PKM_zaryad = False
@@ -359,12 +360,13 @@ def ParallelCompute_PKM(air_temperature):
     # print(heaters)
     # print(accumulation)
 
-    gas_streams_razryad = gas_streams
-    water_streams_razryad = water_streams
-    syngas_streams_razryad = syngas_streams
-    electric_razryad = electric
-    heaters_razryad = heaters
-    accumulation_razryad = accumulation
+    gas_streams_razryad = gas_streams.copy()
+    water_streams_razryad = water_streams.copy()
+    syngas_streams_razryad = syngas_streams.copy()
+    electric_razryad = electric.copy()
+    heaters_razryad = heaters.copy()
+    accumulation_razryad = accumulation.copy()
+    GTU_input_rzaryad=GTU_input.copy()
     Potb2_turb = water_streams.at["DOOTB2", "P"]
     Potb2_teplof = water_streams.at["OTB2-SP2", "P"]
     Delta_P_Diafragma=Potb2_teplof-Potb2_turb
@@ -395,12 +397,14 @@ def ParallelCompute_PKM(air_temperature):
         "electric_zaryad": electric_zaryad,
         "heaters_zaryad": heaters_zaryad,
         "accumulation_zaryad": accumulation_zaryad,
+        "GTU_input_zaryad":GTU_input_zaryad,
         "gas_streams_razryad":   gas_streams_razryad,
         "water_streams_razryad": water_streams_razryad,
         "syngas_streams_razryad":   syngas_streams_razryad,
         "electric_razryad": electric_razryad,
         "heaters_razryad":  heaters_razryad,
         "accumulation_razryad":    accumulation_razryad,
+        "GTU_input_rzaryad":GTU_input_rzaryad
     }
     print(result)
     
