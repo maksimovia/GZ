@@ -778,7 +778,6 @@ class accum:
         Psg = 2
         rosg = SG.p_t(Psg, Tsg)['rho']
         Gsg = V*self._kolichestvo*rosg/(t*3600)
-        print(Psg,Tsg) 
         def sved_Gst(Gst):
             water_streams.loc['DROSVD-ST', 'G'] = Gst
             PKM = PKM_all.calc(True, gas_streams, syngas_streams,
