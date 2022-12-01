@@ -50,7 +50,7 @@ def ParallelCompute_PKM(air_temperature):
 
     # Параметры, отвечающие за процесс расчета
     Calcmethod = "hybr"
-    Calctolerance = 10**-1
+    Calctolerance = 10**-2
     Maxiterations_KU_TU = 5
     Maxiterations_cotel = 3
     Maxiterations_turbine = 15
