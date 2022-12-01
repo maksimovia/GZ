@@ -510,12 +510,13 @@ class PKM_all:
 
 
 class syngas_GTU:
-    def calc(syngas_streams, P2, KPDcomp, KPDturb, heaters, electric):
+    def calc(water_streams,syngas_streams, P2, KPDcomp, KPDturb, heaters, electric,accumulation):
         Tsg = syngas_streams.loc["Sepout-COMB", "T"]
         Psg = syngas_streams.loc["Sepout-COMB", "P"]
         Hsg = syngas_streams.loc["Sepout-COMB", "H"]
         Gsg = syngas_streams.loc["Sepout-COMB", "G"]
         # print(syngas_streams.loc["Sepout-COMB", "T"])
+        # print(syngas_streams)
 
         RP = prop.init_REFPROP(r"C:\Program Files (x86)\REFPROP")
         air = prop.Materials_prop("Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO",
@@ -563,8 +564,6 @@ class syngas_GTU:
 
         fractions_syngas = SGfrac
         components = list(syngas_streams.columns)[4:]
-        # print(components)
-        # print(fractions_syngas)
 
         Sr_mol_mass_syngas = sum(
             map(lambda x1, x2: molar_mases[x1] * x2, components, fractions_syngas))
@@ -582,25 +581,16 @@ class syngas_GTU:
         Molar_flow_syngas = Gsg/Sr_mol_mass_syngas
         Molar_components_flows_syngas = list(
             map(lambda x: x*Molar_flow_syngas, fractions_syngas))
-        # print(Molar_components_flows_syngas)
-
-        # print(Tsg,Hsg,Psg,fractions_syngas )
-        # print("Sr_mol_mass_syngas",Sr_mol_mass_syngas)
-        # print("Qnr_molar",Qnr_molar)
-        # print("Qnr_mass",Qnr_mass)
-        # кам сгор
-
+        #Writing LHV in accumulation
+        accumulation.at["PKM", "Qnr"] = Qnr_mass/1000
         # сост ух газов
         air_composition = ["N2", "O2", "Ar"]
         air_fraction_composition = [0.78, 0.21, 0.01]
         combsost = "Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO"
-        
-        
         combfrac=syngas_streams.loc['COMB-TURB', 'N2':'CO'] 
         if combfrac[0]==0:
             combfrac = (0.5, 0.2,0.2,
                     0, 0.1, 0, 0, 0)  #первое приближение
-            
 
         max_iterations_gas_turbine = 20
         Gair_tol = 10**-4
@@ -611,6 +601,7 @@ class syngas_GTU:
         # print(Sr_mol_mass_air)
         Molar_composition_exhaust=combfrac
         # print(Molar_composition_exhaust)
+        
 
         for i in range(max_iterations_gas_turbine):
             
@@ -681,28 +672,22 @@ class syngas_GTU:
             Error_Gair = abs((Gair_it[-1]-Gair_it[-2])/Gair_it[-1]*100)
             
             combfrac=Molar_composition_exhaust
+            if Gair<0:
+                print("Расход воздуха меньше 0")
+                print(f"Gsg:{Gsg}, Hsg:{Hsg}, Hcomb:{Hcomb}, Qnr_mass:{Qnr_mass}, Hair2:{Hair2}")
             
             if Error_G > 0.1:
                 print("Не сходится баланс камеры сгорания",G_exhaust_calculated,Gcomb, G_exhaust_calculated- Gcomb)
-                # print(dict(zip(components,Molar_components_flows_syngas)))
-                # print(dict(zip(components,Molar_flow_components_exhaust)))
-                # print(dict(zip(air_composition,Molar_components_flows_air)))
-                # print(sum(Molar_components_flows_syngas),sum(Molar_components_flows_air),sum(Molar_flow_components_exhaust))
-                # print(dict(zip(components,list(map(lambda x1, x2: x1*molar_mases[x2],Molar_components_flows_syngas,components)))))
-                # print(dict(zip(components,list(map(lambda x1, x2: x1*molar_mases[x2],Molar_components_flows_air,air_composition)))))
-                # print(dict(zip(components,list(map(lambda x1, x2: x1*molar_mases[x2],Molar_flow_components_exhaust,components)))))                                     
+                       
             if i == max_iterations_gas_turbine-1:
                 print("Достигнуто максимальное количество итераций расхода воздуха в пиковую ГТУ: ",
                       max_iterations_gas_turbine)
                 print("Gair_it ", Gair_it)
             if Error_Gair < Gair_tol and Error_composition < Gair_tol:
                 print("Рассчитана пиковая ГТУ, расход воздуха:",Gair_it[-1])
-                # print("Gair_it ", Gair_it)
                 break
 
         # Qnr = 23375.32317
-
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         # турб
         Scomb = COMB.p_h(P2, Hcomb)['s']
@@ -710,13 +695,14 @@ class syngas_GTU:
         Hcombex = Hcomb - (Hcomb-Hcombext)*KPDturb
         Tcombex = COMB.p_h(0.1, Hcombex)['T']
 
-        Tex = 70
+        Tex = water_streams.loc['SWIN', 'T']+20
         Hex = COMB.p_t(0.1, Tex)['h']
 
         Ncomp = Gair*(Hair2-Hair1)
         Nturb = Gcomb*(Hcomb - Hcombex)
         Ngtu = Nturb-Ncomp
         Qgtu_ex = Gcomb*(Hcombex-Hex)
+        print(f"Gcomb:{Gcomb}, Hcombex:{Hcombex}, Hex:{Hex}")
 
         syngas_streams.loc['AIR-COMP', 'T':'G'] = [15, 0.1, Hair1, Gair]
         syngas_streams.loc['COMP-COMB', 'T':'G'] = [Tair2, P2, Hair2, Gair]
@@ -836,6 +822,7 @@ class accum:
         SGsost = "Nitrogen*O2*CO2*Ar*H2O*Methane*H2*CO"
         SGmass = syngas_streams.loc['Separacc-Sepout', 'G']  # масса
         SGfrac = list(syngas_streams.loc['Separacc-Sepout', 'N2':'CO'])
+        print(syngas_streams)
 
         SG = prop.Materials_prop(SGsost, SGfrac,
                                  prop.REFPROP_h_s,
@@ -860,10 +847,13 @@ class accum:
         syngas_streams.loc["Sepout-GTU", "G"] = Gsg_GTUmain
         syngas_streams.loc["Sepout-GTU", "N2":"CO"] = SGfrac
         syngas_streams.loc["Sepout-COMB", "N2":"CO"] = SGfrac
+        print(syngas_streams)
 
         Qteplofic = water_streams.loc['SWIN', 'G'] * \
             (water_streams.loc['SWOUT', 'H']-water_streams.loc['SWIN', 'H'])
+        syngas_GTU.calc(water_streams,syngas_streams, 1.2, 0.88, 0.9, heaters, electric,accumulation)
         Qgvto = heaters.loc['SGgtu_Qsw', 'Qw']
+        print("Qgvto:",Qgvto)
         if Qgvto < Qteplofic:
             Gw_pkm = Qgvto / \
                 (water_streams.loc['SWOUT', 'H'] -
@@ -878,7 +868,6 @@ class accum:
             print('Тепла в ГВТО хватает на теплофикацию')
             Teplo = 0
 
-        syngas_GTU.calc(syngas_streams, 1.2, 0.88, 0.9, heaters, electric)
         return {'steamVD_to_turbine': steamVD_to_turbine, 'Teplo': Teplo}
 
     def jdat(self, time_jdat, accumulation, gas_streams, syngas_streams, water_streams, heaters, electric):
@@ -926,9 +915,8 @@ class accum:
             # T_accum = SG.p_h(Psg, H2)['T']
             
             
-        
         for i in range(n_step):
-            poteri = time_jdat_step*3600/1000*3.14*self._H*(self._T_accum-self._T_nar_vozd)/(1/2*self._lambda_min_vata*n.log((self._D+2*self._delta_min_vata)/self._D)+1/(100000*self._D)+1/(20*(self._D+2*self._delta_min_vata)))+ time_jdat_step*3600/1000*2*3.14*self._D**2/4*(self._T_accum-self._T_nar_vozd)/(1/20+1/100000+self._delta_min_vata/self._lambda_min_vata) #kJ
+            poteri = time_jdat_step*3600/1000*3.14*self._H*(T_accum-self._T_nar_vozd)/(1/2*self._lambda_min_vata*n.log((self._D+2*self._delta_min_vata)/self._D)+1/(100000*self._D)+1/(20*(self._D+2*self._delta_min_vata)))+ time_jdat_step*3600/1000*2*3.14*self._D**2/4*(self._T_accum-self._T_nar_vozd)/(1/20+1/100000+self._delta_min_vata/self._lambda_min_vata) #kJ
             H2 = H2 - poteri/(self._V*self._kolichestvo*rosg)
             T_accum = SG.p_h(Psg, H2)['T']
 
