@@ -50,7 +50,7 @@ def ParallelCompute_PKM(air_temperature):
 
     # Параметры, отвечающие за процесс расчета
     Calcmethod = "hybr"
-    Calctolerance = 10**-2
+    Calctolerance = 10**-1
     Maxiterations_KU_TU = 5
     Maxiterations_cotel = 3
     Maxiterations_turbine = 15
@@ -184,7 +184,7 @@ def ParallelCompute_PKM(air_temperature):
 
     n_GTU_it = [0.5]
     Delta_n_GTU = 100
-    coeficient_PGU = 10
+    coeficient_PGU = 13
     if Сalculate_minimum == True:
         gas_streams.loc["GTU-PEVD", "G"] = gas_streams.loc["GTU-KU", "G"]
         n_GTU = GTU_input.at["n", 1]
@@ -277,13 +277,15 @@ def ParallelCompute_PKM(air_temperature):
                 gas_streams = Calculate_CCGT_PKM_iter(
                     arguments_all_it, New_Iter_pkm, pkm_pgu_tol
                 )
-                print(
-                    f"Отклонение от ограничения минимальное равно {Delta_min}")
-                print(f"Относительная мощность ГТУ равна {n_GTU}")
+                
                 print(
                     f"fin минимальная мощность ПГУ:--- {round((time.time() - start_time), 1)} сек. ---"
                 )
+                print(
+                    f"Отклонение от ограничения минимальное равно {Delta_min}")
+                print(f"Относительная мощность ГТУ равна {n_GTU}")                
                 print("n_GTU_it", n_GTU_it)
+                print("air_temperature: ", air_temperature)
                 break
             if i == Max_iterations_minimum - 1:
                 print(
