@@ -245,10 +245,6 @@ class HTS:
                                  prop.REFPROP_s_q,
                                  RP=RP)
         Hin = SG.p_t(Pin, Tin)['h']
-#         Hdt = SG.p_t(Pin,self.Tout)['h']
-#         Qdt = G*(Hin-Hdt)
-#         Qreac = (2701.173347/44.6397313913235)*G
-#         Qhts = Qdt+Qreac
         SGfracnew = (0, 0, 0.0864149892361543, 0, 0.513766606256586,
                      0.0500421238434872, 0.348747199710724, 0.00102908095304842)
         SGnew = prop.Materials_prop(SGsost,
@@ -267,6 +263,7 @@ class HTS:
         self.syngas_streams.loc[self.stream2, 'T':'G'] = [
             self.Tout, Pin, Hout, G]
         self.syngas_streams.loc[self.stream2, 'N2':'CO'] = list(SGfracnew)
+        self.heaters.at['Ref_HTS','Qw'] = Qhts
         return {'Qhts': Qhts, 'Tout': self.Tout, 'Pout': Pin, 'Hout': Hout, 'G': G}
 
 
@@ -480,15 +477,12 @@ class PKM_all:
                               syngas_streams, heaters, 450).calc()
             hts = HTS('COOL-HTS', 'HTS-HTSCOOL',
                       syngas_streams, heaters, 275).calc()
-
             # +HTS_cooler
-            # from PKM import HTS_cooler
             cool = HTS_cooler.calc(
                 'HTS-HTSCOOL', 'HTSCOOL-Separ', syngas_streams, heaters, 100)
             # from PKM import separator
             sep = separator.calc(
                 'HTSCOOL-Separ', 'Separ-SGaccum', syngas_streams, heaters)
-
             Qref_all = heaters.loc["Ref_HTS", "Qw"] + heaters.loc["Ref_cooler",
                                                                   "Qw"] + heaters.loc["Strans_cool", "Qw"]+heaters.loc["HTS_cooler", "Qw"]
             
