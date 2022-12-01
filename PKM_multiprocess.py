@@ -416,7 +416,7 @@ def ParallelCompute_PKM(air_temperature):
     # nametable=[]
     # создаются новые таблицы после каждого расчета
 
-    nametable = "resdataTemp"+str(result['T_air'])+".xlsx"
+    nametable = "resdataTemp"+str(air_temperature)+".xlsx"
 
     with pd.ExcelWriter(nametable) as writer:
         for name,table in result_df.items():
