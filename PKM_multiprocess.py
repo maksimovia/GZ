@@ -284,7 +284,7 @@ def ParallelCompute_PKM(arguments):
                 print("n_GTU_it", n_GTU_it)
                 print("Delta_n_GTU: ", Delta_n_GTU)
                 print("Delta_min: ", Delta_min)
-                print("Temp={air_temperature}, Volume={D}x{H}x{N}", air_temperature)
+                print(f"Temp={air_temperature}, Volume={D}x{H}x{N}", air_temperature)
                 break
             if i == Max_iterations_minimum - 1:
                 print(
