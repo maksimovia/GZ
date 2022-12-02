@@ -354,12 +354,6 @@ def ParallelCompute_PKM(arguments):
     New_Iter_pkm = 20
     pkm_pgu_tol = 10**-2
     gas_streams = Calculate_CCGT_PKM_iter(arguments_all_it, New_Iter_pkm, pkm_pgu_tol)
-    # print(gas_streams)
-    # print(water_streams)
-    # print(syngas_streams)
-    # print(electric)
-    # print(heaters)
-    # print(accumulation)
 
     gas_streams_razryad = gas_streams.copy()
     water_streams_razryad = water_streams.copy()
@@ -385,10 +379,7 @@ def ParallelCompute_PKM(arguments):
         "DK": round(electric.at["DK", "N"], 4),
         "PEN": round(electric.at["PEN", "Ni"], 4),
         "Turbine_Qt": round(heaters.at["SP2", "Qw"]+heaters.at["SP1", "Qw"]+heaters.at["OD", "Qw"], 4),
-        # "PKM_Qt": round(accumulation.at["ASW", "Qw"]/(vremya*3600), 4),
-        # "Delta_P_Diafragma":round(water_streams.at["DOOTB1", "P"]-water_streams.at["INCND", "P"],4),
         "INKOND": round(water_streams.at["INKOND", "G"], 4),
-        # "Calculate_minimum": Сalculate_minimum,
         "Delta_P_Diafragma": round(Delta_P_Diafragma, 4),
         "T_accum": round(accumulation.at["PKM", "T"], 4),
         "time to calc":time_all}
