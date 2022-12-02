@@ -200,7 +200,7 @@ def ParallelCompute_PKM(arguments):
                     New_iterations_turbine,
                     New_Iter_pkm,
                     New_coeficient_PGU
-                ) = (2, 2, 15, 4, 5)
+                ) = (2, 2, 15, 4, 7)
             else:
                 # print("Delta_n_GTU: ", Delta_n_GTU)
                 (
