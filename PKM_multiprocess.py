@@ -278,6 +278,8 @@ def ParallelCompute_PKM(air_temperature,constr={"Diametr": 10,"kolichestvo": 8,"
                     f"Отклонение от ограничения минимальное равно {Delta_min}")
                 print(f"Относительная мощность ГТУ равна {n_GTU}")                
                 print("n_GTU_it", n_GTU_it)
+                print("Delta_n_GTU: ", Delta_n_GTU)
+                print("Delta_min: ", Delta_min)
                 print("air_temperature: ", air_temperature)
                 break
             if i == Max_iterations_minimum - 1:
@@ -413,7 +415,7 @@ def ParallelCompute_PKM(air_temperature,constr={"Diametr": 10,"kolichestvo": 8,"
     N=constr["kolichestvo"]
     
 
-    nametable = f"resdata PKM Temp: {air_temperature}, Volume: {D}x{H}x{N}.xlsx"
+    nametable = f"resdata PKM Temp={air_temperature}, Volume={D}x{H}x{N}.xlsx"
 
     with pd.ExcelWriter(nametable) as writer:
         for name,table in result_df.items():
