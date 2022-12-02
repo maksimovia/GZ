@@ -1,6 +1,7 @@
 # Импорт библиотек
 
-def ParallelCompute_PKM(air_temperature,constr={"Diametr": 10,"kolichestvo": 8,"Visota": 15,"lambda_min_vata": 0.045,"delta_min_vata":0.01,}):
+def ParallelCompute_PKM(arguments):
+    air_temperature, constr = arguments
     import os
     import time
     import GTU
