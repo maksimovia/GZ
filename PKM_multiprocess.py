@@ -2,6 +2,9 @@
 
 def ParallelCompute_PKM(arguments):
     air_temperature, constr = arguments
+    D=constr["Diametr"]
+    H=constr["Visota"]
+    N=constr["kolichestvo"]
     import os
     import time
     import GTU
@@ -281,7 +284,7 @@ def ParallelCompute_PKM(arguments):
                 print("n_GTU_it", n_GTU_it)
                 print("Delta_n_GTU: ", Delta_n_GTU)
                 print("Delta_min: ", Delta_min)
-                print("air_temperature: ", air_temperature)
+                print("Temp={air_temperature}, Volume={D}x{H}x{N}", air_temperature)
                 break
             if i == Max_iterations_minimum - 1:
                 print(
@@ -370,7 +373,7 @@ def ParallelCompute_PKM(arguments):
     Delta_P_Diafragma=Potb2_teplof-Potb2_turb
     
     time_all=time.time() -start_time_all
-    print(f"Расчет окончен для температуры {air_temperature}:--- {round((time_all), 1)} сек. ---")
+    print(f"Расчет окончен для Temp={air_temperature}, Volume={D}x{H}x{N}:--- {round((time_all), 1)} сек. ---")
 
     result_all={
         "T_air": round(air_temperature, 2),
@@ -405,16 +408,6 @@ def ParallelCompute_PKM(arguments):
         "accumulation_razryad":    accumulation_razryad,
         "GTU_input_razryad":GTU_input_razryad
     }
-  
-    
-    # df = pd.DataFrame(result)
-    # df = df
-    # nametable=[]
-    # создаются новые таблицы после каждого расчета
-    D=constr["Diametr"]
-    H=constr["Visota"]
-    N=constr["kolichestvo"]
-    
 
     nametable = f"resdata PKM Temp={air_temperature}, Volume={D}x{H}x{N}.xlsx"
 
