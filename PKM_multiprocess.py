@@ -1,6 +1,6 @@
 # Импорт библиотек
 
-def ParallelCompute_PKM(air_temperature,constr):
+def ParallelCompute_PKM(air_temperature,constr={"Diametr": 10,"kolichestvo": 8,"Visota": 15,"lambda_min_vata": 0.045,"delta_min_vata":0.01,}):
     import os
     import time
     import GTU
@@ -54,7 +54,7 @@ def ParallelCompute_PKM(air_temperature,constr):
     Maxiterations_KU_TU = 5
     Maxiterations_cotel = 3
     Maxiterations_turbine = 15
-    Iter_pkm = 8
+    Iter_pkm = 6
 
     # Параметры режима работы ПГУ
     # Расчет для минимума нагрузки
