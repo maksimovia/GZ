@@ -350,7 +350,7 @@ def ParallelCompute_PKM(arguments):
     ]
     New_Iter_pkm = 20
     pkm_pgu_tol = 10**-2
-    CCGT = Calculate_CCGT_PKM_iter(arguments_all_it, New_Iter_pkm, pkm_pgu_tol)
+    gas_streams = Calculate_CCGT_PKM_iter(arguments_all_it, New_Iter_pkm, pkm_pgu_tol)
     # print(gas_streams)
     # print(water_streams)
     # print(syngas_streams)
