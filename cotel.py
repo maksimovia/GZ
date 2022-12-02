@@ -83,7 +83,7 @@ class heatex:
                 Q = G1*(H11-H12)*self.KPD
                 H22 = H21 + (Q/G2)
                 if H22<0:
-                    print("Энтальпия внутри ПЕНД стала меньше 0: ", H22)
+                    print("Энтальпия внутри ПЕ стала меньше 0: ", H22)
                     t_opa=T11-1
                     H22=self.water.p_t(P22, t_opa)['h']
                 T22 = self.water.p_h(P22, H22)['T']
@@ -102,7 +102,7 @@ class heatex:
                 
                 if lambda1av<0:
                     print("lambda1av",lambda1av,"Pr1av",Pr1av,"G1",G1,"nu1av",nu1av,"ro1av",ro1av,"P1",P1, "T1av",T1av)
-                    print(f"Используем параметры из номинального режима: lambda01av: {self.lambda01av}, Pr01av: {self.Pr01av}, ro01av: {self.ro01av}, nu01av: {self.nu01av}, gas: {gas}")
+                    print(f"Используем параметры из номинального режима: lambda01av: {self.lambda01av}, Pr01av: {self.Pr01av}, ro01av: {self.ro01av}, nu01av: {self.nu01av}, gas: {self.gas}")
                     kk = (self.lambda01av/self.lambda01av)*((self.Pr01av/self.Pr01av)**0.33) * \
                     (((self.G01/G1)*(self.ro01av/self.ro01av)*(self.nu01av/self.nu01av))**0.685)
                 else:

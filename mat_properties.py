@@ -47,16 +47,16 @@ def REFPROP_p_t(p, t, gas,fraction, RP):
     res['cv'] = prop.Output[3]
     res['cp'] = prop.Output[4]
     fraction_local=list(fraction)
-    if fraction_local[3]>0.05 and fraction_local[0]>0.5:
-        fraction_local[2]=fraction_local[2]+fraction_local[3]-0.05
-        fraction_local[3]=0.05
+    if fraction_local[3]>0.04 and fraction_local[0]>0.5:
+        fraction_local[2]=fraction_local[2]+fraction_local[3]-0.04
+        fraction_local[3]=0.04
     prop1 = RP.REFPROPdll(gas, 'PT', 'H;S;D;CV;CP;KV;Prandtl;TCX;VIS;Qmass', 21, 0, 0, p, t, fraction_local)
     res['nu'] = prop1.Output[5] / 100
     res['Prandtl'] = prop1.Output[6] 
     res['L'] = prop1.Output[7]
     res['Q'] = prop1.Output[9]
     if res['h']<0 and fraction_local[0]>0.5 and gas.split("*")[0]=='Nitrogen':
-        # print("Ошибка в расчете по p и t")
+        print("Ошибка в расчете по p и t")
         if fraction[0]==1:
             res['rho'] = CP.PropsSI('D','P', p,'T',t,gas)
             res['h'] = CP.PropsSI('H','P', p,'T',t,gas)/1000
@@ -86,12 +86,12 @@ def REFPROP_p_h(p, h, gas,fraction, RP):
         res['cv'] = prop.Output[3]
         res['cp'] = prop.Output[4]
         k = prop.Output[5]
-        res['q']  = prop.Output[6]
         fraction_local=list(fraction)
-        if fraction_local[3]>0.05:
-            fraction_local[2]=fraction_local[2]+fraction_local[3]-0.05
-            fraction_local[3]=0.05
+        if fraction_local[3]>0.04:
+            fraction_local[2]=fraction_local[2]+fraction_local[3]-0.04
+            fraction_local[3]=0.04
         prop1 = RP.REFPROPdll(gas, 'PH', 'T;S;D;CV;CP;KV;Prandtl;TCX;VIS;Qmass', 21, 0, 0, p, h, fraction_local)
+        res['q']  = prop1.Output[6]
         res['nu'] = prop1.Output[5] / 100
         res['Prandtl'] = prop1.Output[6] 
         res['L'] = prop1.Output[7] 
