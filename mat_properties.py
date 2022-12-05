@@ -57,6 +57,7 @@ def REFPROP_p_t(p, t, gas,fraction, RP):
     res['Q'] = prop1.Output[9]
     if res['h']<0 and fraction_local[0]>0.5 and gas.split("*")[0]=='Nitrogen':
         print(f"Ошибка в расчете по p: {p} и t : {t}, gas: {gas},fraction: {fraction}")
+        print("ERRMSGdll: ",RP.ERRMSGdll(1))
         if fraction[0]==1:
             res['rho'] = CP.PropsSI('D','P', p,'T',t,gas)
             res['h'] = CP.PropsSI('H','P', p,'T',t,gas)/1000
@@ -64,6 +65,7 @@ def REFPROP_p_t(p, t, gas,fraction, RP):
         if fraction[0]<1:
             fraction_local[2]=fraction_local[2]+fraction_local[3]-0.01
             fraction_local[3]=0.01
+            print("ERRMSGdll: ",RP.ERRMSGdll(1))
             RP.FLAGSdll("Reset all",1)
             print("Reseted ALL RFPROP")
             print("Peng-Robinson: ",RP.PREOSdll(3))
@@ -116,6 +118,7 @@ def REFPROP_p_h(p, h, gas,fraction, RP):
         res['Q'] = prop1.Output[9]
     if res['T']< -999 or res['s']<-1000:
         print("Ошибка в расчете по p и h")
+        print("ERRMSGdll: ",RP.ERRMSGdll(1))
         # print(f"p: {p}, q: {q}, gas: {gas},fraction: {fraction}, RP: {RP}")
         if fraction[0]==1:
             print( "Переход на расчет по p и h по Coolprop")
@@ -145,6 +148,7 @@ def REFPROP_p_s(p, s, gas,fraction, RP):
     res['Q'] = prop1.Output[9]
     if res['h']<0:
         print("Ошибка в расчете по p и s, переход на расчет по Coolprop")
+        print("ERRMSGdll: ",RP.ERRMSGdll(1))
         # print(f"p: {p}, q: {q}, gas: {gas},fraction: {fraction}, RP: {RP}")
         res['T'] = CP.PropsSI('T','P', p,'S',s,gas)-273.15
         res['rho'] = CP.PropsSI('D','P', p,'S',s,gas)
@@ -162,6 +166,7 @@ def REFPROP_p_q(p, q, gas,fraction, RP):
     res['s'] = prop.Output[3]/1000
     if res['h']<0:
         print("Ошибка в расчете по p и q, переход на расчет по Coolprop")
+        print("ERRMSGdll: ",RP.ERRMSGdll(1))
         # print(f"p: {p}, q: {q}, gas: {gas},fraction: {fraction}, RP: {RP}")
         res['T'] = CP.PropsSI('T','P', p,'Q',q,gas)-273.15
         res['rho'] = CP.PropsSI('D','P', p,'Q',q,gas)
