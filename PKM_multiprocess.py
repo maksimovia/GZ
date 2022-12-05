@@ -181,18 +181,16 @@ def ParallelCompute_PKM(arguments):
 
     n_GTU_it = [0.5]
     Delta_n_GTU = 100
-    coeficient_PGU = 9
+    coeficient_PGU = 11
     if Сalculate_minimum == True:
         gas_streams.loc["GTU-PEVD", "G"] = gas_streams.loc["GTU-KU", "G"]
         n_GTU = GTU_input.at["n", 1]
         start_time = time.time()
         Delta_min = 0
         n_GTU_it.append(round(n_GTU, 5))
+        print("n_GTU:", n_GTU_it)
         for i in range(Max_iterations_minimum):
-            print("n_GTU:", n_GTU_it)
-            print("Delta_n_GTU: ", Delta_n_GTU)
-            print("Delta_min: ", Delta_min)
-            print("air_temperature: ", air_temperature)
+
             if i<3 :#Delta_n_GTU > 1 :
                 (
                     New_iterations_KU_TU,
@@ -259,6 +257,10 @@ def ParallelCompute_PKM(arguments):
             print(
                 f"Время {i+1} итерации расчета мощности ГТУ при ПГУ с ПКМ: --- {round((time.time() - start_time), 1)} сек. ---"
             )
+            print("n_GTU:", n_GTU_it)
+            print("Delta_n_GTU: ", Delta_n_GTU)
+            print("Delta_min: ", Delta_min)
+            print("air_temperature: ", air_temperature)
             # print(f"Отклонение от ограничения минимальное равно {Delta_min}")
 
             if n_GTU == 1 and Delta_min < 0:
