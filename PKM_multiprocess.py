@@ -171,7 +171,7 @@ def ParallelCompute_PKM(arguments):
     # Gнд_мин = 50% от номинала
 
     ########РАСЧЕТ расхода пара на ПКМ из условия заполнения хранилища################
-    ########РАСЧЕТ мощности ГТУ из условия тепловой мощности и ################
+    ########РАСЧЕТ мощности ГТУ из условия ограничений################
 
     ################Расчет минимальной нагрузки ГТУ при остальных нормальных условиях############
 
@@ -311,15 +311,6 @@ def ParallelCompute_PKM(arguments):
     Maxiterations_cotel = 5
     Maxiterations_turbine = 20
     
-    
-    # gas_streams0 = pd.read_excel(
-    #     "streams0.xlsx", sheet_name="gas", index_col=0)
-    # gas_streams = pd.read_excel("streams.xlsx", sheet_name="gas", index_col=0)
-    # fractiongas0 = list(gas_streams0.loc["GTU-PEVD", "N2":"Ar"])
-    # # Задание энтальпий газа в номинальном режиме
-    # gas_streams0.loc["GTU-KU":"GPK-out", "H"] = list(
-    #     map(lambda x: gas0.p_t(Pressure, x)["h"], Temperatures))
-
     n_GTU = 1
     GTU_input.at["n", 1] = n_GTU
 
@@ -385,6 +376,7 @@ def ParallelCompute_PKM(arguments):
         "Delta_P_Diafragma": round(Delta_P_Diafragma, 4),
         "T_accum": round(accumulation.at["PKM", "T"], 4),
         "time to calc":time_all}
+    
     result_df = {
         "gas_streams_zaryad": gas_streams_zaryad,
         "water_streams_zaryad": water_streams_zaryad,
@@ -407,22 +399,5 @@ def ParallelCompute_PKM(arguments):
     with pd.ExcelWriter(nametable) as writer:
         for name,table in result_df.items():
             table.to_excel(writer,sheet_name=name)
-        
-        
-        # df.to_excel(writer, sheet_name="all_result", index=False)
-        # dfgas_streams_zaryad.to_excel(writer, sheet_name="gas_streams_zaryad")
-        # dfwater_streams_zaryad.to_excel(writer, sheet_name="water_streams_zaryad")
-        # dfsyngas_streams_zaryad.to_excel(writer, sheet_name="syngas_streams_zaryad")
-        # dfelectric_zaryad.to_excel(writer, sheet_name="electric_zaryad")
-        # dfheaters_zaryad.to_excel(writer, sheet_name="heaters_zaryad")
-        # dfaccumulation_zaryad.to_excel(writer, sheet_name="accumulation_zaryad")
-        # dfGTU_input_zaryad.to_excel(writer, sheet_name="accumulation_zaryad")
-        # dfgas_streams_razryad.to_excel(writer, sheet_name="gas_streams_razryad")
-        # dfwater_streams_razryad.to_excel(writer, sheet_name="water_streams_razryad")
-        # dfsyngas_streams_razryad.to_excel(writer, sheet_name="syngas_streams_razryad")
-        # dfelectric_razryad.to_excel(writer, sheet_name="electric_razryad")
-        # dfheaters_razryad.to_excel(writer, sheet_name="heaters_razryad")
-        # dfaccumulation_razryad.to_excel(writer, sheet_name="accumulation_razryad")
-    
     
     return result_all
