@@ -181,7 +181,7 @@ def ParallelCompute_PKM(arguments):
 
     n_GTU_it = [0.5]
     Delta_n_GTU = 100
-    coeficient_PGU = 25
+    coeficient_PGU = 10
     if Сalculate_minimum == True:
         gas_streams.loc["GTU-PEVD", "G"] = gas_streams.loc["GTU-KU", "G"]
         n_GTU = GTU_input.at["n", 1]
@@ -267,7 +267,7 @@ def ParallelCompute_PKM(arguments):
                 print("Мощность ГТУ 100% и расход пара все еще слишком мал")
 
             # if abs(Delta_min) < Calctolerance and Delta_n_GTU < Calctolerance:
-            if abs(Delta_min) < Calctolerance:
+            if abs(Delta_min) < Calctolerance*10:
                 arguments_all_it[0], arguments_all_it[1], arguments_all_it[2] = (
                     Maxiterations_KU_TU,
                     Maxiterations_cotel,
