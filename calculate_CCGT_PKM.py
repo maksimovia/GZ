@@ -52,7 +52,8 @@ def calculate_CCGT_PKM(arguments_all):
         Accumulator = Accum.razryad(time_ac, accumulation, gas_streams,
                                     syngas_streams, water_streams, water_streams0, heaters, electric)
         Teplo = Accumulator['Teplo']
-        steamVD_to_turbine = Accumulator['steamVD_to_turbine']
+        steamVD_to_turbine = 0
+        steamVD_fraction_to_turbine=1
 
     else:
         gas_streams.loc["GTU-PEVD",
