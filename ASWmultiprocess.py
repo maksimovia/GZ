@@ -35,17 +35,7 @@ def ParallelCompute(args):
     accumulation = pd.read_excel(
         "blocks.xlsx", sheet_name="accumulation", index_col=0)
     ############################################################
-    # Теплосеть и перекидка температуры воздуха
-    gas_streams.loc["AIR", "T":"P"] = [GTU_input.loc["tair", 1], 0.1]
-    water_streams.loc["AIR", "T":"P"] = [GTU_input.loc["tair", 1], 0.1]
-    Tnv = gas_streams.at["AIR", "T"]
-    water_streams.at["SWIN", "T"] = SP.Tset(Tnv)[1]
-    water_streams.at["SWOUT", "T"] = SP.Tset(Tnv)[0]
-    water_streams.at["SWIN-TURB", "T"] = water_streams.at["SWIN", "T"]
-    water_streams.at["SWIN-TURB", "G"] = water_streams.at["SWIN", "G"]
-    water_streams.at["SP2-WOUT", "T"] = water_streams.at["SWOUT", "T"]
-    water_streams.at["SWIN-TURB", "H"] = water.p_t(1, SP.Tset(Tnv)[1])['h']
-    water_streams.at["SP2-WOUT", "H"] = water.p_t(1, SP.Tset(Tnv)[0])['h']
+   
     ############################################################
     # Состав газов в номинале в ГТУ
     gasmix = "Nitrogen*Oxygen*CO2*Water*Argon"
@@ -80,6 +70,18 @@ def ParallelCompute(args):
     )
 
     #####################
+     # Теплосеть и перекидка температуры воздуха
+    gas_streams.loc["AIR", "T":"P"] = [GTU_input.loc["tair", 1], 0.1]
+    water_streams.loc["AIR", "T":"P"] = [GTU_input.loc["tair", 1], 0.1]
+    Tnv = gas_streams.at["AIR", "T"]
+    water_streams.at["SWIN", "T"] = SP.Tset(Tnv)[1]
+    water_streams.at["SWOUT", "T"] = SP.Tset(Tnv)[0]
+    water_streams.at["SWIN-TURB", "T"] = water_streams.at["SWIN", "T"]
+    water_streams.at["SWIN-TURB", "G"] = water_streams.at["SWIN", "G"]
+    water_streams.at["SP2-WOUT", "T"] = water_streams.at["SWOUT", "T"]
+    water_streams.at["SWIN-TURB", "H"] = water.p_t(1, SP.Tset(Tnv)[1])['h']
+    water_streams.at["SP2-WOUT", "H"] = water.p_t(1, SP.Tset(Tnv)[0])['h']
+    
     ######Максимов#######
     fractionwaterMethane = (0.833372660622383, 0.166627339377617, 0, 0, 0)
     waterMethanemix = "Water*METHANE"
