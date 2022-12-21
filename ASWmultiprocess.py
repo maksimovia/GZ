@@ -44,6 +44,8 @@ def ParallelCompute(args):
     water_streams.at["SWIN-TURB", "T"] = water_streams.at["SWIN", "T"]
     water_streams.at["SWIN-TURB", "G"] = water_streams.at["SWIN", "G"]
     water_streams.at["SP2-WOUT", "T"] = water_streams.at["SWOUT", "T"]
+    water_streams.at["SWIN-TURB", "H"] = water.p_t(1, SP.Tset(Tnv)[1])['h']
+    water_streams.at["SP2-WOUT", "H"] = water.p_t(1, SP.Tset(Tnv)[0])['h']
     ############################################################
     # Состав газов в номинале в ГТУ
     gasmix = "Nitrogen*Oxygen*CO2*Water*Argon"
