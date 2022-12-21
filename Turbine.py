@@ -172,7 +172,7 @@ class turbine:
         state0 = self.water.p_h(pin, Hin)
         s0 = state0["s"]
         if s0<0:
-            print(f"Энтропия меньше нуля pin: {pin}, Hin: {Hin}, pout: {pout}, Hout: {Hout}")
+            print(f"Энтропия меньше нуля pin: {pin}, Hin: {Hin}, pout: {pout}, Hout: {Hout}, G1: {G1}")
         x0 = state0["Q"]
         Hteor_vl = self.water.s_q(s0, 1)['h']
         Hteor_out = self.water.p_s(pout, s0)['h']
