@@ -528,7 +528,7 @@ class cotel_all:
 
             else:
                 calctolerance_new=calctolerance
-            # Связвка высокого давления
+            # Связка высокого давления
             for j in range(it):
 
                 # Расчёт ПЕВД
